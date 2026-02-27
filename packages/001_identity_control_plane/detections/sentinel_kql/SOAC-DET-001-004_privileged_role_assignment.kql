@@ -1,0 +1,18 @@
+// ---
+// id: SOAC-DET-001-004
+// name: Privileged Role Assignment Activity
+// platform: sentinel_kql
+// mitre_attack: T1098
+// severity: High
+// data_sources: AuditLogs
+// ---
+
+let timeframe = 7d;
+let privilegedRoles = dynamic(["Global Administrator","Privileged Role Administrator","Security Administrator","Exchange Administrator","Cloud Application Administrator","Application Administrator","Authentication Administrator","Privileged Authentication Administrator"]);
+AuditLogs
+| where TimeGenerated > ago(timeframe)
+| where OperationName has_any ("Add member to role","Add eligible member to role","Add member to directory role")
+| extend RoleName = tostring(TargetResources[0].displayName)
+| where RoleName in~ (privilegedRoles)
+| project TimeGenerated, OperationName, RoleName, InitiatedBy=tostring(InitiatedBy.user.userPrincipalName), Target=tostring(TargetResources[1].displayName), Result, CorrelationId
+| extend AlertReason = "Privileged role assignment detected"

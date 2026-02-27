@@ -1,0 +1,22 @@
+# Entra Conditional Access Baseline (guidance)
+
+policies:
+  - name: Require MFA for all users (exclude break-glass)
+    rollout: report-only-then-enforce
+    controls: [mfa]
+
+  - name: Block legacy authentication
+    rollout: enforce
+    controls: [block]
+
+  - name: Require compliant device for privileged roles
+    rollout: report-only-then-enforce
+    scope:
+      include: [privileged_roles]
+    controls: [require_compliant_device, mfa]
+
+  - name: Step-up auth for risky sign-ins
+    rollout: enforce
+    conditions:
+      risk_levels: [medium, high]
+    controls: [mfa, require_password_change]

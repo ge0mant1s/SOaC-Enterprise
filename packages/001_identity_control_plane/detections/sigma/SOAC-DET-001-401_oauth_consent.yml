@@ -1,0 +1,29 @@
+title: OAuth Consent or Service Principal Change
+id: SOAC-DET-001-401
+status: experimental
+description: Detects OAuth consent and service principal changes; review for consent phishing/malicious app persistence.
+author: SOaC Community
+date: 2026/02/27
+logsource:
+  product: azure
+  service: auditlogs
+level: high
+tags:
+  - attack.t1528
+  - soac.identity
+
+detection:
+  selection:
+    OperationName|contains:
+      - "Consent to application"
+      - "Add service principal"
+      - "Add app role assignment"
+      - "Update application"
+  condition: selection
+falsepositives:
+  - Legitimate app onboarding
+fields:
+  - TimeGenerated
+  - OperationName
+  - InitiatedBy
+  - TargetResources

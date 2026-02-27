@@ -1,0 +1,15 @@
+# ---
+# id: SOAC-DET-001-301
+# name: Entra MFA Fatigue / Push Bombing
+# platform: splunk_spl
+# mitre_attack: T1621
+# severity: High
+# ---
+
+index=o365 sourcetype="azure:ad:signin"
+| eval user=coalesce(userPrincipalName, UserPrincipalName)
+| search ResultType IN (50074,50076,50079,50126)
+| bucket _time span=5m
+| stats count as mfa_events values(appDisplayName) as apps values(ipAddress) as ips values(userAgent) as uas by user _time
+| where mfa_events>=8
+| eval AlertReason="Possible MFA fatigue / push bombing"

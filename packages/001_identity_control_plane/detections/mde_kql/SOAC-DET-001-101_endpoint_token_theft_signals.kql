@@ -1,0 +1,14 @@
+// ---
+// id: SOAC-DET-001-101
+// name: Endpoint signals consistent with token/credential theft (browser store access)
+// platform: mde_kql
+// mitre_attack: T1550
+// severity: Medium
+// ---
+
+let timeframe = 7d;
+DeviceProcessEvents
+| where Timestamp > ago(timeframe)
+| where FileName in~ ("rundll32.exe","powershell.exe","cmd.exe","wscript.exe","cscript.exe")
+| where ProcessCommandLine has_any ("Login Data","Web Data","Cookies","Local State")
+| project Timestamp, DeviceName, AccountName, FileName, ProcessCommandLine, InitiatingProcessFileName

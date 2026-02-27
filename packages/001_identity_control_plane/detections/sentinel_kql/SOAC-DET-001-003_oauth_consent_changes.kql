@@ -1,0 +1,17 @@
+// ---
+// id: SOAC-DET-001-003
+// name: OAuth Consent / Service Principal Change (Review)
+// platform: sentinel_kql
+// mitre_attack: T1528
+// severity: High
+// data_sources: AuditLogs
+// ---
+
+let timeframe = 7d;
+AuditLogs
+| where TimeGenerated > ago(timeframe)
+| where OperationName has_any ("Consent to application","Add service principal","Add app role assignment","Update application")
+| extend InitiatedByUPN = tostring(InitiatedBy.user.userPrincipalName)
+| extend TargetApp = tostring(TargetResources[0].displayName)
+| project TimeGenerated, OperationName, InitiatedByUPN, TargetApp, Result, CorrelationId
+| extend AlertReason = "OAuth consent / service principal change: validate legitimacy"

@@ -1,0 +1,11 @@
+# ---
+# id: SOAC-DET-001-201
+# name: Suspicious browser credential store access
+# platform: crowdstrike_logscale
+# mitre_attack: T1552
+# severity: Medium
+# ---
+
+# Adapt fields to your Falcon event schema.
+ProcessName in ["powershell.exe","cmd.exe","rundll32.exe","wscript.exe","cscript.exe"]
+| groupBy([ComputerName, UserName, ProcessName], function=[count()])

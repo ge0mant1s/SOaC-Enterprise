@@ -1,0 +1,28 @@
+package:
+  id: SOAC-PKG-001
+  name: Identity Control Plane Defense
+  version: 1.0.0
+  status: public
+  maintainer: community
+  scope:
+    - m365
+    - entra_id
+    - endpoint
+    - aws
+    - google_workspace
+  tags:
+    - identity
+    - token-theft
+    - oauth
+    - mfa-fatigue
+    - impossible-travel
+    - persistence
+  assumptions:
+    - Entra ID sign-in logs are ingested into SIEM.
+    - Endpoint telemetry available via MDE and/or CrowdStrike and/or Wazuh.
+    - Organization uses MFA and Conditional Access.
+  autonomy_tiers:
+    tier0: observe
+    tier1: constrain
+    tier2: contain
+    tier3: recover
