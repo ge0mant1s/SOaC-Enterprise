@@ -34,3 +34,9 @@ This package operationalizes:
 - Detection of abnormal export within 5 minutes
 - Token abuse detected within first API burst
 - SaaS session revocation < 10 minutes for high confidence cases
+
+This package includes an optional Claude reasoning layer under `brain/claude/`.
+Use it to generate evidence-backed containment recommendations and executive summaries.
+
+- Package ID: SOAC-PKG-003
+- Package Version: 1.1.0
