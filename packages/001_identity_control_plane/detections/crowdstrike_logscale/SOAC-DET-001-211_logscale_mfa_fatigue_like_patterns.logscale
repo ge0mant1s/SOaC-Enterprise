@@ -1,0 +1,13 @@
+# ---
+# id: SOAC-DET-001-211
+# name: MFA fatigue-like patterns (identity provider events) 
+# platform: crowdstrike_logscale
+# severity: High
+# ---
+
+# NOTE: Requires IdP events in LogScale (via Falcon LogScale connectors).
+# Adapt fields: user, result, eventType, ip, userAgent.
+
+(eventType=/signin|auth|mfa/i)
+| groupBy([user], function=[count(as=mfa_events), collect(ip, limit=10), collect(userAgent, limit=5)])
+| where mfa_events >= 8

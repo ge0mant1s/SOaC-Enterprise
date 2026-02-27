@@ -1,0 +1,11 @@
+# ---
+# id: SOAC-DET-001-231
+# name: EntraAWS pivot signals (AssumeRole bursts / unusual UA)
+# platform: crowdstrike_logscale
+# severity: Medium
+# ---
+
+# If CloudTrail is routed to LogScale:
+EventName in ["AssumeRole","AssumeRoleWithSAML","AssumeRoleWithWebIdentity"]
+| groupBy([UserIdentityArn], function=[count(as=cnt), collect(SourceIpAddress, limit=10), collect(UserAgent, limit=5)])
+| where cnt >= 20

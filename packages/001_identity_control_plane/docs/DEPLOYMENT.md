@@ -1,13 +1,24 @@
-# Deployment Guide — Package 001
+# Deployment Guide  Package 001 (v1.1)
+
+## Golden platforms
+- Microsoft Sentinel for analytics + correlation
+- CrowdStrike Falcon LogScale for high-scale hunting
 
 ## Minimum telemetry
 - Entra: Sign-in logs + Audit logs
-- Endpoint: MDE and/or CrowdStrike and/or Wazuh
-- Optional: AWS CloudTrail (if Entra SSO into AWS)
+- Endpoint: Falcon process telemetry and/or MDE
+- Cloud: AWS CloudTrail (recommended)
+- SaaS: Google Workspace / Salesforce / SAP logs where available (schema varies)
 
 ## Steps
 1. Enable and ingest logs
-2. Import detections
-3. Apply CA policies in report-only
-4. Run simulations
-5. Enable Tier 1 automation, then Tier 2
+2. Import Sentinel analytics rules (including `SOAC-CORR-001-001`)
+3. Import LogScale queries and adapt schema mappings
+4. Roll out CA baseline in report-only  enforce
+5. Run simulations
+6. Enable Tier 1 actions; define Tier 2 approvals
+
+## Tuning
+- Thresholds are starting points: tune per environment
+- Maintain allowlists for automation IPs/UAs
+- Use correlation scoring to reduce false positives

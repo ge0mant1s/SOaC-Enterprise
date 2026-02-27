@@ -1,0 +1,17 @@
+// ---
+// id: SOAC-HUNT-001-011
+// name: EntraAWS pivot hunting  unusual AssumeRole bursts / new principal
+// platform: sentinel_kql
+// severity: Medium
+// ---
+
+// NOTE: Adapt table name depending on your connector (AWSCloudTrail, AWSCloudTrailEvents, etc.)
+let timeframe = 7d;
+AWSCloudTrail
+| where TimeGenerated > ago(timeframe)
+| where EventName in ("AssumeRole","AssumeRoleWithSAML","AssumeRoleWithWebIdentity")
+| summarize cnt=count(), first=min(TimeGenerated), last=max(TimeGenerated),
+          srcIPs=make_set(SourceIpAddress, 10), uas=make_set(UserAgent, 5)
+  by UserIdentityArn, EventName
+| where cnt >= 20
+| extend AlertReason = "Possible automated role assumption or pivot activity; correlate with Entra sign-ins"
