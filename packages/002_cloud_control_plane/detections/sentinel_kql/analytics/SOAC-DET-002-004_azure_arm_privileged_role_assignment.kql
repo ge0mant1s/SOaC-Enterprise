@@ -1,0 +1,16 @@
+// ---
+// id: SOAC-DET-002-004
+// name: Azure ARM Privileged Role Assignment (Owner / Contributor / UAA)
+// platform: sentinel_kql
+// mitre_attack: T1098
+// severity: High
+// ---
+
+let timeframe = 24h;
+AzureActivity
+| where TimeGenerated > ago(timeframe)
+| where OperationNameValue == "microsoft.authorization/roleassignments/write"
+| where ActivityStatusValue == "Success"
+| extend RoleDefinitionId = tostring(parse_json(Properties).requestbody)
+| project TimeGenerated, Caller, CallerIpAddress, ResourceGroup, _ResourceId, RoleDefinitionId, CorrelationId
+| extend AlertReason = "Azure ARM role assignment: validate against change ticket"

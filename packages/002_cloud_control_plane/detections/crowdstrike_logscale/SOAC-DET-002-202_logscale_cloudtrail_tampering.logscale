@@ -1,0 +1,10 @@
+# ---
+# id: SOAC-DET-002-202
+# name: AWS CloudTrail Logging Tampering (LogScale)
+# platform: crowdstrike_logscale
+# mitre_attack: T1562.008
+# severity: Critical
+# ---
+
+EventName in ["StopLogging","DeleteTrail","UpdateTrail","PutEventSelectors","DeleteFlowLogs"]
+| groupBy([UserIdentityArn, SourceIpAddress], function=[count(as=event_count), collect(EventName, limit=5)])

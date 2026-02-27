@@ -1,0 +1,29 @@
+title: AWS CloudTrail Logging Stopped or Deleted
+id: SOAC-DET-002-401
+status: stable
+description: Detects CloudTrail logging being stopped or deleted, a key defense evasion technique.
+author: SOaC Community
+date: 2026/02/27
+logsource:
+  product: aws
+  service: cloudtrail
+level: critical
+tags:
+  - attack.t1562.008
+  - soac.cloud-control-plane
+
+detection:
+  selection:
+    eventName:
+      - StopLogging
+      - DeleteTrail
+      - UpdateTrail
+  condition: selection
+falsepositives:
+  - Authorized infrastructure changes (validate against change ticket)
+fields:
+  - eventTime
+  - eventName
+  - userIdentity.arn
+  - sourceIPAddress
+  - userAgent

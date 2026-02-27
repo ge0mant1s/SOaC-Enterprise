@@ -1,0 +1,17 @@
+// ---
+// id: SOAC-HUNT-002-011
+// name: AWS API Enumeration / Discovery Burst
+// platform: sentinel_kql
+// mitre_attack: T1580, T1619
+// severity: Medium
+// ---
+
+let timeframe = 1h;
+let threshold = 50;
+AWSCloudTrail
+| where TimeGenerated > ago(timeframe)
+| where EventName startswith "Describe" or EventName startswith "List" or EventName startswith "Get"
+| summarize ApiCalls=count(), APIs=make_set(EventName, 20), Regions=make_set(AWSRegion, 5)
+  by UserIdentityArn, SourceIpAddress, UserAgent, bin(TimeGenerated, 10m)
+| where ApiCalls >= threshold
+| extend AlertReason = "AWS API enumeration burst: possible discovery phase"

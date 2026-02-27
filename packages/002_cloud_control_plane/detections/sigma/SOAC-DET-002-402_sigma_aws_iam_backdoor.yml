@@ -1,0 +1,34 @@
+title: AWS IAM Backdoor Creation Pattern
+id: SOAC-DET-002-402
+status: experimental
+description: Detects creation of IAM users, roles, or access keys that may indicate backdoor persistence.
+author: SOaC Community
+date: 2026/02/27
+logsource:
+  product: aws
+  service: cloudtrail
+level: high
+tags:
+  - attack.t1136.003
+  - attack.t1098.001
+  - soac.cloud-control-plane
+
+detection:
+  selection:
+    eventName:
+      - CreateUser
+      - CreateRole
+      - CreateAccessKey
+      - AttachUserPolicy
+      - AttachRolePolicy
+      - PutUserPolicy
+      - PutRolePolicy
+  condition: selection
+falsepositives:
+  - Authorized IAM provisioning (validate against ITSM ticket)
+fields:
+  - eventTime
+  - eventName
+  - userIdentity.arn
+  - sourceIPAddress
+  - requestParameters

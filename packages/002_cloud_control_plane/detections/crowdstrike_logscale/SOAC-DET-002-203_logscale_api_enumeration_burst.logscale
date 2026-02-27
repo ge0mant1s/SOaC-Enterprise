@@ -1,0 +1,11 @@
+# ---
+# id: SOAC-DET-002-203
+# name: AWS API Enumeration Burst (LogScale)
+# platform: crowdstrike_logscale
+# mitre_attack: T1580
+# severity: Medium
+# ---
+
+EventName=/^(Describe|List|Get)/
+| groupBy([UserIdentityArn, SourceIpAddress], function=[count(as=api_calls), collect(EventName, limit=20)])
+| where api_calls >= 50

@@ -1,0 +1,21 @@
+// ---
+// id: SOAC-DET-002-001
+// name: AWS IAM Backdoor Creation (New User / Role / Access Key)
+// platform: sentinel_kql
+// mitre_attack: T1136.003, T1098.001
+// severity: High
+// ---
+
+let timeframe = 24h;
+AWSCloudTrail
+| where TimeGenerated > ago(timeframe)
+| where EventName in (
+    "CreateUser","CreateRole","CreateAccessKey",
+    "AttachUserPolicy","AttachRolePolicy",
+    "PutUserPolicy","PutRolePolicy",
+    "AddUserToGroup","CreateLoginProfile"
+  )
+| extend Actor = UserIdentityArn, TargetEntity = tostring(RequestParameters)
+| summarize EventCount=count(), Events=make_set(EventName, 10), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated)
+  by Actor, SourceIpAddress, UserAgent
+| extend AlertReason = "AWS IAM backdoor creation pattern: new user/role/key or policy attachment"

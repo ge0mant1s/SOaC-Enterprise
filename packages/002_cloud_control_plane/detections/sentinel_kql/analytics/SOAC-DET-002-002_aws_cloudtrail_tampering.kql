@@ -1,0 +1,18 @@
+// ---
+// id: SOAC-DET-002-002
+// name: AWS CloudTrail Logging Tampering (Stop / Delete / Update)
+// platform: sentinel_kql
+// mitre_attack: T1562.008
+// severity: Critical
+// ---
+
+let timeframe = 1h;
+AWSCloudTrail
+| where TimeGenerated > ago(timeframe)
+| where EventName in (
+    "StopLogging","DeleteTrail","UpdateTrail",
+    "PutEventSelectors","DeleteFlowLogs",
+    "DisableAlarmActions","DeleteAlarms"
+  )
+| project TimeGenerated, EventName, UserIdentityArn, SourceIpAddress, UserAgent, AWSRegion, RequestParameters
+| extend AlertReason = "CRITICAL: Cloud logging/monitoring tampering detected"

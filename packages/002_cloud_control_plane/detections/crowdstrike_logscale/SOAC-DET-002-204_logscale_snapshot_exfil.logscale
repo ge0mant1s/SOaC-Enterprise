@@ -1,0 +1,10 @@
+# ---
+# id: SOAC-DET-002-204
+# name: AWS Snapshot / AMI Shared Externally (LogScale)
+# platform: crowdstrike_logscale
+# mitre_attack: T1537
+# severity: High
+# ---
+
+EventName in ["ModifySnapshotAttribute","ModifyImageAttribute","CopySnapshot","ShareSnapshot"]
+| groupBy([UserIdentityArn, SourceIpAddress], function=[count(as=event_count), collect(EventName, limit=5)])

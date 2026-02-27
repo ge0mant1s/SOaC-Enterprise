@@ -1,0 +1,15 @@
+// ---
+// id: SOAC-HUNT-002-021
+// name: GCP IAM Policy Changes (Hunting)
+// platform: sentinel_kql
+// mitre_attack: T1098
+// severity: Medium
+// ---
+
+// NOTE: Adapt table name to your GCP ingestion (GCPAuditLogs, etc.)
+let timeframe = 24h;
+GCPAuditLogs
+| where TimeGenerated > ago(timeframe)
+| where MethodName has_any ("SetIamPolicy","CreateServiceAccount","CreateServiceAccountKey","GrantRole")
+| project TimeGenerated, MethodName, PrincipalEmail, CallerIp, ResourceName, ServiceName
+| extend AlertReason = "GCP IAM change: validate against change ticket"
