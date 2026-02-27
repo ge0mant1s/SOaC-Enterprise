@@ -66,3 +66,9 @@ This package operationalizes the SOaC Distributed Intelligence Architecture mode
 
 ## Mapping
 See docs/mapping/attack_mapping.md
+
+This package includes an optional Claude reasoning layer under `brain/claude/`.
+Use it to generate evidence-backed containment recommendations and executive summaries.
+
+- Package ID: SOAC-PKG-002
+- Package Version: 1.1.0
