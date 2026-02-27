@@ -1,0 +1,15 @@
+// id: SOAC-CORR-003-001
+// name: Risky Entra Sign-in Followed by SaaS High-Risk Activity
+// severity: Critical
+
+let lookback = 6h;
+let RiskyUsers = SigninLogs
+| where TimeGenerated > ago(lookback)
+| where RiskState != "none" or RiskLevelDuringSignIn in ("medium","high")
+| summarize by UserPrincipalName;
+
+SalesforceLogs
+| where TimeGenerated > ago(lookback)
+| join kind=inner (RiskyUsers) on $left.UserEmail == $right.UserPrincipalName
+| project TimeGenerated, UserEmail, OperationName, ClientIP
+| extend AlertReason = "High confidence: Risky Entra identity pivoted into SaaS"

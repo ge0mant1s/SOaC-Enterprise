@@ -1,0 +1,11 @@
+// id: SOAC-DET-003-002
+// name: Google Workspace Drive Mass Download
+// severity: High
+
+let timeframe = 1h;
+GoogleWorkspaceLogs
+| where TimeGenerated > ago(timeframe)
+| where EventName in ("download","export","drive.download")
+| summarize DownloadCount=count() by UserEmail, IPAddress, bin(TimeGenerated, 10m)
+| where DownloadCount >= 50
+| extend AlertReason = "Possible Google Drive mass data download"

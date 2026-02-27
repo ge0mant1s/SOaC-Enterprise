@@ -1,0 +1,12 @@
+// id: SOAC-DET-003-001
+// name: Salesforce Mass Export / Report Abuse
+// severity: High
+
+let timeframe = 1h;
+SalesforceLogs
+| where TimeGenerated > ago(timeframe)
+| where OperationName has_any ("ReportExport","BulkAPI","DataExport")
+| summarize ExportCount=count(), Objects=make_set(ObjectName,10)
+  by UserId, ClientIP, bin(TimeGenerated, 10m)
+| where ExportCount >= 20
+| extend AlertReason = "Possible Salesforce mass export / data staging"

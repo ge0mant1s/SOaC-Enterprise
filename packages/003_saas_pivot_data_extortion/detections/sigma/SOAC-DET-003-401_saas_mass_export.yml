@@ -1,0 +1,13 @@
+title: SaaS Mass Export Pattern
+id: SOAC-DET-003-401
+status: experimental
+logsource:
+  category: application
+level: high
+detection:
+  selection:
+    EventName|contains:
+      - Export
+      - Bulk
+      - Download
+  condition: selection
