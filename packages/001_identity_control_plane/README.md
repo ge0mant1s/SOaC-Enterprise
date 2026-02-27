@@ -54,3 +54,36 @@ This package operationalizes the **SOaC: Distributed Intelligence Architecture**
 
 ## Mapping
 See `docs/mapping/attack_mapping.md`.
+
+**Version:** 1.1.0  
+**Last Updated:** 2026-02-27
+
+## v1.1 highlights (what changed)
+- Added **high-confidence correlation** logic in Sentinel (MFA fatigue  risky sign-in  OAuth changes  privileged role changes)
+- Added **Cross-cloud pivot** detections: Entra  AWS
+- Added **SaaS focus** detections & response patterns for:
+  - Google Workspace
+  - Salesforce (pattern-based)
+  - SAP (pattern-based)
+- Added **LogScale-focused** queries for identity pivot & endpoint precursors
+- Added **simulation pack** expansions (OAuth consent abuse, EntraAWS role pivot)
+
+## Quickstart
+1. Import Sentinel analytics rules in `detections/sentinel_kql/analytics/`
+2. Import hunting queries in `detections/sentinel_kql/hunting/`
+3. Deploy LogScale queries from `detections/crowdstrike_logscale/`
+4. Roll out CA baseline in report-only  enforce
+5. Run simulations in `simulations/`
+
+## Evidence-based outcomes
+- Correlation reduces false positives and drives **Tier 1 constraints** fast
+- Cross-domain containment reduces lateral movement probability
+- Public simulations provide repeatable proof of detection efficacy
+
+**v1.2 SAP Specialization:**
+- **SAP Security Audit Log (SAL)**: Concrete, executable detections for Sentinel and LogScale.
+- **Entra  SAP Correlation**: High-confidence pivot detection (Identity Takeover  SAP Action).
+- **SAP Containment Playbook**: Automated locking and session termination logic.
+
+**Version:** 1.2.0  
+**Last Updated:** 2026-02-27
