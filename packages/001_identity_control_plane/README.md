@@ -87,3 +87,10 @@ See `docs/mapping/attack_mapping.md`.
 
 **Version:** 1.2.0  
 **Last Updated:** 2026-02-27
+**Last Updated:** 2026-02-27## Claude Intelligence (Brain Module)
+
+This package includes an optional Claude reasoning layer under `brain/claude/`.
+Use it to generate evidence-backed containment recommendations and executive summaries.
+
+- Package ID: SOAC-PKG-001
+- Package Version: 1.3.0
