@@ -1,0 +1,17 @@
+// ---
+// id: SOAC-DET-001-051
+// name: SAP Privileged Access Anomaly (Security Audit Log)
+// platform: sentinel_kql
+// mitre_attack: T1098, T1078
+// severity: High
+// ---
+
+let timeframe = 24h;
+let privileged_events = dynamic(["AUO", "AUP", "AUQ", "AUR", "AUS", "AUT"]); // SAP SAL Message IDs for User/Auth changes
+SAPSecurityAuditLog_CL
+| where TimeGenerated > ago(timeframe)
+| where MessageID_s in (privileged_events) or MessageText_s has_any ("Authorization","Profile","Role","User")
+| extend User = User_s, Terminal = Terminal_s, Message = MessageText_s
+| summarize EventCount=count(), FirstSeen=min(TimeGenerated), LastSeen=max(TimeGenerated), Terminals=make_set(Terminal, 5) 
+  by User, MessageID_s, Message
+| extend AlertReason = "SAP Privileged Access/Authorization change detected in Security Audit Log"

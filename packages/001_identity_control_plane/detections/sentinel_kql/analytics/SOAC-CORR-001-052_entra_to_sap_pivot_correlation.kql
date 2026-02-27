@@ -1,0 +1,20 @@
+// ---
+// id: SOAC-CORR-001-052
+// name: Entra ID to SAP Pivot Correlation (Identity Takeover -> SAP Access)
+// platform: sentinel_kql
+// severity: Critical
+// ---
+
+let lookback = 12h;
+// Step 1: Identify Risky Entra Sign-ins
+let RiskyUsers = SigninLogs
+| where TimeGenerated > ago(lookback)
+| where RiskState != "none" or RiskLevelDuringSignIn in ("medium", "high")
+| summarize hint.strategy=shuffle by UserPrincipalName, IPAddress, RiskLevelDuringSignIn;
+
+// Step 2: Correlate with SAP Security Audit Log activity from the same IP/User
+SAPSecurityAuditLog_CL
+| where TimeGenerated > ago(lookback)
+| join kind=inner (RiskyUsers) on $left.User_s == $right.UserPrincipalName // Assuming UPN matches SAP User ID or mapped via alias
+| project TimeGenerated, User_s, IPAddress, RiskLevelDuringSignIn, MessageText_s, Terminal_s
+| extend AlertReason = "High Confidence: Risky Entra ID user performing actions in SAP Security Audit Log"

@@ -1,0 +1,11 @@
+# ---
+# id: SOAC-DET-001-251
+# name: SAP Security Audit Log - Brute Force / Multiple Login Failures
+# platform: crowdstrike_logscale
+# severity: Medium
+# ---
+
+# Filter for SAP SAL Login Failure Message IDs (e.g., AU2, AU3)
+(MessageID="AU2" OR MessageID="AU3" OR MessageText=/Login failed|Password incorrect/i)
+| groupBy([User, Terminal], function=[count(as=fail_count), collect(MessageText, limit=5)])
+| where fail_count >= 10
