@@ -1,0 +1,6 @@
+// Detect first-time RMM tool execution
+DeviceProcessEvents
+| where FileName in ("AnyDesk.exe","TeamViewer.exe","ScreenConnect.exe")
+| summarize FirstSeen=min(TimeGenerated) by DeviceName, FileName, AccountName
+| where FirstSeen > ago(1d)
+| extend AlertReason="First-time RMM execution on endpoint"
