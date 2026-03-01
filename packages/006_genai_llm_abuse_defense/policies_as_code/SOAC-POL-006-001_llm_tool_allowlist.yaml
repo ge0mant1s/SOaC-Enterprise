@@ -1,0 +1,33 @@
+# SOAC-POL-006-001: LLM Tool Allowlist & Data Guardrails
+version: 1
+policy:
+  name: llm_tool_allowlist
+  description: >
+    Restrict which tools/connectors an LLM agent may invoke and enforce data-classification guardrails.
+  enforcement:
+    mode: block
+  allow:
+    tools:
+      - ticket.create
+      - knowledge.search
+      - alert.summarize
+      - email.draft
+  deny:
+    tools:
+      - secrets.read
+      - admin.user.create
+      - iam.policy.attach
+      - drive.share.public
+  data_guardrails:
+    block_if_contains:
+      - pattern: "(?i)api[_-]?key"
+      - pattern: "(?i)secret"
+      - pattern: "AKIA[0-9A-Z]{16}"  # AWS access key id pattern
+      - pattern: "(?i)BEGIN PRIVATE KEY"
+    require_redaction_for:
+      - pii
+      - credentials
+      - secrets
+  logging:
+    audit: true
+    retain_days: 365
