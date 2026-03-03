@@ -1,4 +1,4 @@
-# Security Reasoning Core (v1.0)
+# BRAIN -- Security Reasoning Core (v1.0)
 ## The Central Intelligence of the SOaC Distributed Architecture
 
 This core component acts as the "Brain" of the SOaC ecosystem. It provides high-level reasoning, confidence scoring, and enforcement tiering by ingesting normalized telemetry from all domain packages (001-006).
