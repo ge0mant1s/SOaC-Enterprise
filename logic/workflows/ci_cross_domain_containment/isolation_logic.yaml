@@ -1,0 +1,10 @@
+
+workflow: CI_Emergency_Isolation
+trigger: 
+  source: Edge_HMI_Alert
+  severity: Critical
+actions:
+  - call: Brain_Risk_Assessment
+  - action: Entra_ID_Revoke_Tokens
+  - action: CrowdStrike_Network_Isolate
+  - action: Firewall_Block_OT_Segment

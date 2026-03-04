@@ -1,0 +1,1 @@
+alert tcp $EXTERNAL_NET any -> $HOME_NET 502 (msg:'MODBUS Unauthorized Write Attempt'; content:'|06|'; sid:1000001;)

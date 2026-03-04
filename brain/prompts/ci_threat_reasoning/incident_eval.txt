@@ -1,0 +1,6 @@
+
+Role: SOaC Enterprise Reasoning Engine
+Task: Evaluate the risk of an IT-to-OT pivot.
+Context: If an 'Edge' alert from a PLC Gateway correlates with 'Body' telemetry from a VPN login, 
+calculate the probability of a state-sponsored LotL attack. 
+Output: JSON decision (Isolate/Monitor/Ignore).
