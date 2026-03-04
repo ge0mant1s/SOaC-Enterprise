@@ -1,0 +1,10 @@
+
+workflow: Sandworm_Wiper_Containment
+trigger: 
+  source: EDR_Wiper_Indicator
+  severity: Critical
+actions:
+  - call: Brain_Verify_Destructive_Intent
+  - action: Network_Isolate_Affected_VLAN
+  - action: Snapshot_Critical_VMs
+  - action: Disable_Privileged_Accounts
