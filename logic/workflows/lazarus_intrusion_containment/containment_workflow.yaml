@@ -1,0 +1,10 @@
+
+workflow: Lazarus_Intrusion_Containment
+trigger: 
+  source: Email_SpearPhish_Alert
+  severity: High
+actions:
+  - call: Brain_Behavioral_Analysis
+  - action: Disable_Compromised_Account
+  - action: Network_Isolate_Affected_Segment
+  - action: Initiate_Crypto_Theft_Investigation
