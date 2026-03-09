@@ -1,7 +1,7 @@
 
 # SOaC-Enterprise: SecurityOperations-as-Code for Enterprise-Grade Threat Defense
 
-Welcome to SOaC-Enterprise, a comprehensive, modular, and scalable Security-as-Code (SOaC) framework designed to empower security teams with automated, programmable, and integrated defenses against advanced cyber threats. This repository embodies a distributed intelligence architecture that unifies detection, response, reasoning, and enforcement across hybrid and multi-cloud environments.
+Welcome to SOaC-Enterprise, a comprehensive, modular, and scalable SecurityOperations-as-Code (SOaC) framework designed to empower security teams with automated, programmable, and integrated defenses against advanced cyber threats. This repository embodies a distributed intelligence architecture that unifies detection, response, reasoning, and enforcement across hybrid and multi-cloud environments.
 
 ---
 
