@@ -47,6 +47,7 @@ Note: Each package contains its own detailed README with comprehensive detection
 
 ## Repository Structure & Navigation
 
+```text
 SOaC-Enterprise/
 ├── packages/                  # Industry/use case/threat actor-specific SOaC packages
 │   ├── 001_identity_control_plane/
@@ -63,6 +64,7 @@ SOaC-Enterprise/
 │   └── technical/             # Engineer-focused deployment and integration guides
 ├── README.md                  # This root README
 └── CONTRIBUTING.md            # Contribution guidelines and code of conduct
+```
 
 ---
 
