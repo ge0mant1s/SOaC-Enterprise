@@ -48,21 +48,21 @@ Note: Each package contains its own detailed README with comprehensive detection
 ## Repository Structure & Navigation
 
 SOaC-Enterprise/
-├── packages/ # Industry/use case/threat actor-specific SOaC packages
-│ ├── 001_identity_control_plane/
-│ ├── 002_cloud_control_plane/
-│ ├── ... # Other packages
-│ └── 011_healthcare_resilience/
-├── logic/ # Playbooks-as-Code workflows (YAML/JSON)
-├── brain/ # AI-driven reasoning prompts and models
-├── edge/ # Enforcement rules for network, endpoint, cloud
-├── simulations/ # Breach & attack simulation scenarios
-├── docs/ # Documentation for different audiences
-│ ├── executive/ # Executive summaries and strategic docs
-│ ├── operations/ # SOC analyst guides and operational playbooks
-│ └── technical/ # Engineer-focused deployment and integration guides
-├── README.md # This root README
-└── CONTRIBUTING.md # Contribution guidelines and code of conduct
+├── packages/                  # Industry/use case/threat actor-specific SOaC packages
+│   ├── 001_identity_control_plane/
+│   ├── 002_cloud_control_plane/
+│   ├── ...                    # (Packages 003 - 010)
+│   └── 011_healthcare_resilience/
+├── logic/                     # Playbooks-as-Code workflows (YAML/JSON)
+├── brain/                     # AI-driven reasoning prompts and models
+├── edge/                      # Enforcement rules for network, endpoint, cloud
+├── simulations/               # Breach & attack simulation scenarios
+├── docs/                      # Documentation for different audiences
+│   ├── executive/             # Executive summaries and strategic docs
+│   ├── operations/            # SOC analyst guides and operational playbooks
+│   └── technical/             # Engineer-focused deployment and integration guides
+├── README.md                  # This root README
+└── CONTRIBUTING.md            # Contribution guidelines and code of conduct
 
 ---
 
