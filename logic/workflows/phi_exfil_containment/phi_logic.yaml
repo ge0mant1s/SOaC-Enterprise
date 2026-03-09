@@ -1,0 +1,10 @@
+
+workflow: PHI_Exfiltration_Emergency_Stop
+trigger: 
+  source: Brain_High_Risk_PHI_Access
+  severity: Critical
+actions:
+  - action: AWS_IAM_Quarantine_Role
+  - action: Entra_ID_Revoke_SaaS_Tokens (Epic/Cerner)
+  - action: CrowdStrike_Network_Isolate_PACS_Server
+  - action: Notify_DPO_GDPR_Protocol

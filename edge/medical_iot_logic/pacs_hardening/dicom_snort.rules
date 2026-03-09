@@ -1,0 +1,1 @@
+alert tcp any any -> $PACS_SERVERS 104 (msg:'DICOM Unauthorized Association Request'; content:'|01 00 00|'; sid:1000011;)
