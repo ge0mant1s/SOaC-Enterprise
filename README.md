@@ -48,9 +48,9 @@ Note: Each package contains its own detailed README with comprehensive detection
 ## Repository Structure & Navigation
 
 SOaC-Enterprise/
-├── packages/                  # Industry/use case/threat actor-specific SOaC packages
-│   ├── 001_identity_control_plane/
-│   ├── 002_cloud_control_plane/
+├── packages/                  # Industry/use case/threat actor-specific SOaC packages│
+├── 001_identity_control_plane/│
+├── 002_cloud_control_plane/
 │   ├── ...                   # Other packages
 │   └── 011_healthcare_resilience/
 ├── logic/                     # Playbooks-as-Code workflows (YAML/JSON)
