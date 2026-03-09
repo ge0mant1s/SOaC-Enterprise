@@ -1,0 +1,1 @@
+alert tcp any any -> $PLC_IPS 502 (msg:"Unauthorized Modbus Write Command to PLC"; content:"|05|"; offset:7; depth:1; sid:1000007;)
