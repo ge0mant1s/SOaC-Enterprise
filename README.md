@@ -128,7 +128,7 @@ We welcome contributions from security professionals, developers, and researcher
 
 ## Contact & Support
 
-For questions, support, or collaboration inquiries, please open an issue or contact the maintainers via GitHub.
+For questions, support, or collaboration inquiries, please open an issue or contact via GitHub.
 
 ---
 
@@ -142,4 +142,4 @@ Last updated: 2026-03-09
 
 # License
 
-[Specify license here, e.g., MIT License]
+MIT License
