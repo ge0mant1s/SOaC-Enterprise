@@ -1,0 +1,1 @@
+alert tcp any any -> $LAZARUS_C2_IPS any (msg:"Lazarus Group C2 Communication Detected"; content:"|01 02 03 04|"; depth:4; sid:1000010;)
