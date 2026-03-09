@@ -1,0 +1,1 @@
+alert tcp any any -> $SAAS_IP_RANGES 443 (msg:"Large Data Export to SaaS Detected"; flow:established,to_server; threshold:type both, track by_src, count 100, seconds 60; sid:1000003;)

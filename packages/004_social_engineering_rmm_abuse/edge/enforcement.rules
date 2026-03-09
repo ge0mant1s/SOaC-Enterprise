@@ -1,0 +1,1 @@
+alert udp any any -> any 7070 (msg:"AnyDesk Outbound Traffic Detected - Potential RMM Abuse"; sid:1000004;)

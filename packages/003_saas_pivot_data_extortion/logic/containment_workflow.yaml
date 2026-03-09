@@ -1,0 +1,9 @@
+workflow: SaaS_Data_Exfiltration_Stop
+trigger:
+  source: Brain_SaaS_Extortion_Alert
+  severity: Critical
+actions:
+  - action: Salesforce_Revoke_OAuth_Tokens
+  - action: Google_Workspace_Suspend_User
+  - action: Entra_ID_Revoke_All_Sessions
+  - action: Slack_Notify_Security_Channel
