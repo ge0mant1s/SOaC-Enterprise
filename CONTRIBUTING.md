@@ -80,7 +80,7 @@ All contributions must comply with the repository’s license ([Specify License 
 
 ## Contact and Support
 
-For questions or assistance, please open an issue or contact via GitHub.
+For questions or assistance, please open an issue or contact the maintainers.
 
 ---
 
