@@ -1,0 +1,2 @@
+{"TimeGenerated": "2026-03-10T10:00:00Z", "OperationName": "Sign-in Activity", "UserPrincipalName": "admin@enterprise.com", "IPAddress": "192.168.1.100", "Location": "US"}
+{"TimeGenerated": "2026-03-10T10:05:00Z", "OperationName": "PIM Role Activation", "UserPrincipalName": "user2@enterprise.com", "IPAddress": "1.2.3.4", "RoleName": "Global Administrator"}
