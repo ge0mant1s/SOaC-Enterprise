@@ -1,0 +1,38 @@
+{
+    "metadata": {
+        "version": "1.0",
+        "package_id": "001_identity_control_plane",
+        "timestamp": "2026-03-10T14:30:00Z"
+    },
+    "event": {
+        "category": [
+            "iam"
+        ],
+        "type": [
+            "access"
+        ],
+        "outcome": "success",
+        "action": "token_refresh"
+    },
+    "user": {
+        "name": "j.doe@enterprise.com",
+        "id": "user_99283",
+        "risk_score": 85,
+        "roles": [
+            "Cloud_Admin",
+            "Developer"
+        ]
+    },
+    "source": {
+        "ip": "185.220.101.44",
+        "geo": {
+            "country_name": "Unknown",
+            "as_name": "Tor_Exit_Node"
+        }
+    },
+    "threat": {
+        "indicator": "Suspicious_Token_Refresh_from_Tor",
+        "confidence": "High",
+        "mitre_technique": "T1550.001"
+    }
+}

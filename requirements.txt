@@ -1,0 +1,26 @@
+# SOaC-Enterprise Core Dependencies
+# Install via: pip install -r requirements.txt
+
+# Data Processing & Normalization
+pandas>=2.0.0
+numpy>=1.24.0
+pyyaml>=6.0.1
+
+# AI Reasoning (The Brain)
+openai>=1.0.0
+anthropic>=0.5.0
+langchain>=0.1.0
+
+# Telemetry & SIEM Integration (The Body)
+elasticsearch-dsl>=8.0.0
+azure-monitor-query>=1.2.0
+boto3>=1.28.0
+
+# API & Web Interface (The Console)
+fastapi>=0.100.0
+uvicorn>=0.22.0
+jinja2>=3.1.0
+
+# Security & Validation
+sigma-cli>=0.10.0
+pytest>=7.4.0
