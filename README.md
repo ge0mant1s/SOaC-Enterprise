@@ -116,4 +116,4 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for our code of conduct and submis
 - **Compliance:** Designed to meet **GDPR Article 32** and **EU AI Act** transparency requirements.
 
 **Last Updated:** 2026-03-10  
-**Maintainer:** OpenCLAW Community / SOaC-Enterprise Team
+**Maintainer:** SOaC Community / SOaC-Enterprise Team
