@@ -4,7 +4,7 @@ First off, thank you for considering contributing to SOaC-Enterprise. It's peopl
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [SOaC-Enterprise Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [INSERT EMAIL ADDRESS].
+This project and everyone participating in it is governed by the [SOaC-Enterprise Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior through GitHub channel.
 
 ## How Can I Contribute?
 
