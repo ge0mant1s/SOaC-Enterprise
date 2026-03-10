@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOaC-Enterprise | Analyst Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .glow-green { color: #4ade80; text-shadow: 0 0 10px #4ade80; }
+        .glow-red { color: #f87171; text-shadow: 0 0 10px #f87171; }
+    </style>
+</head>
+<body class="p-8">
+    <header class="mb-8 flex justify-between items-center">
+        <h1 class="text-3xl font-bold tracking-tight">SOaC-Enterprise <span class="text-blue-500">Analyst Console</span></h1>
+        <div class="text-sm text-slate-400">System Status: <span class="text-green-400">Autonomous Mode Active</span></div>
+    </header>
+
+    <div class="grid grid-cols-1 gap-6" id="alert-container">
+        <!-- Alerts will be injected here -->
+    </div>
+
+    <script>
+        async function fetchAlerts() {
+            const response = await fetch('/api/alerts');
+            const alerts = await response.json();
+            const container = document.getElementById('alert-container');
+
+            container.innerHTML = alerts.map(alert => `
+                <div class="card p-6 rounded-xl shadow-2xl">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs font-mono text-blue-400 uppercase">${alert.package}</span>
+                            <h2 class="text-xl font-semibold">${alert.id} - ${alert.telemetry.action}</h2>
+                            <p class="text-sm text-slate-400">${alert.timestamp}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold ${alert.brain_decision === 'BLOCK' ? 'glow-red' : 'glow-green'}">${alert.brain_decision}</div>
+                            <div class="text-xs text-slate-500">Confidence: ${(alert.confidence * 100).toFixed(1)}%</div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/50 p-4 rounded-lg mb-4 border-l-4 border-blue-500">
+                        <p class="text-sm italic text-slate-300">"Brain Reasoning: ${alert.reasoning}"</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick="execute('${alert.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium transition">Approve & Execute Purpose</button>
+                        <button class="border border-slate-600 hover:bg-slate-700 px-4 py-2 rounded-md text-sm font-medium transition">Dismiss</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function execute(id) {
+            const res = await fetch(\`/api/execute/\${id}\`, { method: 'POST' });
+            const data = await res.json();
+            alert(data.message);
+        }
+
+        fetchAlerts();
+    </script>
+</body>
+</html>
