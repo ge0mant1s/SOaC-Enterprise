@@ -1,0 +1,1 @@
+Analyze this security alert for identity control plane threats and provide a JSON decision with 'decision', 'confidence', and 'reasoning'.
