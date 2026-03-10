@@ -4,7 +4,7 @@
 **Date:** March 10, 2026  
 **Version:** 1.0 (Initial Release)  
 **Classification:** Public / Open-Source Research  
-**Authors:** The OpenCLAW Community / SOaC-Enterprise Research Group
+**Authors:** SOaC Community / SOaC-Enterprise Research Group
 
 ---
 
