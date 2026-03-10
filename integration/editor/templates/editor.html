@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SOaC | Playbook Low-Code Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .panel { background-color: #1e293b; border: 1px solid #334155; }
+        pre { background-color: #020617; color: #38bdf8; }
+    </style>
+</head>
+<body class="p-8">
+    <header class="mb-8">
+        <h1 class="text-3xl font-bold">SOaC <span class="text-blue-500">Playbook Editor</span></h1>
+        <p class="text-slate-400">Design your "Purpose" (Response Logic) without writing code.</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Form Panel -->
+        <div class="panel p-6 rounded-xl">
+            <h2 class="text-xl font-semibold mb-4">Configuration</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Playbook Name</label>
+                    <input id="pb-name" type="text" class="w-full bg-slate-900 border border-slate-700 rounded p-2" value="Isolate_Compromised_Host">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Trigger Source</label>
+                    <select id="pb-source" class="w-full bg-slate-900 border border-slate-700 rounded p-2">
+                        <option value="crowdstrike">CrowdStrike Falcon</option>
+                        <option value="sentinel">Microsoft Sentinel</option>
+                        <option value="wazuh">Wazuh</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Primary Action</label>
+                    <select id="pb-action" class="w-full bg-slate-900 border border-slate-700 rounded p-2">
+                        <option value="isolate_host">Isolate Host (EDR)</option>
+                        <option value="disable_user">Disable User (Entra ID)</option>
+                        <option value="revoke_tokens">Revoke Session Tokens</option>
+                        <option value="block_ip">Block IP (Firewall)</option>
+                    </select>
+                </div>
+                <button onclick="generate()" class="w-full bg-blue-600 hover:bg-blue-500 py-2 rounded font-bold transition">Generate YAML</button>
+            </div>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="panel p-6 rounded-xl">
+            <h2 class="text-xl font-semibold mb-4">YAML Preview (The Purpose)</h2>
+            <pre id="yaml-output" class="p-4 rounded-lg h-64 overflow-auto font-mono text-sm">
+# Click Generate to see output...
+            </pre>
+            <button class="mt-4 text-sm text-blue-400 hover:underline">Download .yaml file</button>
+        </div>
+    </div>
+
+    <script>
+        async function generate() {
+            const payload = {
+                name: document.getElementById('pb-name').value,
+                source: document.getElementById('pb-source').value,
+                action_type: document.getElementById('pb-action').value
+            };
+            const res = await fetch('/api/generate-yaml', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            document.getElementById('yaml-output').textContent = data.yaml;
+        }
+    </script>
+</body>
+</html>
