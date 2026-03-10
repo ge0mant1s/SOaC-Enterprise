@@ -1,117 +1,79 @@
 # 🛡️ SOaC-Enterprise: Security-Operations-as-Code
-## The Autonomous, Vendor-Agnostic Defense Framework for the Modern Enterprise
+## The Autonomous, Distributed Intelligence Framework for Modern Defense
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Framework: SOaC](https://img.shields.io/badge/Framework-SOaC-blue.svg)](#architecture)
-[![MITRE ATT&CK](https://img.shields.io/badge/MITRE%20ATT%26CK-Validated-green.svg)](integration/benchmarks/MITRE_ATTACK_EVALUATION_RESULTS.md)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Version](https://img.shields.io/badge/Version-1.0.0--Stable-green.svg)]()
+[![Framework](https://img.shields.io/badge/Framework-SOaC--Standard-orange.svg)]()
 
-**SOaC-Enterprise** is a modular, programmable, and highly scalable framework designed to transform static security artifacts into a dynamic, AI-powered defense system. By unifying **Detection (The Body)**, **Reasoning (The Brain)**, and **Response (The Purpose)**, we provide an open-source alternative to proprietary "Autonomous SOC" vendors.
-
----
-
-### 🎯 Mission & Strategic Objectives
-
-**Mission:** To democratize high-tier autonomous defense by providing enterprises with a code-driven framework that outpaces adversaries through precision, speed, and explainable AI.
-
-**Strategic Objectives:**
-1. **Eliminate Vendor Lock-in:** Provide a universal normalization layer (ECS) that works across Microsoft, CrowdStrike, Splunk, and AWS.
-2. **Explainable AI (XAI):** Move away from "Black Box" security. Every AI decision is logged with a full "Chain of Thought" in our **Prompt Registry**.
-3. **Shift-Left Security Ops:** Treat detection and response as software. Version control your defense logic just like your application code.
-4. **Regulatory Alignment:** Built-in mapping for **GDPR**, **EU AI Act**, **NIST CSF**, and **ISO 27001**.
+**SOaC-Enterprise** is a scientific, vendor-agnostic framework designed to transform the Security Operations Center (SOC) from a reactive monitoring hub into an autonomous, code-driven defense engine. By treating security logic as **First-Class Software**, we resolve the "Linear Defense Paradox" and collapse breakout times to under 5 minutes.
 
 ---
 
-### 🧠 The Architecture: The Four Pillars
+### 🏛️ The Four Pillars of SOaC
+SOaC-Enterprise abstracts security operations into a modular, four-layered architecture:
 
-SOaC-Enterprise operates on a distributed intelligence model:
-
-*   **💪 The Body (Detection-as-Code):** High-fidelity telemetry ingestion via KQL, LQL, SPL, and Sigma.
-*   **🧠 The Brain (AI-Driven Reasoning):** An asynchronous LLM connector that performs behavioral analysis and risk scoring.
-*   **🎯 The Purpose (Playbooks-as-Code):** YAML-based automated workflows for containment and remediation.
-*   **🛡️ The Edge (Enforcement Logic):** Real-time policy enforcement across Identity (Entra ID), Endpoint (EDR), and Cloud (AWS/Azure).
-
----
-
-### 📦 Threat Intelligence Packages (The Library)
-
-We provide 11 production-ready packages. Each contains its own `README.md`, detection rules, and specific AI reasoning prompts.
-
-| ID | Package Name | Primary Focus | Path |
-|:---|:---|:---|:---|
-| 001 | **Identity Control Plane** | Token Theft, PIM Abuse, MFA Bypass | [`/packages/001_identity`](packages/001_identity_control_plane) |
-| 002 | **Cloud Control Plane** | AWS/Azure Root Abuse, IAM Shadowing | [`/packages/002_cloud`](packages/002_cloud_control_plane) |
-| 003 | **SaaS Pivot & Extortion** | Salesforce, SAP, Google Workspace | [`/packages/003_saas`](packages/003_saas_pivot_data_extortion) |
-| 004 | **RMM & Social Eng.** | AnyDesk/ScreenConnect Abuse | [`/packages/004_rmm`](packages/004_social_engineering_rmm_abuse) |
-| 005 | **Perimeter Exploit** | Edge Device Chaining (VPN/Firewall) | [`/packages/005_perimeter`](packages/005_perimeter_exploit_chaining) |
-| 006 | **GenAI & LLM Abuse** | Prompt Injection, Data Exfiltration | [`/packages/006_genai`](packages/006_genai_llm_abuse_defense) |
-| 007 | **Critical Infra (ICS)** | OT/ICS Resilience & Modbus/S7 | [`/packages/007_ics`](packages/007_critical_infrastructure_resilience) |
-| 008 | **Sandworm/Destructive** | Wiper Malware & Industrial Sabotage | [`/packages/008_sandworm`](packages/008_sandworm_destructive_defense) |
-| 009 | **Financial Defense** | SWIFT/Banking Trojan Patterns | [`/packages/009_finance`](packages/009_financial_industry_defense) |
-| 010 | **Lazarus Group** | State-Sponsored Crypto/Apt Defense | [`/packages/010_lazarus`](packages/010_lazarus_group_defense) |
-| 011 | **Healthcare Resilience** | Ransomware vs. Medical IoT | [`/packages/011_healthcare`](packages/011_healthcare_resilience) |
+1.  **The Body (Telemetry):** A universal normalization layer mapping multi-vendor logs (Sentinel, AWS, CrowdStrike) to the **Elastic Common Schema (ECS)**.
+2.  **The Brain (Reasoning):** An asynchronous cognitive engine using **Explainable AI (XAI)** to perform behavioral risk synthesis and intent inference.
+3.  **The Purpose (Logic):** A library of **Versioned YAML Playbooks** that define idempotent, cross-cloud security interventions.
+4.  **The Edge (Enforcement):** Real-time API enforcement across Identity (Entra ID), Network (Firewalls), and Endpoint (EDR) layers.
 
 ---
 
-### 🛠️ The Integration Engine (The Core)
+### 🚀 Quick Start: 30 Seconds to Autonomous Defense
 
-The `integration/` directory contains the production-grade software that runs the framework:
-
-*   **[Master Orchestrator](master_orchestrator.py):** The main entry point that binds all components.
-*   **[Brain Connector](integration/brain_connector_v2_prod.py):** Async AI reasoning engine with audit logging.
-*   **[Normalization Layer](integration/normalization/):** Maps multi-vendor logs to Elastic Common Schema (ECS).
-*   **[Prompt Registry](integration/prompt_registry/):** Version-controlled AI prompts to prevent model drift.
-*   **[Analyst Console](integration/console/):** A sleek, web-based "Glass Box" UI for human-in-the-loop approval.
-*   **[Playbook Editor](integration/editor/):** Low-code YAML generator for rapid response design.
-*   **[Replay Engine](integration/replay_engine/):** Test your defense against historical telemetry.
-
----
-
-### 🚀 Getting Started
-
-#### 1. Prerequisites
-- Python 3.9+
-- Access to an LLM API (OpenAI, Azure, or local via RouteLLM)
-- A SIEM/EDR data source (Sentinel, CrowdStrike, or Wazuh)
-
-#### 2. Installation
+#### 1. Clone and Install
 ```bash
-git clone https://github.com/your-org/SOaC-Enterprise.git
-cd SOaC-Enterprise
+git clone https://github.com/soac-community/soac-enterprise.git
+cd soac-enterprise
 pip install -r requirements.txt
 ```
 
-#### 3. Configuration
-Set your environment variables:
+#### 2. Run the Validation Simulation
+Validate the full lifecycle (Body -> Brain -> Purpose -> Edge) using our "Hello World" identity theft scenario:
 ```bash
-export SOAC_AI_KEY="your-api-key"
-export SOAC_AI_ENDPOINT="https://your-endpoint"
-```
-
-#### 4. Run the Orchestrator
-```bash
-python master_orchestrator.py
+python quick_start_validation.py
 ```
 
 ---
 
-### 📊 Validation & Trust
-We believe in **Radical Transparency**. 
-- **MITRE ATT&CK:** View our latest [Evaluation Results](integration/benchmarks/MITRE_ATTACK_EVALUATION_RESULTS.md).
-- **Audit Logs:** Every AI decision is stored in `soac_brain_audit.log` for forensic review.
+### 📂 Repository Structure
+- **`/packages`**: 11 Production-ready Threat Intelligence Packages (Identity, Cloud, SaaS, GenAI, etc.).
+- **`/core`**: The Master Orchestrator, Normalizer, and Brain Connector logic.
+- **`/docs`**: 
+    - `executive/`: CISO Transformation Guide & Board-level KPIs.
+    - `whitepaper/`: The full scientific white paper (PDF & Markdown).
+- **`/ui`**: The Analyst Console and Playbook Editor for Human-in-the-Loop (HITL) oversight.
+- **`/samples`**: Normalized ECS alerts for testing and simulation.
 
 ---
 
-### 🤝 Community & Contribution
-We are building the future of autonomous security together.
-- **Analysts:** Contribute new Playbooks (The Purpose).
-- **Engineers:** Add new Vendor Mappings (The Body).
-- **Researchers:** Refine AI Prompts (The Brain).
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for our code of conduct and submission process.
+### 📚 Documentation & Research
+- **[White Paper: A Scientific Framework for Autonomous SOC](./docs/whitepaper/soac_enterprise_white_paper_2026_v2.pdf)**
+- **[CISO Transformation Guide: Transitioning to SOaC](./docs/executive/CISO_TRANSFORMATION_GUIDE.md)**
+- **[Contributing Guidelines](./CONTRIBUTING.md)**
 
 ---
 
-### 📜 License & Compliance
+### 🛡️ The 11 Core Defense Packages
+| ID | Package Name | Focus Area |
+|:---|:---|:---|
+| **001** | Identity Control Plane | Token Theft, PIM Abuse, MFA Fatigue |
+| **002** | Cloud Control Plane | AWS/Azure Root Abuse, IAM Shadowing |
+| **003** | SaaS Pivot & Extortion | Salesforce, SAP, Google Workspace |
+| **006** | GenAI & LLM Abuse | Prompt Injection, Data Exfiltration |
+| **...** | *See /packages for full list* | *Healthcare, Finance, ICS/SCADA* |
+
+---
+
+### 🤝 Community & Contributing
+We believe in **Open Security**. SOaC-Enterprise is built by the community, for the community. 
+- **Comment "SOAC"** on our LinkedIn launch post to join the working group.
+- **Submit a PR** to add new detection rules or playbooks.
+- **Report Bugs** via GitHub Issues.
+
+---
+**"Stop Triage. Start Programming."**  
+© 2026 SOaC Community | SOaC-Enterprise Research Group
 - **License:** MIT License.
 - **Compliance:** Designed to meet **GDPR Article 32** and **EU AI Act** transparency requirements.
 
