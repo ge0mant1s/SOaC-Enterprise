@@ -65,4 +65,4 @@ SOaC-Enterprise v1.0 marks the first stable release of a scientific, autonomous 
 
 SOaC-Enterprise v1.0 is a foundational step toward autonomous, scalable, and explainable security operations. The journey ahead is one of continuous innovation, collaboration, and adaptation to the ever-changing threat landscape.
 
-Together, we will keep SOaC-Enterprise at the forefront of security innovation  empowering defenders worldwide to stop triage and start programming.
+Together, we will keep SOaC-Enterprise at the forefront of security innovation, empowering defenders worldwide to stop triage and start programming.
