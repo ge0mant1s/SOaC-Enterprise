@@ -21,7 +21,7 @@ SOaC-Enterprise v1.0 marks the first stable release of a scientific, autonomous 
 
 ## 2. Roadmap for Continuous Evolution
 
-### 2.1 Planned Minor Releases (v1.1, v1.2, v1.3)
+### 2.1 Planned Minor Releases (v1.1, v1.2, v1.3, ...)
 
 - **New SOaC Packages:**  
   - Emerging threat vectors (e.g., supply chain attacks, zero trust enforcement).  
@@ -54,7 +54,7 @@ SOaC-Enterprise v1.0 marks the first stable release of a scientific, autonomous 
 
 ## 3. How to Participate
 
-- **Join the Community:** Comment SOAC on our LinkedIn launch post or join the GitHub discussions.
+- **Join the Community:** Comment "SOaC" on our LinkedIn launch post or join the GitHub discussions.
 - **Contribute Code:** Submit pull requests for new packages, playbooks, or improvements.
 - **Report Issues:** Use GitHub issues to report bugs or request features.
 - **Share Feedback:** Help shape the roadmap by sharing your use cases and priorities.
