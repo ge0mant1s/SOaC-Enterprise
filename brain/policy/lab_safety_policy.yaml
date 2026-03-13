@@ -1,25 +1,26 @@
 # ============================================================
 # SOaC-Enterprise: Lab Safety Policy
-# Component: 05_Policy_as_Code
+# Component: brain/policy
 # ============================================================
-# Publisher:  SOaC Core Team
-# Version:    1.0.0
-# Date:       March 2026
-# License:    Apache 2.0
+# Publisher: SOaC Core Team
+# Version: 1.0.1
+# Date: March 2026
+# License: Apache 2.0
 # Repository: github.com/ge0mant1s/SOaC-Enterprise
 # ============================================================
 # Purpose:
-#   Defines the boundary policy controlling permissible actions
-#   across lab, staging, and production environments. Enforced
-#   by The Nervous System (Edge) before any CLAW playbook step
-#   executes against a target environment.
+# Defines the boundary policy controlling permissible actions
+# across lab, staging, and production environments. Enforced
+# by The Nervous System (Edge) before any CLAW playbook step
+# executes against a target environment.
 # ============================================================
 
 apiVersion: policy.soac.io/v1
 kind: LabSafetyPolicy
+
 metadata:
   name: lab-safety-policy
-  version: "1.0.0"
+  version: "1.0.1"
   author: soac-core-team
   created: "2026-03-01T00:00:00Z"
   tags:
@@ -35,6 +36,7 @@ metadata:
 # ============================================================
 # 1. ENVIRONMENT DEFINITIONS
 # ============================================================
+
 environments:
   lab:
     description: Isolated simulation environment for SOaC package testing and BAS scenarios
@@ -42,9 +44,9 @@ environments:
       - env_tag: lab
       - hostname_prefix: ["lab-", "soac-lab-", "sim-"]
       - network_cidr: "10.100.0.0/16"
-    data_classification: synthetic       # No real PII or production data
+    data_classification: synthetic
     internet_access: false
-    external_api_calls: blocked          # No real API calls to Okta, Azure, CrowdStrike
+    external_api_calls: blocked
 
   staging:
     description: Pre-production validation environment with anonymized data
@@ -53,8 +55,8 @@ environments:
       - hostname_prefix: ["stg-", "staging-"]
       - network_cidr: "10.200.0.0/16"
     data_classification: anonymized
-    internet_access: limited             # Read-only API calls permitted
-    external_api_calls: read_only        # GET requests only; no enforcement actions
+    internet_access: limited
+    external_api_calls: read_only
 
   production:
     description: Live enterprise environment. Full enforcement permitted with governance controls.
@@ -64,16 +66,15 @@ environments:
       - network_cidr: "10.0.0.0/8"
     data_classification: confidential
     internet_access: true
-    external_api_calls: full             # All CLAW actions permitted subject to governance
+    external_api_calls: full
 
 # ============================================================
 # 2. ACTION PERMISSIONS BY ENVIRONMENT
 # ============================================================
-action_permissions:
 
-  # --- Identity Actions ---
+action_permissions:
   revoke_sessions:
-    lab: simulate                        # simulate | allow | block
+    lab: simulate
     staging: block
     production: allow
     governance_required: true
@@ -93,7 +94,6 @@ action_permissions:
     governance_required: true
     requires_human_approval: true
 
-  # --- Endpoint Actions ---
   contain_host:
     lab: simulate
     staging: simulate
@@ -102,7 +102,7 @@ action_permissions:
     brain_oversight_required: true
 
   kill_process:
-    lab: allow                           # Allowed in lab against synthetic targets
+    lab: allow
     staging: simulate
     production: allow
     governance_required: false
@@ -113,7 +113,6 @@ action_permissions:
     production: allow
     governance_required: false
 
-  # --- Network / Edge Actions ---
   block_host:
     lab: simulate
     staging: simulate
@@ -143,9 +142,8 @@ action_permissions:
     requires_human_approval: true
     max_blast_radius: org
 
-  # --- Notification Actions ---
   notify_slack:
-    lab: allow                           # Allowed in lab (use #soac-lab channel)
+    lab: allow
     staging: allow
     production: allow
     governance_required: false
@@ -156,7 +154,6 @@ action_permissions:
     production: allow
     governance_required: false
 
-  # --- Data Actions ---
   export_logs:
     lab: allow
     staging: allow
@@ -167,43 +164,48 @@ action_permissions:
   delete_data:
     lab: allow
     staging: block
-    production: block                    # Never auto-delete in production
+    production: block
     governance_required: true
     requires_human_approval: true
 
 # ============================================================
 # 3. SIMULATION MODE (Lab)
 # ============================================================
+
 simulation:
-  enabled: true                          # Applies when environment = lab
-  mode: dry_run                          # dry_run | shadow | replay
+  enabled: true
+  mode: dry_run
   output:
     log_simulated_actions: true
-    emit_synthetic_telemetry: true       # Emit fake enforcement events for testing
-    synthetic_telemetry_target: body/test_ingest/
+    emit_synthetic_telemetry: true
+    # Align with repo root folder name as seen in SOaC-Enterprise architecture
+    synthetic_telemetry_target: test_logs/
   restrictions:
     no_real_api_calls: true
-    no_real_notifications: true          # Slack/JIRA calls are mocked
+    no_real_notifications: true
     synthetic_data_only: true
 
 # ============================================================
 # 4. BLAST RADIUS ENFORCEMENT
 # ============================================================
+
 blast_radius:
   lab:
-    max_allowed: single_user             # Lab can never exceed single_user scope
+    max_allowed: single_user
   staging:
     max_allowed: team
   production:
-    max_allowed: org                     # Global scope requires explicit override + human approval
-    global_override:
-      requires_human_approval: true
-      approval_timeout: 10m
-      timeout_action: abort
+    max_allowed: org
+
+  global_override:
+    requires_human_approval: true
+    approval_timeout: 10m
+    timeout_action: abort
 
 # ============================================================
 # 5. AUDIT & COMPLIANCE
 # ============================================================
+
 audit:
   all_environments: true
   level:
@@ -214,31 +216,36 @@ audit:
     lab: 30
     staging: 90
     production: 365
-  immutable: true                        # Audit records are append-only in all environments
+  immutable: true
 
 # ============================================================
 # 6. POLICY ENFORCEMENT
 # ============================================================
+
 enforcement:
-  engine: nervous_system_edge
-  on_policy_violation: block             # block | log_only | escalate
+  engine: edge
+  on_policy_violation: block
   violation_notification:
     channel: slack
     target: "#soac-policy-violations"
   override:
-    allowed: false                       # No runtime overrides; change policy via Git PR
+    allowed: false
 
 # ============================================================
 # 7. VERSIONING & CHANGELOG
 # ============================================================
+
 versioning:
   policy: semver
   changelog:
+    - version: "1.0.1"
+      date: "2026-03-13"
+      changes:
+        - Align component metadata with product architecture (brain/policy)
+        - Fix synthetic telemetry target path alignment (test_logs/)
+        - Normalize enforcement engine name to 'edge'
+
     - version: "1.0.0"
       date: "2026-03-01"
       changes:
         - Initial release of Lab Safety Policy
-        - Three-tier environment model (lab / staging / production)
-        - Action permission matrix with simulate / allow / block modes
-        - Blast radius enforcement per environment
-        - Immutable audit trail across all tiers
