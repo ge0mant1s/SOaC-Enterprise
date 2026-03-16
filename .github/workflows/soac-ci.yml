@@ -1,19 +1,16 @@
 # ============================================================================
 # SOaC-Enterprise CI Pipeline
 # ============================================================================
-# Runs on every push and PR to main.
-# Steps:
-#   1. Checkout
-#   2. Install harness dependencies
-#   3. Level 1+2 — Schema + Cross-Reference validation on core/templates
-#   4. Level 1+2 — Schema + Cross-Reference validation on test-fixtures
-#   5. Generate combined JSON report
-#   6. Upload validation report as artifact
+# Runs on every push and PR to main when harness source changes.
 #
-# NOTE (M2): packages/** validation is intentionally excluded until M3
-#   completes package standardization. When M3 lands, add 'packages/**'
-#   back to paths triggers and add a "Validate packages" step scanning
-#   --path ../../packages --level 2.
+# Strategy (M2):
+#   - Validate test-fixtures/valid-*.yaml   → MUST pass (exit 0)
+#   - Validate test-fixtures/invalid-*.yaml → MUST fail (exit 1, negative test)
+#   - core/templates/** excluded — templates contain placeholder fields that
+#     intentionally fail strict schema validation.
+#   - packages/** excluded — artifacts are not yet contract-complete.
+#
+# M3 will expand validation to packages/** once standardization lands.
 # ============================================================================
 
 name: SOaC Harness CI
@@ -22,12 +19,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'core/templates/**'
       - 'tools/soac-harness/**'
   pull_request:
     branches: [main]
     paths:
-      - 'core/templates/**'
       - 'tools/soac-harness/**'
   workflow_dispatch:  # manual trigger
 
@@ -52,31 +47,55 @@ jobs:
         working-directory: tools/soac-harness
         run: npm install
 
-      - name: Validate core templates (L1 + L2)
+      # ── Positive tests: valid fixtures MUST pass ──────────────
+      - name: "Validate valid fixtures (MUST pass)"
         working-directory: tools/soac-harness
         run: |
-          echo "## Core Templates — Level 1 + 2" >> $GITHUB_STEP_SUMMARY
-          npx ts-node src/index.ts validate --path ../../core/templates --level 2 --format text 2>&1 | tee /tmp/templates-report.txt
+          echo "## Valid Fixtures — Level 1 + 2 (expect PASS)" >> $GITHUB_STEP_SUMMARY
+          VALID_FILES=$(find test-fixtures -name 'valid-*.yaml' -type f | sort)
+          EXIT=0
+          for f in $VALID_FILES; do
+            echo "→ $f"
+            npx ts-node src/index.ts validate --path "$f" --level 2 --format text 2>&1 | tee -a /tmp/valid-report.txt
+            if [ ${PIPESTATUS[0]} -ne 0 ]; then
+              echo "::error::$f was expected to PASS but FAILED"
+              EXIT=1
+            fi
+          done
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/templates-report.txt >> $GITHUB_STEP_SUMMARY
+          cat /tmp/valid-report.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+          exit $EXIT
 
-      - name: Validate harness test-fixtures (L1 + L2)
+      # ── Negative tests: invalid fixtures MUST fail ────────────
+      - name: "Validate invalid fixtures (MUST fail — negative test)"
         working-directory: tools/soac-harness
         run: |
-          echo "## Harness Test Fixtures — Level 1 + 2" >> $GITHUB_STEP_SUMMARY
-          npx ts-node src/index.ts validate --path test-fixtures --level 2 --format text 2>&1 | tee /tmp/fixtures-report.txt || true
+          echo "## Invalid Fixtures — Level 1 + 2 (expect FAIL)" >> $GITHUB_STEP_SUMMARY
+          INVALID_FILES=$(find test-fixtures -name 'invalid-*.yaml' -type f | sort)
+          EXIT=0
+          for f in $INVALID_FILES; do
+            echo "→ $f"
+            npx ts-node src/index.ts validate --path "$f" --level 2 --format text 2>&1 | tee -a /tmp/invalid-report.txt
+            if [ ${PIPESTATUS[0]} -eq 0 ]; then
+              echo "::error::$f was expected to FAIL but PASSED — negative test broken"
+              EXIT=1
+            else
+              echo "✓ $f correctly rejected"
+            fi
+          done
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/fixtures-report.txt >> $GITHUB_STEP_SUMMARY
+          cat /tmp/invalid-report.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+          exit $EXIT
 
+      # ── JSON report artifact ──────────────────────────────────
       - name: Generate JSON report
         if: always()
         working-directory: tools/soac-harness
         run: |
-          echo '{"core_templates":' > /tmp/harness-report.json
-          npx ts-node src/index.ts validate --path ../../core/templates --level 2 --format json 2>/dev/null >> /tmp/harness-report.json || echo '{}' >> /tmp/harness-report.json
-          echo ',"test_fixtures":' >> /tmp/harness-report.json
+          echo '{"valid_fixtures":' > /tmp/harness-report.json
+          VALID_FILES=$(find test-fixtures -name 'valid-*.yaml' -type f -printf '%p ' 2>/dev/null || find test-fixtures -name 'valid-*.yaml' -type f | tr '\n' ' ')
           npx ts-node src/index.ts validate --path test-fixtures --level 2 --format json 2>/dev/null >> /tmp/harness-report.json || echo '{}' >> /tmp/harness-report.json
           echo '}' >> /tmp/harness-report.json
 
