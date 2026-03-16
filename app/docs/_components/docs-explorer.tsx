@@ -444,16 +444,19 @@ validation:
         name: 'README.md',
         type: 'file',
         repoPath: 'tools/soac-harness/README.md',
-        content: `# SOaC Harness — CLI Validation Engine
+        content: `# SOaC Harness — CLI Validation & Replay Engine
 
-Offline, CI-ready validator for all SOaC artifact types.
+Offline, CI-ready validator and scenario replay engine for all SOaC artifact types.
 
 ## Validation Levels
 
   Level 1 — Schema   : Structure, required fields, enum values
   Level 2 — Cross-Ref: MITRE ID format, package_id consistency,
                         CRITICAL severity → rollback + brain_oversight
-  Level 3 — Replay   : Live execution simulation (planned — M4)
+  Level 3 — Replay   : Scenario replay maps lab steps to detection
+                        triggers & playbook actions. Produces Evidence
+                        Bundles (JSON manifest + Markdown report) per
+                        package with MITRE ATT&CK coverage metrics.
 
 ## Supported Schemas
 
@@ -464,18 +467,37 @@ Offline, CI-ready validator for all SOaC artifact types.
 
 ## Usage
 
+  # Validate artifacts (Level 1 + 2)
   npx soac-harness validate --path packages/ --level 2 --format text
+
+  # Replay scenarios → generate Evidence Bundles (Level 3)
+  npx soac-harness replay \\
+    --packages-dir packages/ \\
+    --scenarios data/scenarios.json \\
+    --registry data/packages.json
+
+## Evidence Bundles
+
+  After replay, each package gets:
+    packages/NNN/evidence/evidence-manifest.json  — machine-readable
+    packages/NNN/evidence/replay-report.md      — human-readable
+
+  Verdict logic:
+    PASS    — 100% of declared MITRE techniques validated + detection triggers + playbook actions
+    PARTIAL — ≥50% coverage or at least one detection trigger
+    FAIL    — below threshold
 
 ## Exit Codes
 
-  0 — all files pass
-  1 — one or more findings at error severity
-  2 — no YAML files found
+  0 — all checks pass
+  1 — one or more packages/files failed
+  2 — invalid arguments or missing paths
 
 ## CI Integration
 
   See .github/workflows/soac-ci.yml for a ready-made
-  GitHub Actions pipeline that runs L1 + L2 on every push.`,
+  GitHub Actions pipeline that runs L1 + L2 validation
+  followed by Level 3 replay with evidence artifact upload.`,
       },
       {
         name: 'src/',
@@ -527,15 +549,48 @@ export interface HarnessResult {
 // ~120 lines — see full source in the repository.`,
           },
           {
+            name: 'level3.ts',
+            type: 'file',
+            repoPath: 'tools/soac-harness/src/level3.ts',
+            content: `// Level 3 — Replay & Evidence
+// Walks a package's lab scenario step-by-step, mapping each phase
+// to detection triggers (The Body), playbook actions (The Purpose),
+// reasoning events (The Brain), and policy enforcement (The Edge).
+//
+// Produces an Evidence Bundle per package:
+//   evidence-manifest.json — machine-readable coverage + timeline
+//   replay-report.md     — human-readable Markdown with tables
+//
+// Key functions:
+//   replayPackage()          — Core replay engine per package
+//   generateMarkdownReport() — Renders manifest as Markdown
+//   runLevel3()              — CLI-callable: discover & replay all packages
+//
+// Keyword heuristics map step text to artifacts:
+//   DETECTION_KEYWORDS → detection.yaml (body/telemetry steps)
+//   PLAYBOOK_KEYWORDS  → playbook.yaml  (purpose/brain steps)
+//   Edge steps         → policy.yaml
+//
+// MITRE coverage: extracts technique IDs from artifacts + step text,
+// computes coverage percentage, determines verdict (PASS/PARTIAL/FAIL).
+// ~520 lines — see full source in the repository.`,
+          },
+          {
             name: 'index.ts',
             type: 'file',
             repoPath: 'tools/soac-harness/src/index.ts',
             content: `#!/usr/bin/env node
 // SOaC Harness — CLI Entry Point
-// Usage: soac-harness validate --path <dir|file> [--level 1|2] [--format text|json]
-// Walks directory, parses YAML, runs Level 1 + Level 2 validation,
-// outputs results with emoji badges and line numbers.
-// Exit code: 0 = pass, 1 = fail, 2 = no files found.`,
+//
+// Commands:
+//   validate  — Level 1/2 schema & cross-reference validation
+//     Usage: soac-harness validate --path <dir|file> [--level 1|2] [--format text|json]
+//
+//   replay    — Level 3 scenario replay & evidence generation
+//     Usage: soac-harness replay --packages-dir <dir> --scenarios <file>
+//                                --registry <file> [--format text|json]
+//
+// Exit codes: 0 = pass, 1 = fail, 2 = invalid args / missing paths`,
           },
         ],
       },
@@ -546,11 +601,12 @@ export interface HarnessResult {
         content: `{
   "name": "soac-harness",
   "version": "2.0.0",
-  "description": "SOaC validation harness — schema + cross-reference checks",
+  "description": "SOaC validation & replay harness — schema checks + evidence generation",
   "bin": { "soac-harness": "./dist/index.js" },
   "scripts": {
     "build": "tsc",
     "validate": "ts-node src/index.ts validate",
+    "replay": "ts-node src/index.ts replay --packages-dir ../../packages --scenarios ../../data/scenarios.json --registry ../../data/packages.json",
     "test": "ts-node src/index.ts validate --path ../../packages --level 2"
   }
 }`,
