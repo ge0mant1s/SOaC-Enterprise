@@ -1,16 +1,16 @@
 # ============================================================================
 # SOaC-Enterprise CI Pipeline
 # ============================================================================
-# Runs on every push and PR to main when harness source changes.
+# Runs on every push and PR to main when harness source or package artifacts
+# change.
 #
-# Strategy (M2):
+# Strategy (M3):
 #   - Validate test-fixtures/valid-*.yaml   → MUST pass (exit 0)
 #   - Validate test-fixtures/invalid-*.yaml → MUST fail (exit 1, negative test)
+#   - Validate packages/**/metadata.yml, detection.yaml, playbook.yaml,
+#     policy.yaml → MUST pass Level 1 + 2 (contract compliance)
 #   - core/templates/** excluded — templates contain placeholder fields that
 #     intentionally fail strict schema validation.
-#   - packages/** excluded — artifacts are not yet contract-complete.
-#
-# M3 will expand validation to packages/** once standardization lands.
 # ============================================================================
 
 name: SOaC Harness CI
@@ -20,10 +20,12 @@ on:
     branches: [main]
     paths:
       - 'tools/soac-harness/**'
+      - 'packages/**'
   pull_request:
     branches: [main]
     paths:
       - 'tools/soac-harness/**'
+      - 'packages/**'
   workflow_dispatch:  # manual trigger
 
 jobs:
@@ -86,6 +88,30 @@ jobs:
           done
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/invalid-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          exit $EXIT
+
+      # ── Package artifact validation (M3) ─────────────────────
+      - name: "Validate package artifacts (MUST pass)"
+        working-directory: tools/soac-harness
+        run: |
+          echo "## Package Artifacts — Level 1 + 2 (expect PASS)" >> $GITHUB_STEP_SUMMARY
+          PKG_FILES=$(find ../../packages -type f \( -name '*.yaml' -o -name '*.yml' \) | sort)
+          if [ -z "$PKG_FILES" ]; then
+            echo "⚠ No package artifacts found — skipping"
+            exit 0
+          fi
+          EXIT=0
+          for f in $PKG_FILES; do
+            echo "→ $f"
+            npx ts-node src/index.ts validate --path "$f" --level 2 --format text 2>&1 | tee -a /tmp/pkg-report.txt
+            if [ ${PIPESTATUS[0]} -ne 0 ]; then
+              echo "::error::$f FAILED contract validation"
+              EXIT=1
+            fi
+          done
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/pkg-report.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           exit $EXIT
 
