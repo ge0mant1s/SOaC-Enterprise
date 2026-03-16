@@ -1,0 +1,77 @@
+# ============================================================================
+# SOaC CLAW Playbook Template v1.0
+# Continuous, Logic-Adaptive Workflow Engine
+# ============================================================================
+# This is the canonical template for all CLAW playbooks across SOaC packages.
+# Every playbook in every package MUST conform to this schema.
+# Validation: soac-harness validate --level 2 <playbook.yaml>
+# ============================================================================
+
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: ""                        # REQUIRED — unique kebab-case identifier
+  version: "1.0.0"                 # REQUIRED — semver
+  author: ""                       # REQUIRED — author or team identifier
+  created: ""                      # REQUIRED — ISO 8601 (e.g. 2026-03-16T00:00:00Z)
+  tags: []                         # OPTIONAL — classification tags
+  mitre_attack: []                 # REQUIRED — at least one MITRE ATT&CK technique ID
+  severity: ""                     # REQUIRED — CRITICAL | HIGH | MEDIUM | LOW
+  package_id: ""                   # REQUIRED — parent package (e.g. pkg-001)
+
+spec:
+  description: ""                  # REQUIRED — human-readable summary
+
+  # --- Trigger Definition ---
+  trigger:
+    source: ""                     # REQUIRED — BODY | BRAIN | MANUAL | SCHEDULED
+    conditions:                    # REQUIRED — at least one condition
+      - field: ""                  # field from detection event
+        operator: ""               # eq | neq | gt | lt | contains | regex
+        value: ""                  # expected value
+    cooldown: "5m"                 # OPTIONAL — minimum interval between firings
+
+  # --- Input Parameters ---
+  inputs:                          # REQUIRED — at least one input
+    - name: ""                     # parameter name
+      type: ""                     # string | number | boolean | list | object
+      required: true
+      description: ""
+      # default: ""               # OPTIONAL
+
+  # --- Execution Steps ---
+  steps:                           # REQUIRED — ordered execution steps
+    - id: "step-1"
+      name: ""                     # human-readable step name
+      action: ""                   # action identifier (e.g. api_call, containment, notification)
+      target: ""                   # BODY | BRAIN | EDGE | INTERNAL
+      parameters: {}               # action-specific key-value pairs
+      timeout: "30s"               # OPTIONAL — step timeout
+      retry:
+        max_attempts: 1
+        backoff: "exponential"     # linear | exponential | fixed
+      on_failure: "halt"           # halt | skip | rollback
+      # depends_on: []             # OPTIONAL — step IDs this step depends on
+
+  # --- Output Definition ---
+  outputs:
+    - name: ""
+      type: ""                     # string | number | boolean | object
+      description: ""
+
+  # --- Rollback Procedure ---
+  rollback:                        # REQUIRED for severity CRITICAL | HIGH
+    steps:
+      - id: "rollback-1"
+        name: ""
+        action: ""
+        target: ""
+        parameters: {}
+
+  # --- Governance ---
+  governance:
+    requires_brain_oversight: true  # REQUIRED for CRITICAL severity
+    max_blast_radius: ""           # single_user | team | org | global
+    audit_level: "verbose"         # minimal | standard | verbose
+    human_approval_required: false  # OPTIONAL — gate for manual review

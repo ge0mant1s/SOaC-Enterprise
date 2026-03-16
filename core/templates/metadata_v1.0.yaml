@@ -1,0 +1,70 @@
+# ============================================================================
+# SOaC Package Metadata Template v1.0
+# Required: Every package directory MUST contain a metadata.yml conforming
+# to this schema at the package root.
+# ============================================================================
+# Validation: soac-harness validate --level 1 <metadata.yml>
+# ============================================================================
+
+apiVersion: soac.io/v1
+kind: PackageMetadata
+
+# --- Package Identity ---
+package:
+  id: ""                             # REQUIRED — e.g. pkg-001
+  name: ""                            # REQUIRED — human-readable name
+  version: "1.0.0"                    # REQUIRED — semver
+  description: ""                     # REQUIRED — one-line summary
+  author: ""                          # REQUIRED — author or team
+  created: ""                         # REQUIRED — ISO 8601
+  updated: ""                         # REQUIRED — ISO 8601 of last change
+  status: ""                          # REQUIRED — draft | review | released | deprecated
+  license: "Apache-2.0"              # REQUIRED — SPDX identifier
+
+# --- Threat Coverage ---
+threat:
+  mitre_attack:                       # REQUIRED — at least one technique
+    - technique_id: ""                # e.g. T1557.001
+      technique_name: ""              # e.g. LLMNR/NBT-NS Poisoning
+      tactic: ""                      # e.g. Credential Access
+  threat_actors: []                   # OPTIONAL — named threat groups
+  severity: ""                        # REQUIRED — CRITICAL | HIGH | MEDIUM | LOW
+
+# --- Artifact Manifest ---
+artifacts:
+  detections:                         # List of detection rule files
+    - path: ""                        # relative path within package
+      name: ""                        # rule name
+      platforms: []                   # splunk | sentinel | crowdstrike | sigma
+  playbooks:                          # List of CLAW playbook files
+    - path: ""
+      name: ""
+      severity: ""
+  policies:                           # List of policy files
+    - path: ""
+      name: ""
+      scope: ""                       # global | package | environment
+  simulations:                        # Lab scenario references
+    - scenario_id: ""                 # references data/scenarios.json key
+      name: ""
+
+# --- Stakeholder Relevance ---
+stakeholders:                          # REQUIRED — at least one
+  - role: ""                           # ciso | detection | soc | platform
+    relevance: ""                      # primary | secondary
+
+# --- Signal Requirements ---
+signals_required:                      # REQUIRED — data sources needed
+  - name: ""                           # e.g. Okta System Log
+    type: ""                           # log | api | endpoint | network | cloud
+
+# --- Dependencies ---
+dependencies:                          # OPTIONAL — other SOaC packages required
+  - package_id: ""
+    minimum_version: ""
+
+# --- Validation ---
+validation:
+  harness_level: 1                     # minimum harness level passed (1 | 2 | 3)
+  last_validated: ""                   # ISO 8601
+  evidence_bundle: ""                  # OPTIONAL — path or URL to evidence

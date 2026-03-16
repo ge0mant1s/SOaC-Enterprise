@@ -1,0 +1,72 @@
+# ============================================================================
+# SOaC Detection Rule Template v1.0
+# The Body — Telemetry & Detection Layer
+# ============================================================================
+# This is the canonical template for all detection rules across SOaC packages.
+# Every detection rule in every package MUST conform to this schema.
+# Validation: soac-harness validate --level 1 <detection.yaml>
+# ============================================================================
+
+apiVersion: soac.io/v1
+kind: DetectionRule
+
+metadata:
+  name: ""                         # REQUIRED — unique kebab-case identifier
+  version: "1.0.0"                  # REQUIRED — semver
+  author: ""                        # REQUIRED — author identifier
+  created: ""                       # REQUIRED — ISO 8601
+  package_id: ""                    # REQUIRED — parent package (e.g. pkg-001)
+  mitre_attack:                     # REQUIRED — at least one technique
+    - technique: ""                 # e.g. T1557.001
+      tactic: ""                    # e.g. Credential Access
+  severity: ""                      # REQUIRED — CRITICAL | HIGH | MEDIUM | LOW
+  confidence: ""                    # REQUIRED — HIGH | MEDIUM | LOW
+  tags: []                          # OPTIONAL
+
+spec:
+  description: ""                   # REQUIRED — what this rule detects
+  
+  # --- Data Sources ---
+  data_sources:                     # REQUIRED — at least one
+    - name: ""                      # e.g. Okta System Log, Windows Security
+      type: ""                      # log | api | endpoint | network | cloud
+      fields: []                    # specific fields consumed
+
+  # --- Detection Logic ---
+  logic:
+    type: ""                        # correlation | threshold | anomaly | signature
+    timewindow: "5m"                # evaluation window
+    # Platform-specific implementations below
+    implementations:
+      splunk:
+        spl: |                      # OPTIONAL — SPL query
+          | ... 
+      sentinel:
+        kql: |                      # OPTIONAL — KQL query
+          ...
+      crowdstrike:
+        ioa: |                      # OPTIONAL — IOA definition
+          ...
+      sigma:
+        rule: |                     # OPTIONAL — Sigma rule YAML
+          ...
+    # At least ONE implementation is REQUIRED
+
+  # --- Tuning Parameters ---
+  tuning:
+    threshold: 1                    # numeric threshold for alerting
+    whitelist: []                   # known-good values to exclude
+    noise_reduction: ""             # OPTIONAL — dedup strategy
+
+  # --- Response Mapping ---
+  response:
+    playbook: ""                    # OPTIONAL — linked CLAW playbook name
+    escalation: ""                  # auto | manual | conditional
+    notify: []                      # notification channels
+
+  # --- Testing ---
+  test_cases:                       # RECOMMENDED — at least one
+    - name: ""
+      description: ""
+      input: {}                     # simulated event data
+      expected_result: ""           # alert | no_alert

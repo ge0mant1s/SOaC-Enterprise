@@ -1,0 +1,58 @@
+# ============================================================================
+# SOaC Policy-as-Code Template v1.0
+# Governance & Compliance Layer
+# ============================================================================
+# This is the canonical template for all policy definitions across SOaC.
+# Policies enforce constraints on environments, actions, and data handling.
+# Validation: soac-harness validate --level 1 <policy.yaml>
+# ============================================================================
+
+apiVersion: soac.io/v1
+kind: Policy
+
+metadata:
+  name: ""                          # REQUIRED — unique kebab-case identifier
+  version: "1.0.0"                   # REQUIRED — semver
+  author: ""                         # REQUIRED — author identifier
+  created: ""                        # REQUIRED — ISO 8601
+  package_id: ""                     # OPTIONAL — scoped to package, or global
+  scope: ""                          # REQUIRED — global | package | environment
+  tags: []                           # OPTIONAL
+
+spec:
+  description: ""                    # REQUIRED — human-readable purpose
+
+  # --- Environment Constraints ---
+  environments:
+    - name: ""                       # e.g. lab | staging | production
+      mode: ""                       # enforce | simulate | audit
+      data_handling: ""              # synthetic | anonymized | live
+      network_access: ""             # isolated | restricted | full
+      persistence: ""                # ephemeral | persistent
+
+  # --- Action Controls ---
+  actions:
+    allowed: []                      # list of permitted action identifiers
+    blocked: []                      # list of explicitly blocked actions
+    requires_approval: []            # actions that need human approval
+
+  # --- Access Control ---
+  access_control:
+    roles:                           # REQUIRED — at least one role
+      - name: ""                     # role identifier
+        permissions: []              # read | write | execute | admin
+    authentication:
+      required: true
+      methods: []                    # sso | mfa | api_key | certificate
+
+  # --- Compliance Mapping ---
+  compliance:
+    frameworks: []                   # e.g. NIST CSF, ISO 27001, SOC 2
+    controls: []                     # specific control IDs
+    review_frequency: ""             # quarterly | monthly | on_change
+
+  # --- Audit ---
+  audit:
+    log_level: "standard"            # minimal | standard | verbose
+    retention: "90d"                 # log retention period
+    immutable: true                  # tamper-proof audit trail
