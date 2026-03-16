@@ -1,0 +1,93 @@
+# ============================================================================
+# SOaC-Enterprise CI Pipeline
+# ============================================================================
+# Runs on every push and PR to main.
+# Steps:
+#   1. Checkout
+#   2. Install harness dependencies
+#   3. Level 1 — Schema validation on all YAML artifacts
+#   4. Level 2 — Cross-reference validation
+#   5. Banned-term scan (enforced inside Level 1)
+#   6. Upload validation report as artifact
+# ============================================================================
+
+name: SOaC Harness CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'core/templates/**'
+      - 'tools/soac-harness/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'core/templates/**'
+      - 'tools/soac-harness/**'
+  workflow_dispatch:  # manual trigger
+
+jobs:
+  validate:
+    name: SOaC Harness — Level 1 + 2
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: tools/soac-harness/package.json
+
+      - name: Install harness dependencies
+        working-directory: tools/soac-harness
+        run: npm install
+
+      - name: Run Level 1 — Schema Validation
+        id: level1
+        working-directory: tools/soac-harness
+        run: |
+          echo "## SOaC Harness — Level 1 (Schema)" >> $GITHUB_STEP_SUMMARY
+          npx ts-node src/index.ts validate --path ../../packages --level 1 --format text 2>&1 | tee /tmp/l1-report.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/l1-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Level 2 — Cross-Reference Validation
+        id: level2
+        working-directory: tools/soac-harness
+        run: |
+          echo "## SOaC Harness — Level 2 (Cross-Reference)" >> $GITHUB_STEP_SUMMARY
+          npx ts-node src/index.ts validate --path ../../packages --level 2 --format text 2>&1 | tee /tmp/l2-report.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/l2-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate JSON report
+        if: always()
+        working-directory: tools/soac-harness
+        run: |
+          npx ts-node src/index.ts validate --path ../../packages --level 2 --format json > /tmp/harness-report.json 2>&1 || true
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soac-harness-report
+          path: /tmp/harness-report.json
+          retention-days: 30
+
+      - name: Validate core templates
+        working-directory: tools/soac-harness
+        run: |
+          echo "## Core Templates Validation" >> $GITHUB_STEP_SUMMARY
+          npx ts-node src/index.ts validate --path ../../core/templates --level 1 --format text 2>&1 | tee /tmp/templates-report.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/templates-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
