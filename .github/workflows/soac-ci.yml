@@ -1,16 +1,24 @@
 # ============================================================================
 # SOaC-Enterprise CI Pipeline
 # ============================================================================
-# Runs on every push and PR to main when harness source or package artifacts
-# change.
+# Runs on every push and PR to main when harness source, package artifacts,
+# or scenario data change.
 #
-# Strategy (M3):
-#   - Validate test-fixtures/valid-*.yaml   → MUST pass (exit 0)
-#   - Validate test-fixtures/invalid-*.yaml → MUST fail (exit 1, negative test)
-#   - Validate packages/**/metadata.yml, detection.yaml, playbook.yaml,
-#     policy.yaml → MUST pass Level 1 + 2 (contract compliance)
-#   - core/templates/** excluded — templates contain placeholder fields that
-#     intentionally fail strict schema validation.
+# Strategy (M4):
+#   Job 1 — validate:
+#     - Validate test-fixtures/valid-*.yaml   → MUST pass (exit 0)
+#     - Validate test-fixtures/invalid-*.yaml → MUST fail (exit 1, negative test)
+#     - Validate packages/**/metadata.yml, detection.yaml, playbook.yaml,
+#       policy.yaml → MUST pass Level 1 + 2 (contract compliance)
+#     - core/templates/** excluded — templates contain placeholder fields that
+#       intentionally fail strict schema validation.
+#
+#   Job 2 — replay:
+#     - Level 3 Scenario Replay for all MTIP packages
+#     - Maps scenario steps to detection/playbook triggers
+#     - Computes MITRE ATT&CK coverage per package
+#     - Writes Evidence Bundles (replay-manifest.json + replay-report.md)
+#     - Uploads Evidence Bundles as CI artifacts
 # ============================================================================
 
 name: SOaC Harness CI
@@ -21,11 +29,15 @@ on:
     paths:
       - 'tools/soac-harness/**'
       - 'packages/**'
+      - 'data/scenarios.json'
+      - 'data/packages.json'
   pull_request:
     branches: [main]
     paths:
       - 'tools/soac-harness/**'
       - 'packages/**'
+      - 'data/scenarios.json'
+      - 'data/packages.json'
   workflow_dispatch:  # manual trigger
 
 jobs:
@@ -131,4 +143,73 @@ jobs:
         with:
           name: soac-harness-report
           path: /tmp/harness-report.json
+          retention-days: 30
+
+  # ════════════════════════════════════════════════════════════
+  # Job 2 — Level 3: Scenario Replay & Evidence Generation
+  # ════════════════════════════════════════════════════════════
+  replay:
+    name: SOaC Harness — Level 3 Replay
+    runs-on: ubuntu-latest
+    needs: validate
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: tools/soac-harness/package.json
+
+      - name: Install harness dependencies
+        working-directory: tools/soac-harness
+        run: npm install
+
+      # ── Run Level 3 replay across all packages ─────────────
+      - name: "Level 3 — Scenario Replay & Evidence Generation"
+        working-directory: tools/soac-harness
+        run: |
+          echo "## Level 3 — Scenario Replay & Evidence Bundles" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          npx ts-node src/index.ts replay \
+            --packages-dir ../../packages \
+            --scenarios ../../data/scenarios.json \
+            --registry ../../data/packages.json \
+            --format text 2>&1 | tee /tmp/replay-report.txt
+          REPLAY_EXIT=${PIPESTATUS[0]}
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/replay-report.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          exit $REPLAY_EXIT
+
+      # ── Generate JSON replay report ────────────────────────
+      - name: Generate replay JSON report
+        if: always()
+        working-directory: tools/soac-harness
+        run: |
+          npx ts-node src/index.ts replay \
+            --packages-dir ../../packages \
+            --scenarios ../../data/scenarios.json \
+            --registry ../../data/packages.json \
+            --format json > /tmp/replay-report.json 2>/dev/null || echo '{"manifests":[],"exitCode":2}' > /tmp/replay-report.json
+
+      # ── Upload Evidence Bundles as CI artifacts ────────────
+      - name: Upload Evidence Bundles
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soac-evidence-bundles
+          path: packages/*/evidence/
+          retention-days: 90
+
+      - name: Upload replay JSON report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soac-replay-report
+          path: /tmp/replay-report.json
           retention-days: 30
