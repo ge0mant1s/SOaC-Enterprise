@@ -1,0 +1,33 @@
+apiVersion: soac.io/v1
+kind: PackageMetadata
+package:
+  id: pkg-001
+  name: Ransomware Containment Suite
+  version: "2.0.0"
+  description: End-to-end ransomware response package.
+  author: soac-core-team
+  status: released
+
+threat:
+  severity: CRITICAL
+  mitre_attack:
+    - technique_id: T1486
+      tactic: impact
+
+artifacts:
+  - path: playbooks/isolate-host.yaml
+    type: playbook
+  - path: detections/ransomware-behavior.yaml
+    type: detection
+
+stakeholders:
+  - role: soc-analyst
+    responsibility: Execute playbooks
+
+signals_required:
+  - name: CrowdStrike EDR
+    type: endpoint
+
+validation:
+  harness_level: 2
+  last_validated: "2025-12-01"

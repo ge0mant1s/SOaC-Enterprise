@@ -1,0 +1,56 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: test-isolate-host
+  version: "1.0.0"
+  author: soac-ci
+  severity: CRITICAL
+  package_id: pkg-001
+  mitre_attack:
+    - T1486
+    - T1059.001
+
+spec:
+  description: Test playbook for harness proof-of-concept.
+
+  trigger:
+    source: BODY
+    conditions:
+      - field: alert_type
+        operator: eq
+        value: "ransomware"
+
+  inputs:
+    - name: host_id
+      type: string
+      required: true
+
+  steps:
+    - id: contain
+      name: Contain Host
+      action: api_call
+      target: EDGE
+      on_failure: rollback
+      retry:
+        max_attempts: 3
+        backoff: exponential
+
+    - id: notify
+      name: Alert SOC
+      action: notify
+      target: INTERNAL
+      on_failure: skip
+
+  rollback:
+    enabled: true
+    steps:
+      - id: lift
+        name: Lift Containment
+        action: api_call
+        target: EDGE
+
+  governance:
+    requires_brain_oversight: true
+    max_blast_radius: single_user
+    audit_level: verbose
+    brain_oversight: true

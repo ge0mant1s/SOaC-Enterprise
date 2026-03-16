@@ -1,0 +1,11 @@
+apiVersion: wrong.version/v99
+kind: SomethingElse
+metadata:
+  severity: UNKNOWN_LEVEL
+  package_id: bad-format
+
+spec:
+  steps: []
+  governance:
+    max_blast_radius: galaxy
+    audit_level: extreme
