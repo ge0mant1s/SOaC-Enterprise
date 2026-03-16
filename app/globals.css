@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --radius: 0.5rem;
+  --background: 220 20% 4%;
+  --foreground: 150 60% 90%;
+  --card: 220 18% 7%;
+  --card-foreground: 150 20% 85%;
+  --popover: 220 18% 7%;
+  --popover-foreground: 150 20% 85%;
+  --primary: 150 100% 50%;
+  --primary-foreground: 220 20% 4%;
+  --secondary: 180 100% 40%;
+  --secondary-foreground: 220 20% 4%;
+  --muted: 220 15% 12%;
+  --muted-foreground: 220 10% 55%;
+  --accent: 150 80% 40%;
+  --accent-foreground: 220 20% 4%;
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 150 20% 15%;
+  --input: 220 15% 15%;
+  --ring: 150 100% 50%;
+  --chart-1: 150 100% 50%;
+  --chart-2: 180 100% 40%;
+  --chart-3: 270 80% 60%;
+  --chart-4: 40 90% 55%;
+  --chart-5: 0 80% 55%;
+}
+
+[data-hydration-error] {
+  display: none !important;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(150, 20%, 20%) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: hsl(150, 20%, 20%);
+  border-radius: 3px;
+}
+
+body {
+  background: hsl(220, 20%, 4%);
+  color: hsl(150, 60%, 90%);
+  font-family: 'Inter', sans-serif;
+}
+
+.font-mono {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes glow {
+  0%, 100% { text-shadow: 0 0 10px hsl(150, 100%, 50%, 0.5); }
+  50% { text-shadow: 0 0 20px hsl(150, 100%, 50%, 0.8), 0 0 40px hsl(150, 100%, 50%, 0.3); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes typewriter-cursor {
+  0%, 100% { border-right-color: hsl(150, 100%, 50%); }
+  50% { border-right-color: transparent; }
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+.terminal-bg {
+  background: linear-gradient(180deg, hsl(220, 20%, 5%) 0%, hsl(220, 25%, 3%) 100%);
+}
+
+.glass-card {
+  background: hsl(220, 18%, 7%, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(150, 20%, 15%, 0.5);
+}
+
+.text-terminal {
+  color: hsl(150, 100%, 50%);
+}
+
+.text-cyan {
+  color: hsl(180, 100%, 50%);
+}
+
+.border-terminal {
+  border-color: hsl(150, 100%, 50%, 0.3);
+}
