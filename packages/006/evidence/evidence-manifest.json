@@ -1,0 +1,724 @@
+{
+  "schema_version": "1.0.0",
+  "harness_level": 3,
+  "package_id": "pkg-006",
+  "package_name": "Credential Harvesting & Phishing Kit",
+  "scenario_id": "pkg-006",
+  "scenario_title": "EvilProxy Credential Harvest",
+  "generated_at": "2026-03-16T18:25:00.515Z",
+  "summary": {
+    "total_steps": 76,
+    "body_steps": 12,
+    "brain_steps": 12,
+    "purpose_steps": 11,
+    "edge_steps": 5,
+    "detection_triggers": 6,
+    "playbook_actions": 12,
+    "mitre_techniques_declared": 3,
+    "mitre_techniques_exercised": 3,
+    "coverage_pct": 100
+  },
+  "mitre_coverage": [
+    {
+      "technique_id": "T1598",
+      "tactic": "Reconnaissance",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        12,
+        14,
+        17,
+        18,
+        21,
+        25,
+        48
+      ],
+      "detected_by": "credential-harvest-phishing-kit",
+      "responded_by": "credential-harvest-response"
+    },
+    {
+      "technique_id": "T1566.002",
+      "tactic": "Initial Access",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        12,
+        14,
+        17,
+        18,
+        21,
+        25,
+        48
+      ],
+      "detected_by": "credential-harvest-phishing-kit",
+      "responded_by": "credential-harvest-response"
+    },
+    {
+      "technique_id": "T1056.004",
+      "tactic": "Collection",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        12,
+        14,
+        17,
+        18,
+        21,
+        25,
+        48
+      ],
+      "detected_by": "credential-harvest-phishing-kit",
+      "responded_by": "credential-harvest-response"
+    }
+  ],
+  "replay_timeline": [
+    {
+      "step_index": 0,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 1,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "╔══════════════════════════════════════════════════════════════╗",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 2,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "║   SCENARIO: EVILPROXY CREDENTIAL HARVEST — pkg-006          ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 3,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "║   Phishing Kit → Credential Capture → Account Takeover      ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 4,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "╚══════════════════════════════════════════════════════════════╝",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 5,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 6,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Loading scenario: EvilProxy Credential Harvest",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 7,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Threat actor profile: FIN-HARVEST (Credential Theft Group)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 8,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] MITRE ATT&CK: T1598, T1566.002, T1056.004",
+      "artifact_hit": null,
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 9,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Signals: Email gateway, Web proxy, DNS query logs",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 10,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Lab safety: SIMULATE mode | Synthetic credential data",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 11,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 12,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "━━━ PHASE 1: THE BODY — Email & Web Telemetry ━━━━━━━━━━━━━━",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 13,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 14,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Email gateway alert: Suspicious link in inbound message",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 15,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Subject: \"Urgent: Verify your account credentials\"",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 16,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Sender: noreply@c0rp-auth.top (domain age: 2 days)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 17,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Link: https://c0rp-auth.top/login/verify?token=abc123",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 18,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] ⚡ Detection triggered: BODY-CRED-HARVEST-a4f2c1",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 19,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ Domain c0rp-auth.top → newly registered (48h)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 20,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ Certificate: Let's Encrypt wildcard (common in phish kits)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 21,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ Page structure: EvilProxy template fingerprint detected",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 22,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   └─ Form action: POST /collect → credential exfil endpoint",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 23,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] DNS query: c0rp-auth.top → 185.234.xx.xx (known bulletproof hosting)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 24,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY] risk_score = HIGH | phishing_kit = EvilProxy v3.2",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 25,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Detection hash: BODY-CRED-HARVEST-a4f2c19e7d",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 26,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY] Forwarding to The Brain for analysis...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 27,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 28,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "━━━ PHASE 2: THE BRAIN — Threat Analysis ━━━━━━━━━━━━━━━━━━━",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 29,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 30,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Receiving detection BODY-CRED-HARVEST-a4f2c19e7d...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 31,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Loading governance: ai_governance_baseline.yaml",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 32,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Prompt injection scan: CLEAN ✓",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 33,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "[BRAIN] Analyzing phishing infrastructure...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 34,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Domain typosquat similarity: 94% match to corp-auth.com",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 35,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ SSL cert: wildcard *.c0rp-auth.top (Let's Encrypt)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 36,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ EvilProxy kit signature: HTML form + JS keylogger",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 37,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Credential exfil: POST to /collect with base64 encoding",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 38,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   └─ 3 users clicked link in past 15 minutes",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 39,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Confidence: 89% → 96% (kit fingerprint + domain intel)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 40,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Recommended playbook: credential-harvest-response v1.0.0",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 41,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "[BRAIN] Decision: APPROVE execution",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 42,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Audit hash: sha256:c7d4e1... | Immutable log stored",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 43,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 44,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "━━━ PHASE 3: THE PURPOSE — CLAW Playbook Execution ━━━━━━━━━━",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 45,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 46,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Loading: credential-harvest-response v1.0.0",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 47,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] apiVersion: claw.soac.io/v1 | kind: Playbook",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 48,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] severity: HIGH | mitre_attack: [T1598, T1566.002, T1056.004]",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": [
+        "T1598",
+        "T1566.002",
+        "T1056.004"
+      ]
+    },
+    {
+      "step_index": 49,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Trigger matched: detection_type=credential_harvest_phishing",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 50,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 51,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 1/3: block_phishing_domain",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 52,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: EDGE | action: block_domain c0rp-auth.top",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 53,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Domain blocked across all edge nodes",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 54,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 2/3: reset_affected_credentials",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 55,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: BODY | action: force_password_reset (3 users)",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 56,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Password reset forced for j.smith, m.jones, k.lee",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 57,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 3/3: submit_iocs",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 58,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: INTERNAL | action: submit IOCs to threat intel",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 59,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Domain, IP, cert hash submitted to TIP",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 60,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 61,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "━━━ PHASE 4: THE EDGE — Enforcement ━━━━━━━━━━━━━━━━━━━━━━━━",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 62,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 63,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Receiving enforcement from CLAW playbook...",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 64,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Verifying HMAC-SHA256 signature: VERIFIED ✓",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 65,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Enforcing domain block: c0rp-auth.top",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 66,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   ├─ edge-us-east-1: DNS sinkhole ENFORCED ✓ (3ms)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 67,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   ├─ edge-eu-west-1: DNS sinkhole ENFORCED ✓ (41ms)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 68,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   └─ edge-ap-south-1: DNS sinkhole ENFORCED ✓ (78ms)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 69,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Email gateway: Quarantined 12 additional messages from c0rp-auth.top",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 70,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 71,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "╔══════════════════════════════════════════════════════════════╗",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 72,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   ✓ SIMULATION COMPLETE                                    ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 73,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   Phishing kit neutralized in 6.2s | 3 users protected     ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 74,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "╚══════════════════════════════════════════════════════════════╝",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 75,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Lab safety policy enforced: SIMULATE mode active.",
+      "artifact_hit": null,
+      "mitre_match": []
+    }
+  ],
+  "artifacts_used": {
+    "detection": "detection.yaml",
+    "playbook": "playbook.yaml",
+    "policy": "policy.yaml",
+    "metadata": "metadata.yml"
+  },
+  "verdict": "PASS",
+  "verdict_reason": "All 3 declared MITRE techniques (from metadata.yml) validated by replay heuristics. 6 detection triggers, 12 playbook actions observed."
+}
