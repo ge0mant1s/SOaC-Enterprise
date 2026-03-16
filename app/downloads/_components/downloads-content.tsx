@@ -18,6 +18,7 @@ import {
   FileText,
   Play,
 } from 'lucide-react';
+import packagesData from '@/data/packages.json';
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -113,21 +114,31 @@ const assets: Asset[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Package data (all 11)                                              */
+/*  Package data — derived from the single-source registry              */
 /* ------------------------------------------------------------------ */
-const packages: PkgEntry[] = [
-  { id: 'pkg-001', name: 'Identity-led Intrusion Defense', description: 'AitM phishing, session hijacking, and identity attacks across Okta, Entra ID, Azure AD.', audiences: ['CISO/Board', 'Detection Eng', 'SOC/IR'], mitre: ['T1557.001', 'T1078.004', 'T1539'], githubFolder: 'packages/001_identity_intrusion_defense', labPkg: '001' },
-  { id: 'pkg-002', name: 'Ransomware Containment & Response', description: 'Automated host isolation, process kill, forensic snapshot, and SOC notification.', audiences: ['SOC/IR', 'Detection Eng', 'Platform/Cloud'], mitre: ['T1486', 'T1059', 'T1068', 'T1490'], githubFolder: 'packages/002_ransomware_containment', labPkg: '002' },
-  { id: 'pkg-003', name: 'Supply Chain & npm Compromise', description: 'Detect malicious npm packages, dependency confusion, and software supply chain attacks.', audiences: ['Detection Eng', 'Platform/Cloud'], mitre: ['T1195.002', 'T1059.007', 'T1027'], githubFolder: 'packages/003_supply_chain_defense', labPkg: '003' },
-  { id: 'pkg-004', name: 'BYOVD & Kernel Exploit Defense', description: 'Bring Your Own Vulnerable Driver and kernel-level exploitation detection.', audiences: ['Detection Eng', 'SOC/IR', 'Platform/Cloud'], mitre: ['T1068', 'T1014', 'T1547.006'], githubFolder: 'packages/004_byovd_defense', labPkg: '004' },
-  { id: 'pkg-005', name: 'SEO Poisoning & Gootloader Defense', description: 'SEO poisoning campaigns and Gootloader malware delivery via compromised sites.', audiences: ['Detection Eng', 'SOC/IR'], mitre: ['T1189', 'T1059.007', 'T1071.001'], githubFolder: 'packages/005_seo_poisoning_defense', labPkg: '005' },
-  { id: 'pkg-006', name: 'Credential Harvesting & Phishing Kit', description: 'Detection of credential harvesting infrastructure and phishing kit deployment patterns.', audiences: ['SOC/IR', 'Detection Eng'], mitre: ['T1598', 'T1566.002', 'T1056.004'], githubFolder: 'packages/006_credential_harvesting', labPkg: '006' },
-  { id: 'pkg-007', name: 'Cloud IAM Privilege Escalation', description: 'Detect and respond to IAM role chaining, cross-account pivoting, and cloud privilege abuse.', audiences: ['Platform/Cloud', 'Detection Eng'], mitre: ['T1078.004', 'T1548', 'T1484'], githubFolder: 'packages/007_cloud_iam_privesc', labPkg: '007' },
-  { id: 'pkg-008', name: 'Lateral Movement & RDP Abuse', description: 'Detect RDP tunneling, pass-the-hash, and network-layer lateral movement techniques.', audiences: ['SOC/IR', 'Detection Eng'], mitre: ['T1021.001', 'T1550.002', 'T1570'], githubFolder: 'packages/008_lateral_movement', labPkg: '008' },
-  { id: 'pkg-009', name: 'Data Exfiltration & Staging', description: 'Detect data staging, compression, and exfiltration over C2 and legitimate channels.', audiences: ['SOC/IR', 'Detection Eng', 'CISO/Board'], mitre: ['T1560', 'T1041', 'T1567'], githubFolder: 'packages/009_data_exfiltration', labPkg: '009' },
-  { id: 'pkg-010', name: 'Living off the Land (LOLBins)', description: 'Detect abuse of legitimate system binaries for execution, persistence, and defense evasion.', audiences: ['Detection Eng', 'SOC/IR'], mitre: ['T1218', 'T1059.001', 'T1036'], githubFolder: 'packages/010_lolbins_defense', labPkg: '010' },
-  { id: 'pkg-011', name: 'Insider Threat & Anomalous Behavior', description: 'Behavioral analytics for detecting insider threat indicators and anomalous access patterns.', audiences: ['CISO/Board', 'SOC/IR', 'Platform/Cloud'], mitre: ['T1078', 'T1530', 'T1213'], githubFolder: 'packages/011_insider_threat', labPkg: '011' },
-];
+const STAKEHOLDER_TO_AUDIENCE: Record<string, Audience> = {
+  ciso: 'CISO/Board',
+  detection: 'Detection Eng',
+  soc: 'SOC/IR',
+  platform: 'Platform/Cloud',
+};
+
+const packages: PkgEntry[] = (packagesData as Array<{
+  id: string;
+  name: string;
+  summary: string;
+  stakeholders: string[];
+  mitre: string[];
+  repo_path: string;
+}>).map((p) => ({
+  id: p.id,
+  name: p.name,
+  description: p.summary,
+  audiences: p.stakeholders.map((s) => STAKEHOLDER_TO_AUDIENCE[s] ?? ('All' as Audience)),
+  mitre: p.mitre,
+  githubFolder: p.repo_path,
+  labPkg: p.id.replace('pkg-', ''),
+}));
 
 /* ------------------------------------------------------------------ */
 /*  Audience colour helper                                             */
