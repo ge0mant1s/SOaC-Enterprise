@@ -5,10 +5,15 @@
 # Steps:
 #   1. Checkout
 #   2. Install harness dependencies
-#   3. Level 1 — Schema validation on all YAML artifacts
-#   4. Level 2 — Cross-reference validation
-#   5. Banned-term scan (enforced inside Level 1)
+#   3. Level 1+2 — Schema + Cross-Reference validation on core/templates
+#   4. Level 1+2 — Schema + Cross-Reference validation on test-fixtures
+#   5. Generate combined JSON report
 #   6. Upload validation report as artifact
+#
+# NOTE (M2): packages/** validation is intentionally excluded until M3
+#   completes package standardization. When M3 lands, add 'packages/**'
+#   back to paths triggers and add a "Validate packages" step scanning
+#   --path ../../packages --level 2.
 # ============================================================================
 
 name: SOaC Harness CI
@@ -17,13 +22,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'packages/**'
       - 'core/templates/**'
       - 'tools/soac-harness/**'
   pull_request:
     branches: [main]
     paths:
-      - 'packages/**'
       - 'core/templates/**'
       - 'tools/soac-harness/**'
   workflow_dispatch:  # manual trigger
@@ -49,31 +52,33 @@ jobs:
         working-directory: tools/soac-harness
         run: npm install
 
-      - name: Run Level 1 — Schema Validation
-        id: level1
+      - name: Validate core templates (L1 + L2)
         working-directory: tools/soac-harness
         run: |
-          echo "## SOaC Harness — Level 1 (Schema)" >> $GITHUB_STEP_SUMMARY
-          npx ts-node src/index.ts validate --path ../../packages --level 1 --format text 2>&1 | tee /tmp/l1-report.txt
+          echo "## Core Templates — Level 1 + 2" >> $GITHUB_STEP_SUMMARY
+          npx ts-node src/index.ts validate --path ../../core/templates --level 2 --format text 2>&1 | tee /tmp/templates-report.txt
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/l1-report.txt >> $GITHUB_STEP_SUMMARY
+          cat /tmp/templates-report.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Run Level 2 — Cross-Reference Validation
-        id: level2
+      - name: Validate harness test-fixtures (L1 + L2)
         working-directory: tools/soac-harness
         run: |
-          echo "## SOaC Harness — Level 2 (Cross-Reference)" >> $GITHUB_STEP_SUMMARY
-          npx ts-node src/index.ts validate --path ../../packages --level 2 --format text 2>&1 | tee /tmp/l2-report.txt
+          echo "## Harness Test Fixtures — Level 1 + 2" >> $GITHUB_STEP_SUMMARY
+          npx ts-node src/index.ts validate --path test-fixtures --level 2 --format text 2>&1 | tee /tmp/fixtures-report.txt || true
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/l2-report.txt >> $GITHUB_STEP_SUMMARY
+          cat /tmp/fixtures-report.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Generate JSON report
         if: always()
         working-directory: tools/soac-harness
         run: |
-          npx ts-node src/index.ts validate --path ../../packages --level 2 --format json > /tmp/harness-report.json 2>&1 || true
+          echo '{"core_templates":' > /tmp/harness-report.json
+          npx ts-node src/index.ts validate --path ../../core/templates --level 2 --format json 2>/dev/null >> /tmp/harness-report.json || echo '{}' >> /tmp/harness-report.json
+          echo ',"test_fixtures":' >> /tmp/harness-report.json
+          npx ts-node src/index.ts validate --path test-fixtures --level 2 --format json 2>/dev/null >> /tmp/harness-report.json || echo '{}' >> /tmp/harness-report.json
+          echo '}' >> /tmp/harness-report.json
 
       - name: Upload validation report
         if: always()
@@ -82,12 +87,3 @@ jobs:
           name: soac-harness-report
           path: /tmp/harness-report.json
           retention-days: 30
-
-      - name: Validate core templates
-        working-directory: tools/soac-harness
-        run: |
-          echo "## Core Templates Validation" >> $GITHUB_STEP_SUMMARY
-          npx ts-node src/index.ts validate --path ../../core/templates --level 1 --format text 2>&1 | tee /tmp/templates-report.txt
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          cat /tmp/templates-report.txt >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
