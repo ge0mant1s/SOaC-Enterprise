@@ -108,6 +108,8 @@ const assets: Asset[] = [
   { id: 'lab-safety', title: 'Lab Safety Policy (YAML)', description: 'Policy-as-code controlling lab vs. staging vs. production behavior boundaries.', pillar: 'the-edge', audiences: ['SOC/IR'], githubUrl: `${GH_BLOB}/brain/policy/lab_safety_policy.yaml`, rawUrl: `${GH_RAW}/brain/policy/lab_safety_policy.yaml` },
 
   // Releases
+  { id: 'v2-m4-replay', title: 'v2.0-M4 — Replay & Evidence', description: 'Level 3 Replay Engine: scenario-driven evidence generation with MITRE ATT&CK coverage metrics. Each MTIP package now ships with a machine-readable Evidence Bundle proving artifact reachability.', pillar: 'releases', audiences: ['All'], githubUrl: `${GH_BLOB}/docs/releases/v2.0/milestones/M4_replay_evidence.md` },
+  { id: 'v2-m3-packages', title: 'v2.0-M3 — Package Manager & Lab', description: 'MTIP Package Manager with 11 downloadable packages, interactive Scenario Lab with per-package walkthroughs, and CI-integrated Level 1 + 2 validation.', pillar: 'releases', audiences: ['All'], githubUrl: `${GH_BLOB}/docs/releases/v2.0/milestones/M3_package_manager.md` },
   { id: 'roadmap', title: 'Release 1.0 Roadmap', description: 'Milestone plan and delivery timeline for the SOaC 1.0 release.', pillar: 'releases', audiences: ['All'], githubUrl: `${GH_BLOB}/RELEASE_1.0_ROADMAP.md` },
   { id: 'contributing', title: 'Contributing Guide', description: 'How to contribute detection rules, playbooks, and documentation to SOaC.', pillar: 'releases', audiences: ['All'], githubUrl: `${GH_BLOB}/CONTRIBUTING.md` },
   { id: 'coc', title: 'Code of Conduct', description: 'Community standards for respectful, inclusive collaboration.', pillar: 'releases', audiences: ['All'], githubUrl: `${GH_BLOB}/CODE_OF_CONDUCT.md` },
