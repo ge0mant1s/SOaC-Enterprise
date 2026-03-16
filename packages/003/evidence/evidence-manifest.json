@@ -1,0 +1,631 @@
+{
+  "schema_version": "1.0.0",
+  "harness_level": 3,
+  "package_id": "pkg-003",
+  "package_name": "Supply Chain & npm Compromise",
+  "scenario_id": "pkg-003",
+  "scenario_title": "Shai-Hulud Supply Chain Attack",
+  "generated_at": "2026-03-16T18:25:00.406Z",
+  "summary": {
+    "total_steps": 68,
+    "body_steps": 9,
+    "brain_steps": 8,
+    "purpose_steps": 9,
+    "edge_steps": 4,
+    "detection_triggers": 2,
+    "playbook_actions": 8,
+    "mitre_techniques_declared": 3,
+    "mitre_techniques_exercised": 3,
+    "coverage_pct": 100
+  },
+  "mitre_coverage": [
+    {
+      "technique_id": "T1195.002",
+      "tactic": "Initial Access",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        13,
+        16
+      ],
+      "detected_by": "supply-chain-npm-compromise",
+      "responded_by": "supply-chain-quarantine"
+    },
+    {
+      "technique_id": "T1059.007",
+      "tactic": "Execution",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        13,
+        16,
+        20
+      ],
+      "detected_by": "supply-chain-npm-compromise",
+      "responded_by": "supply-chain-quarantine"
+    },
+    {
+      "technique_id": "T1027",
+      "tactic": "Defense Evasion",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        13,
+        16,
+        21
+      ],
+      "detected_by": "supply-chain-npm-compromise",
+      "responded_by": "supply-chain-quarantine"
+    }
+  ],
+  "replay_timeline": [
+    {
+      "step_index": 0,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 1,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "╔══════════════════════════════════════════════════════════════╗",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 2,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "║   SCENARIO: SHAI-HULUD SUPPLY CHAIN ATTACK — pkg-003       ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 3,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "║   Malicious npm → Dependency Confusion → Reverse Shell      ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 4,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "╚══════════════════════════════════════════════════════════════╝",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 5,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 6,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Loading scenario: Shai-Hulud Supply Chain Attack",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 7,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Threat actor: Shai-Hulud (Supply chain operator)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 8,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] MITRE ATT&CK: T1195.002, T1059.007, T1027",
+      "artifact_hit": null,
+      "mitre_match": [
+        "T1195.002",
+        "T1059.007",
+        "T1027"
+      ]
+    },
+    {
+      "step_index": 9,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Signals: npm audit logs, GitHub Advanced Security, Endpoint EDR",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 10,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 11,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "━━━ PHASE 1: THE BODY — Package Registry Monitoring ━━━━━━━━━",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 12,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 13,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] GitHub Advanced Security alert: Critical vulnerability",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1195.002",
+        "T1059.007",
+        "T1027"
+      ]
+    },
+    {
+      "step_index": 14,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Package: @internal-corp/auth-utils v2.0.1 (SUSPICIOUS)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 15,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Registry: npmjs.com (public) — name collision with private scope",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 16,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Dependency confusion pattern detected:",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1195.002",
+        "T1059.007",
+        "T1027"
+      ]
+    },
+    {
+      "step_index": 17,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ Private: @internal-corp/auth-utils v1.8.3 (internal registry)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 18,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   └─ Public:  @internal-corp/auth-utils v2.0.1 (npmjs — MALICIOUS)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 19,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] postinstall script analysis:",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 20,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY]   ├─ node -e \"require('child_process').exec(Buffer.from('...')...\"  (T1059.007)",
+      "artifact_hit": null,
+      "mitre_match": [
+        "T1059.007"
+      ]
+    },
+    {
+      "step_index": 21,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY]   ├─ Obfuscated payload: Base64 → eval() → reverse shell (T1027)",
+      "artifact_hit": null,
+      "mitre_match": [
+        "T1027"
+      ]
+    },
+    {
+      "step_index": 22,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY]   └─ Callback: 45.33.32.156:4443 (known Shai-Hulud C2)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 23,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Risk Score: CRITICAL | Confidence: 96%",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 24,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY] Forwarding to The Brain...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 25,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 26,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "━━━ PHASE 2: THE BRAIN — Supply Chain Analysis ━━━━━━━━━━━━━━",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 27,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 28,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] CRITICAL supply chain detection received",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 29,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "[BRAIN] Analyzing behavioral intent...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 30,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Package publish timestamp: 2h ago — too new, no community usage",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 31,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Maintainer account: created 24h ago — throwaway identity",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 32,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ postinstall payload: reverse shell → Shai-Hulud infrastructure",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 33,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Dependency confusion: private scope name squatted on public registry",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 34,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   └─ CI/CD pipeline at risk: 3 build servers may have pulled this package",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 35,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Recommended: quarantine-malicious-package + scan-ci-artifacts",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 36,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "[BRAIN] Decision: APPROVE | Priority: IMMEDIATE",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 37,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 38,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "━━━ PHASE 3: THE PURPOSE — Package Quarantine ━━━━━━━━━━━━━━━",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 39,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 40,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Loading: quarantine-malicious-package v1.0.0",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 41,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 1/4: block_package_registry",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 42,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: artifactory | action: BLOCK @internal-corp/auth-utils@2.0.1",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 43,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Package blocked in all registries",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 44,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 2/4: scan_ci_artifacts",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 45,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: github_api | action: scan last 24h builds",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 46,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ 1 of 3 build servers compromised — flagged for isolation",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 47,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 3/4: revoke_ci_tokens",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 48,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: github_api | action: revoke PATs for affected service accounts",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 49,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ 4 tokens revoked | 2 deploy keys rotated",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 50,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 4/4: notify_security_team",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 51,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ #supply-chain-security alerted with full IOC report",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 52,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 53,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "━━━ PHASE 4: THE NERVOUS SYSTEM — Build Pipeline Lockdown ━━━",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 54,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 55,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Receiving pipeline enforcement...",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 56,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Enforcing session block...",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 57,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] HMAC-SHA256 signature: VERIFIED ✓",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 58,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   ├─ CI runner build-srv-03: ISOLATED ✓ — network quarantined",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 59,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   ├─ npm registry proxy: ALLOWLIST ONLY mode activated ✓",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 60,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   └─ Outbound to 45.33.32.156:4443: BLOCKED ✓ — C2 sinkholed",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 61,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 62,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "╔══════════════════════════════════════════════════════════════╗",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 63,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   ✓ SCENARIO COMPLETE: Shai-Hulud Supply Chain Attack       ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 64,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   Time to Quarantine: 1.4s | Compromised Builds: 1/3       ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 65,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   Tokens Revoked: 4 | C2 Blocked | Pipeline Secured        ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 66,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "╚══════════════════════════════════════════════════════════════╝",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 67,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+      "artifact_hit": null,
+      "mitre_match": []
+    }
+  ],
+  "artifacts_used": {
+    "detection": "detection.yaml",
+    "playbook": "playbook.yaml",
+    "policy": "policy.yaml",
+    "metadata": "metadata.yml"
+  },
+  "verdict": "PASS",
+  "verdict_reason": "All 3 declared MITRE techniques (from metadata.yml) validated by replay heuristics. 2 detection triggers, 8 playbook actions observed."
+}
