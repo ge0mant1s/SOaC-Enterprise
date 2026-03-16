@@ -1,0 +1,94 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "credential-harvest-response"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  tags: ["pkg-006", "automated-response"]
+  mitre_attack: ["T1598", "T1566.002", "T1056.004"]
+  severity: "HIGH"
+  package_id: "pkg-006"
+
+spec:
+  description: "Block phishing domain at edge, reset credentials for affected users, and submit phishing kit indicators to threat intel platform."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "eq"
+        value: "credential_harvest_phishing"
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_identity"
+      type: "string"
+      required: true
+      description: "The target user or entity identifier"
+
+  steps:
+    - id: "step-1"
+      name: "block_phishing_domain"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+          action: "block_domain"
+          scope: "org"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "reset_affected_credentials"
+      action: "api_call"
+      target: "BODY"
+      parameters:
+          action: "force_password_reset"
+          scope: "affected_users"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+    - id: "step-3"
+      name: "submit_iocs"
+      action: "api_call"
+      target: "INTERNAL"
+      parameters:
+          action: "submit_to_tip"
+          ioc_type: "domain"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "containment_status"
+      type: "string"
+      description: "Final status of the containment action"
+    - name: "affected_entities"
+      type: "object"
+      description: "List of entities affected by the response"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "unblock_domain"
+        action: "containment"
+        target: "EDGE"
+        parameters:
+          action: "remove_domain_block"
+
+  governance:
+    requires_brain_oversight: false
+    max_blast_radius: "org"
+    audit_level: "verbose"
+    human_approval_required: false

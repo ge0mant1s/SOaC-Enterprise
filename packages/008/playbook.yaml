@@ -1,0 +1,94 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "lateral-movement-containment"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  tags: ["pkg-008", "automated-response"]
+  mitre_attack: ["T1021.001", "T1550.002", "T1570"]
+  severity: "HIGH"
+  package_id: "pkg-008"
+
+spec:
+  description: "Block lateral RDP connections, revoke NTLM sessions, segment affected network zone, and trigger forensic collection."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "eq"
+        value: "lateral_movement_rdp"
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_identity"
+      type: "string"
+      required: true
+      description: "The target user or entity identifier"
+
+  steps:
+    - id: "step-1"
+      name: "block_rdp_lateral"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+          action: "block_rdp"
+          scope: "source_to_target"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "revoke_ntlm_sessions"
+      action: "containment"
+      target: "BODY"
+      parameters:
+          action: "invalidate_ntlm"
+          scope: "host"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+    - id: "step-3"
+      name: "segment_network"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+          action: "micro_segment"
+          scope: "subnet"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "containment_status"
+      type: "string"
+      description: "Final status of the containment action"
+    - name: "affected_entities"
+      type: "object"
+      description: "List of entities affected by the response"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "restore_network_segment"
+        action: "containment"
+        target: "EDGE"
+        parameters:
+          action: "remove_micro_segment"
+
+  governance:
+    requires_brain_oversight: false
+    max_blast_radius: "org"
+    audit_level: "verbose"
+    human_approval_required: false

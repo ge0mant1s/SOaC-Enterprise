@@ -1,0 +1,94 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "ransomware-containment-response"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  tags: ["pkg-002", "automated-response"]
+  mitre_attack: ["T1486", "T1059", "T1068", "T1490"]
+  severity: "CRITICAL"
+  package_id: "pkg-002"
+
+spec:
+  description: "Isolate affected host, kill malicious processes, capture forensic snapshot, and notify SOC for ransomware incidents."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "eq"
+        value: "ransomware_encryption"
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_identity"
+      type: "string"
+      required: true
+      description: "The target user or entity identifier"
+
+  steps:
+    - id: "step-1"
+      name: "isolate_host"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+          action: "network_isolate"
+          scope: "host"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "kill_process"
+      action: "containment"
+      target: "BODY"
+      parameters:
+          action: "terminate_process"
+          signal: "SIGKILL"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+    - id: "step-3"
+      name: "capture_forensics"
+      action: "api_call"
+      target: "INTERNAL"
+      parameters:
+          action: "snapshot_disk"
+          format: "raw"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "containment_status"
+      type: "string"
+      description: "Final status of the containment action"
+    - name: "affected_entities"
+      type: "object"
+      description: "List of entities affected by the response"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "restore_network"
+        action: "containment"
+        target: "EDGE"
+        parameters:
+          action: "remove_isolation"
+
+  governance:
+    requires_brain_oversight: true
+    max_blast_radius: "org"
+    audit_level: "verbose"
+    human_approval_required: true

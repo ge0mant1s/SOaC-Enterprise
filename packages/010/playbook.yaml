@@ -1,0 +1,93 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "lolbins-containment-response"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  tags: ["pkg-010", "automated-response"]
+  mitre_attack: ["T1218", "T1059.001", "T1036"]
+  severity: "MEDIUM"
+  package_id: "pkg-010"
+
+spec:
+  description: "Terminate suspicious LOLBin process, collect execution artifacts, apply application control policy, and notify SOC."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "eq"
+        value: "lolbin_abuse"
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_identity"
+      type: "string"
+      required: true
+      description: "The target user or entity identifier"
+
+  steps:
+    - id: "step-1"
+      name: "terminate_lolbin_process"
+      action: "containment"
+      target: "BODY"
+      parameters:
+          action: "terminate_process"
+          target: "suspicious_lolbin"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "collect_execution_artifacts"
+      action: "api_call"
+      target: "INTERNAL"
+      parameters:
+          action: "collect_prefetch_shimcache"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+    - id: "step-3"
+      name: "apply_applocker_policy"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+          action: "enforce_applocker"
+          scope: "host"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "containment_status"
+      type: "string"
+      description: "Final status of the containment action"
+    - name: "affected_entities"
+      type: "object"
+      description: "List of entities affected by the response"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "revert_applocker"
+        action: "containment"
+        target: "EDGE"
+        parameters:
+          action: "revert_applocker_policy"
+
+  governance:
+    requires_brain_oversight: false
+    max_blast_radius: "org"
+    audit_level: "verbose"
+    human_approval_required: false

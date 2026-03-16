@@ -1,0 +1,67 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+
+metadata:
+  name: "lateral-movement-rdp-abuse"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  package_id: "pkg-008"
+  mitre_attack:
+    - technique: "T1021.001"
+      tactic: "Lateral Movement"
+    - technique: "T1550.002"
+      tactic: "Defense Evasion"
+    - technique: "T1570"
+      tactic: "Lateral Movement"
+  severity: "HIGH"
+  confidence: "HIGH"
+  tags: ["pkg-008", "lateral-movement"]
+
+spec:
+  description: "Detects lateral movement via RDP tunneling, pass-the-hash authentication, and anomalous SMB file transfers between internal hosts."
+
+  data_sources:
+    - name: "Windows Security Event Log"
+      type: "log"
+      fields: ["EventID", "LogonType", "SourceIP", "TargetUsername", "AuthenticationPackage"]
+
+  logic:
+    type: "correlation"
+    timewindow: "5m"
+    implementations:
+      sigma:
+        rule: |
+          title: Lateral Movement via RDP and Pass-the-Hash
+          status: experimental
+          logsource:
+            product: windows
+            service: security
+          detection:
+            selection_rdp:
+              EventID: 4624
+              LogonType: 10
+            selection_pth:
+              EventID: 4624
+              LogonType: 9
+              AuthenticationPackage: NTLM
+            condition: selection_rdp or selection_pth
+          level: high
+
+  tuning:
+    threshold: 1
+    whitelist: []
+    noise_reduction: "dedup_by_user"
+
+  response:
+    playbook: "lateral-movement-containment"
+    escalation: "auto"
+    notify: ["soc-team"]
+
+  test_cases:
+    - name: "positive-match"
+      description: "Simulated lateral movement event that should trigger alert"
+      input:
+        event_type: "lateral_movement_rdp"
+        severity: "HIGH"
+      expected_result: "alert"
