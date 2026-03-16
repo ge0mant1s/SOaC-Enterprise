@@ -4,11 +4,19 @@
  * ============================================================================
  * Usage:
  *   soac-harness validate --path <dir|file> [--level 1|2] [--format text|json]
+ *   soac-harness replay   --packages-dir <dir> --scenarios <file> --registry <file>
+ *                         [--format text|json]
+ *
+ * Commands:
+ *   validate  — Level 1/2 schema & semantic validation of individual YAML files
+ *   replay    — Level 3 scenario replay: maps scenario steps to detection/playbook
+ *               triggers, computes MITRE coverage, and writes Evidence Bundles
+ *               (evidence-manifest.json + replay-report.md) per package.
  *
  * Exit codes:
- *   0 — all files passed
- *   1 — one or more files failed
- *   2 — no YAML files found or invalid arguments
+ *   0 — all checks passed
+ *   1 — one or more packages/files failed
+ *   2 — invalid arguments or missing paths
  * ============================================================================ */
 
 import * as fs from 'fs';
@@ -16,28 +24,69 @@ import * as path from 'path';
 import * as yaml from 'js-yaml';
 import { runLevel1 } from './level1';
 import { runLevel2 } from './level2';
+import { runLevel3 } from './level3';
 import { FileResult, HarnessResult, Finding } from './types';
 
+/* ── Argument types ──────────────────────────────────────── */
+interface ValidateArgs {
+  command: 'validate';
+  targetPath: string;
+  level: 1 | 2;
+  format: 'text' | 'json';
+}
+
+interface ReplayArgs {
+  command: 'replay';
+  packagesDir: string;
+  scenariosPath: string;
+  registryPath: string;
+  format: 'text' | 'json';
+}
+
+type CliArgs = ValidateArgs | ReplayArgs;
+
 /* ── Argument parsing ────────────────────────────────────── */
-function parseArgs(): { targetPath: string; level: 1 | 2; format: 'text' | 'json' } {
+function parseArgs(): CliArgs {
   const args = process.argv.slice(2);
-  let targetPath = '.';
-  let level: 1 | 2 = 2;
-  let format: 'text' | 'json' = 'text';
-
   const cmd = args[0];
-  if (cmd !== 'validate') {
-    console.error('Usage: soac-harness validate --path <dir|file> [--level 1|2] [--format text|json]');
-    process.exit(2);
+
+  if (cmd === 'validate') {
+    let targetPath = '.';
+    let level: 1 | 2 = 2;
+    let format: 'text' | 'json' = 'text';
+
+    for (let i = 1; i < args.length; i++) {
+      if (args[i] === '--path' && args[i + 1]) { targetPath = args[++i]; }
+      else if (args[i] === '--level' && args[i + 1]) { level = parseInt(args[++i], 10) as 1 | 2; }
+      else if (args[i] === '--format' && args[i + 1]) { format = args[++i] as 'text' | 'json'; }
+    }
+    return { command: 'validate', targetPath, level, format };
   }
 
-  for (let i = 1; i < args.length; i++) {
-    if (args[i] === '--path' && args[i + 1]) { targetPath = args[++i]; }
-    else if (args[i] === '--level' && args[i + 1]) { level = parseInt(args[++i], 10) as 1 | 2; }
-    else if (args[i] === '--format' && args[i + 1]) { format = args[++i] as 'text' | 'json'; }
+  if (cmd === 'replay') {
+    let packagesDir = '';
+    let scenariosPath = '';
+    let registryPath = '';
+    let format: 'text' | 'json' = 'text';
+
+    for (let i = 1; i < args.length; i++) {
+      if (args[i] === '--packages-dir' && args[i + 1]) { packagesDir = args[++i]; }
+      else if (args[i] === '--scenarios' && args[i + 1]) { scenariosPath = args[++i]; }
+      else if (args[i] === '--registry' && args[i + 1]) { registryPath = args[++i]; }
+      else if (args[i] === '--format' && args[i + 1]) { format = args[++i] as 'text' | 'json'; }
+    }
+
+    if (!packagesDir || !scenariosPath || !registryPath) {
+      console.error('Usage: soac-harness replay --packages-dir <dir> --scenarios <file> --registry <file> [--format text|json]');
+      process.exit(2);
+    }
+    return { command: 'replay', packagesDir, scenariosPath, registryPath, format };
   }
 
-  return { targetPath, level, format };
+  console.error('Usage:');
+  console.error('  soac-harness validate --path <dir|file> [--level 1|2] [--format text|json]');
+  console.error('  soac-harness replay   --packages-dir <dir> --scenarios <file> --registry <file> [--format text|json]');
+  process.exit(2);
 }
 
 /* ── File discovery ──────────────────────────────────────── */
@@ -162,9 +211,58 @@ function printText(result: HarnessResult) {
   console.log(`${bar}\n`);
 }
 
+/* ── Replay reporter ─────────────────────────────────────── */
+function printReplayText(manifests: import('./level3').EvidenceManifest[], exitCode: number) {
+  const bar = '═'.repeat(60);
+  console.log(`\n${bar}`);
+  console.log(`  SOaC Harness — Level 3 Replay Report`);
+  console.log(`  Packages: ${manifests.length} | ${new Date().toISOString()}`);
+  console.log(`${bar}\n`);
+
+  for (const m of manifests) {
+    const icon = m.verdict === 'PASS' ? '✅' : m.verdict === 'PARTIAL' ? '⚠️' : '❌';
+    console.log(`${icon} ${m.package_id} — ${m.package_name}`);
+    console.log(`    Verdict: ${m.verdict}`);
+    console.log(`    MITRE coverage: ${m.summary.coverage_pct}% (${m.summary.mitre_techniques_exercised}/${m.summary.mitre_techniques_declared})`);
+    console.log(`    Detection triggers: ${m.summary.detection_triggers}  |  Playbook actions: ${m.summary.playbook_actions}`);
+    console.log(`    Steps: ${m.summary.total_steps} total (Body: ${m.summary.body_steps}, Brain: ${m.summary.brain_steps}, Purpose: ${m.summary.purpose_steps}, Edge: ${m.summary.edge_steps})`);
+    console.log('');
+  }
+
+  const passed = manifests.filter(m => m.verdict === 'PASS').length;
+  const partial = manifests.filter(m => m.verdict === 'PARTIAL').length;
+  const failed = manifests.filter(m => m.verdict === 'FAIL').length;
+
+  console.log(`${bar}`);
+  console.log(`  PASS: ${passed}  PARTIAL: ${partial}  FAIL: ${failed}`);
+  console.log(`  Exit code: ${exitCode}`);
+  console.log(`${bar}\n`);
+}
+
 /* ── Main ───────────────────────────────────────────────── */
 function main() {
-  const { targetPath, level, format } = parseArgs();
+  const cliArgs = parseArgs();
+
+  /* ── replay command ──────────────────────────────────── */
+  if (cliArgs.command === 'replay') {
+    console.log('\n🔁 SOaC Harness — Level 3: Scenario Replay & Evidence Generation\n');
+    const { manifests, exitCode } = runLevel3(
+      cliArgs.packagesDir,
+      cliArgs.scenariosPath,
+      cliArgs.registryPath,
+    );
+
+    if (cliArgs.format === 'json') {
+      console.log(JSON.stringify({ manifests, exitCode }, null, 2));
+    } else {
+      printReplayText(manifests, exitCode);
+    }
+
+    process.exit(exitCode);
+  }
+
+  /* ── validate command (default) ──────────────────────── */
+  const { targetPath, level, format } = cliArgs;
   const files = findYamlFiles(targetPath);
 
   if (files.length === 0) {
