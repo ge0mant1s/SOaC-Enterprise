@@ -3,132 +3,392 @@
     "id": "pkg-001",
     "name": "Identity-led Intrusion Defense",
     "summary": "Detect and contain AitM phishing, session hijacking, and identity-based attacks across Okta, Entra ID, and Azure AD.",
-    "stakeholders": ["ciso", "detection", "soc"],
-    "mitre": ["T1557.001", "T1078.004", "T1539"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/001_identity_intrusion_defense",
+    "stakeholders": [
+      "ciso",
+      "detection",
+      "soc"
+    ],
+    "mitre": [
+      "T1557.001",
+      "T1078.004",
+      "T1539"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/001_identity_intrusion_defense",
     "lab_scenario_id": "scenario-aitm",
-    "signals_required": ["Okta System Log", "Azure AD Sign-in Logs", "CrowdStrike Detection API"],
-    "includes": ["4 detection rules (SPL + KQL)", "2 CLAW playbooks", "1 lab scenario", "MITRE ATT&CK mapping"]
+    "signals_required": [
+      "Okta System Log",
+      "Azure AD Sign-in Logs",
+      "CrowdStrike Detection API"
+    ],
+    "includes": [
+      "4 detection rules (SPL + KQL)",
+      "2 CLAW playbooks",
+      "1 lab scenario",
+      "MITRE ATT&CK mapping"
+    ],
+    "evidence": {
+      "manifest": "/packages/001/evidence/evidence-manifest.json",
+      "report": "/packages/001/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-001/evidence"
+    }
   },
   {
     "id": "pkg-002",
     "name": "Ransomware Containment & Response",
     "summary": "Automated host isolation, process killing, forensic snapshot capture, and SOC notification for ransomware events.",
-    "stakeholders": ["soc", "detection", "platform"],
-    "mitre": ["T1486", "T1059", "T1068", "T1490"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/002_ransomware_containment",
+    "stakeholders": [
+      "soc",
+      "detection",
+      "platform"
+    ],
+    "mitre": [
+      "T1486",
+      "T1059",
+      "T1068",
+      "T1490"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/002_ransomware_containment",
     "lab_scenario_id": "scenario-ransomware",
-    "signals_required": ["CrowdStrike Falcon", "Microsoft Defender for Endpoint", "Splunk ES"],
-    "includes": ["3 detection rules", "2 CLAW playbooks", "1 lab scenario", "Forensic evidence templates"]
+    "signals_required": [
+      "CrowdStrike Falcon",
+      "Microsoft Defender for Endpoint",
+      "Splunk ES"
+    ],
+    "includes": [
+      "3 detection rules",
+      "2 CLAW playbooks",
+      "1 lab scenario",
+      "Forensic evidence templates"
+    ],
+    "evidence": {
+      "manifest": "/packages/002/evidence/evidence-manifest.json",
+      "report": "/packages/002/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-002/evidence"
+    }
   },
   {
     "id": "pkg-003",
     "name": "Supply Chain & npm Compromise",
     "summary": "Detect and respond to malicious npm packages, dependency confusion, and software supply chain attacks like Shai-Hulud.",
-    "stakeholders": ["detection", "platform"],
-    "mitre": ["T1195.002", "T1059.007", "T1027"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/003_supply_chain_defense",
+    "stakeholders": [
+      "detection",
+      "platform"
+    ],
+    "mitre": [
+      "T1195.002",
+      "T1059.007",
+      "T1027"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/003_supply_chain_defense",
     "lab_scenario_id": "scenario-supply-chain",
-    "signals_required": ["npm audit logs", "GitHub Advanced Security", "Endpoint telemetry"],
-    "includes": ["3 detection rules", "1 CLAW playbook", "1 lab scenario", "npm audit integration"]
+    "signals_required": [
+      "npm audit logs",
+      "GitHub Advanced Security",
+      "Endpoint telemetry"
+    ],
+    "includes": [
+      "3 detection rules",
+      "1 CLAW playbook",
+      "1 lab scenario",
+      "npm audit integration"
+    ],
+    "evidence": {
+      "manifest": "/packages/003/evidence/evidence-manifest.json",
+      "report": "/packages/003/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-003/evidence"
+    }
   },
   {
     "id": "pkg-004",
     "name": "BYOVD & Kernel Exploit Defense",
     "summary": "Detect Bring Your Own Vulnerable Driver attacks and kernel-level exploitation used by advanced ransomware operators.",
-    "stakeholders": ["detection", "soc", "platform"],
-    "mitre": ["T1068", "T1014", "T1547.006"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/004_byovd_defense",
+    "stakeholders": [
+      "detection",
+      "soc",
+      "platform"
+    ],
+    "mitre": [
+      "T1068",
+      "T1014",
+      "T1547.006"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/004_byovd_defense",
     "lab_scenario_id": "scenario-byovd",
-    "signals_required": ["CrowdStrike Falcon", "Windows Event Logs", "Sysmon"],
-    "includes": ["2 detection rules", "1 CLAW playbook", "1 lab scenario", "Driver allowlist template"]
+    "signals_required": [
+      "CrowdStrike Falcon",
+      "Windows Event Logs",
+      "Sysmon"
+    ],
+    "includes": [
+      "2 detection rules",
+      "1 CLAW playbook",
+      "1 lab scenario",
+      "Driver allowlist template"
+    ],
+    "evidence": {
+      "manifest": "/packages/004/evidence/evidence-manifest.json",
+      "report": "/packages/004/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-004/evidence"
+    }
   },
   {
     "id": "pkg-005",
     "name": "SEO Poisoning & Gootloader Defense",
     "summary": "Detect and contain SEO poisoning campaigns and Gootloader malware delivery via compromised websites.",
-    "stakeholders": ["detection", "soc"],
-    "mitre": ["T1189", "T1059.007", "T1071.001"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/005_seo_poisoning_defense",
+    "stakeholders": [
+      "detection",
+      "soc"
+    ],
+    "mitre": [
+      "T1189",
+      "T1059.007",
+      "T1071.001"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/005_seo_poisoning_defense",
     "lab_scenario_id": "scenario-gootloader",
-    "signals_required": ["Web proxy logs", "DNS logs", "Endpoint telemetry"],
-    "includes": ["3 detection rules", "1 CLAW playbook", "1 lab scenario", "IOC feed integration"]
+    "signals_required": [
+      "Web proxy logs",
+      "DNS logs",
+      "Endpoint telemetry"
+    ],
+    "includes": [
+      "3 detection rules",
+      "1 CLAW playbook",
+      "1 lab scenario",
+      "IOC feed integration"
+    ],
+    "evidence": {
+      "manifest": "/packages/005/evidence/evidence-manifest.json",
+      "report": "/packages/005/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-005/evidence"
+    }
   },
   {
     "id": "pkg-006",
     "name": "Credential Harvesting & Phishing Kit",
     "summary": "Detection of credential harvesting infrastructure, phishing kit deployment patterns, and input capture techniques.",
-    "stakeholders": ["soc", "detection"],
-    "mitre": ["T1598", "T1566.002", "T1056.004"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/006_credential_harvesting",
+    "stakeholders": [
+      "soc",
+      "detection"
+    ],
+    "mitre": [
+      "T1598",
+      "T1566.002",
+      "T1056.004"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/006_credential_harvesting",
     "lab_scenario_id": "scenario-credential-harvest",
-    "signals_required": ["Email gateway logs", "Web proxy logs", "DNS query logs"],
-    "includes": ["1 detection rule", "1 CLAW playbook", "1 policy", "1 lab scenario"]
+    "signals_required": [
+      "Email gateway logs",
+      "Web proxy logs",
+      "DNS query logs"
+    ],
+    "includes": [
+      "1 detection rule",
+      "1 CLAW playbook",
+      "1 policy",
+      "1 lab scenario"
+    ],
+    "evidence": {
+      "manifest": "/packages/006/evidence/evidence-manifest.json",
+      "report": "/packages/006/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-006/evidence"
+    }
   },
   {
     "id": "pkg-007",
     "name": "Cloud IAM Privilege Escalation",
     "summary": "Detect and respond to IAM role chaining, cross-account pivoting, and cloud privilege abuse in AWS, Azure, and GCP.",
-    "stakeholders": ["platform", "detection"],
-    "mitre": ["T1078.004", "T1548", "T1484"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/007_cloud_iam_privesc",
+    "stakeholders": [
+      "platform",
+      "detection"
+    ],
+    "mitre": [
+      "T1078.004",
+      "T1548",
+      "T1484"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/007_cloud_iam_privesc",
     "lab_scenario_id": "scenario-cloud-privesc",
-    "signals_required": ["AWS CloudTrail", "Azure Activity Log", "GCP Admin Activity"],
-    "includes": ["1 detection rule", "1 CLAW playbook", "1 policy", "1 lab scenario"]
+    "signals_required": [
+      "AWS CloudTrail",
+      "Azure Activity Log",
+      "GCP Admin Activity"
+    ],
+    "includes": [
+      "1 detection rule",
+      "1 CLAW playbook",
+      "1 policy",
+      "1 lab scenario"
+    ],
+    "evidence": {
+      "manifest": "/packages/007/evidence/evidence-manifest.json",
+      "report": "/packages/007/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-007/evidence"
+    }
   },
   {
     "id": "pkg-008",
     "name": "Lateral Movement & RDP Abuse",
     "summary": "Detect RDP tunneling, pass-the-hash, and network-layer lateral movement techniques across Windows environments.",
-    "stakeholders": ["soc", "detection"],
-    "mitre": ["T1021.001", "T1550.002", "T1570"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/008_lateral_movement",
+    "stakeholders": [
+      "soc",
+      "detection"
+    ],
+    "mitre": [
+      "T1021.001",
+      "T1550.002",
+      "T1570"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/008_lateral_movement",
     "lab_scenario_id": "scenario-lateral-movement",
-    "signals_required": ["Windows Security Event Log", "Network flow data", "RDP connection logs"],
-    "includes": ["1 detection rule", "1 CLAW playbook", "1 policy", "1 lab scenario"]
+    "signals_required": [
+      "Windows Security Event Log",
+      "Network flow data",
+      "RDP connection logs"
+    ],
+    "includes": [
+      "1 detection rule",
+      "1 CLAW playbook",
+      "1 policy",
+      "1 lab scenario"
+    ],
+    "evidence": {
+      "manifest": "/packages/008/evidence/evidence-manifest.json",
+      "report": "/packages/008/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-008/evidence"
+    }
   },
   {
     "id": "pkg-009",
     "name": "Data Exfiltration & Staging",
     "summary": "Detect data staging, compression, and exfiltration over C2 channels and legitimate cloud services.",
-    "stakeholders": ["soc", "detection", "ciso"],
-    "mitre": ["T1560", "T1041", "T1567"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/009_data_exfiltration",
+    "stakeholders": [
+      "soc",
+      "detection",
+      "ciso"
+    ],
+    "mitre": [
+      "T1560",
+      "T1041",
+      "T1567"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/009_data_exfiltration",
     "lab_scenario_id": "scenario-data-exfil",
-    "signals_required": ["DLP logs", "Network flow data", "Cloud storage audit logs"],
-    "includes": ["1 detection rule", "1 CLAW playbook", "1 policy", "1 lab scenario"]
+    "signals_required": [
+      "DLP logs",
+      "Network flow data",
+      "Cloud storage audit logs"
+    ],
+    "includes": [
+      "1 detection rule",
+      "1 CLAW playbook",
+      "1 policy",
+      "1 lab scenario"
+    ],
+    "evidence": {
+      "manifest": "/packages/009/evidence/evidence-manifest.json",
+      "report": "/packages/009/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-009/evidence"
+    }
   },
   {
     "id": "pkg-010",
     "name": "Living off the Land (LOLBins)",
     "summary": "Detect abuse of legitimate system binaries for execution, persistence, and defense evasion across Windows endpoints.",
-    "stakeholders": ["detection", "soc"],
-    "mitre": ["T1218", "T1059.001", "T1036"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/010_lolbins_defense",
+    "stakeholders": [
+      "detection",
+      "soc"
+    ],
+    "mitre": [
+      "T1218",
+      "T1059.001",
+      "T1036"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/010_lolbins_defense",
     "lab_scenario_id": "scenario-lolbins",
-    "signals_required": ["Sysmon", "Windows PowerShell logs", "Process creation events"],
-    "includes": ["1 detection rule", "1 CLAW playbook", "1 policy", "1 lab scenario"]
+    "signals_required": [
+      "Sysmon",
+      "Windows PowerShell logs",
+      "Process creation events"
+    ],
+    "includes": [
+      "1 detection rule",
+      "1 CLAW playbook",
+      "1 policy",
+      "1 lab scenario"
+    ],
+    "evidence": {
+      "manifest": "/packages/010/evidence/evidence-manifest.json",
+      "report": "/packages/010/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-010/evidence"
+    }
   },
   {
     "id": "pkg-011",
     "name": "Insider Threat & Anomalous Behavior",
     "summary": "Behavioral analytics for detecting insider threat indicators, anomalous access patterns, and data hoarding.",
-    "stakeholders": ["ciso", "soc", "platform"],
-    "mitre": ["T1078", "T1530", "T1213"],
-    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/011_insider_threat",
+    "stakeholders": [
+      "ciso",
+      "soc",
+      "platform"
+    ],
+    "mitre": [
+      "T1078",
+      "T1530",
+      "T1213"
+    ],
+    "repo_url": "https://github.com/ge0mant1s/SOaC-Enterprise",
     "repo_path": "packages/011_insider_threat",
     "lab_scenario_id": "scenario-insider-threat",
-    "signals_required": ["UEBA platform", "HR system feed", "DLP logs", "Badge access logs"],
-    "includes": ["1 detection rule", "1 CLAW playbook", "1 policy", "1 lab scenario"]
+    "signals_required": [
+      "UEBA platform",
+      "HR system feed",
+      "DLP logs",
+      "Badge access logs"
+    ],
+    "includes": [
+      "1 detection rule",
+      "1 CLAW playbook",
+      "1 policy",
+      "1 lab scenario"
+    ],
+    "evidence": {
+      "manifest": "/packages/011/evidence/evidence-manifest.json",
+      "report": "/packages/011/evidence/replay-report.md",
+      "verdict": "PASS",
+      "coverage_pct": 100,
+      "route": "/packages/pkg-011/evidence"
+    }
   }
 ]
