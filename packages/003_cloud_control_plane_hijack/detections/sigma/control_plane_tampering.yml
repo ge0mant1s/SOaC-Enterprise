@@ -1,0 +1,45 @@
+title: Cloud Control Plane Configuration Tampering
+id: c3f2a1d0-5e8b-4c7a-a2f6-4g9b3d8e0c02
+status: production
+level: high
+description: |
+  Detects modifications to cloud control plane configurations including
+  logging disablement, network policy changes, and security group modifications
+  that indicate control plane hijack.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.defense_evasion
+  - attack.t1562.008
+  - attack.t1578
+  - attack.t1098
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection_logging:
+    eventName:
+      - 'StopLogging'
+      - 'DeleteTrail'
+      - 'UpdateTrail'
+      - 'PutEventSelectors'
+      - 'DeleteFlowLogs'
+      - 'DeleteLogGroup'
+  selection_network:
+    eventName:
+      - 'AuthorizeSecurityGroupIngress'
+      - 'CreateSecurityGroup'
+      - 'ModifyVpcAttribute'
+      - 'CreateVpcPeeringConnection'
+    requestParameters.ipPermissions.items.ipRanges.items.cidrIp: '0.0.0.0/0'
+  selection_guardrails:
+    eventName:
+      - 'DisableOrganizationsAccess'
+      - 'LeaveOrganization'
+      - 'DeleteOrganization'
+      - 'DeregisterDelegatedAdministrator'
+  condition: selection_logging or selection_network or selection_guardrails
+falsepositives:
+  - Authorized infrastructure changes during maintenance windows
+  - CloudTrail configuration updates by security team

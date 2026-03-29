@@ -1,0 +1,71 @@
+{
+  "package_id": "pkg-003",
+  "version": "1.0.0",
+  "title": "Cloud Control Plane Hijack",
+  "description": "Detect IAM privilege escalation, control plane hijack, and policy tampering in cloud environments.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "category": "Cloud Security",
+  "tags": [
+    "cloud",
+    "iam",
+    "privilege-escalation",
+    "azure",
+    "aws",
+    "control-plane"
+  ],
+  "threat_actor": "Lynx",
+  "github_path": "packages/003_cloud_control_plane_hijack",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre_techniques": [
+    "T1098.001",
+    "T1078.004",
+    "T1562.008",
+    "T1550.001",
+    "T1578"
+  ],
+  "detections": {
+    "sigma": 3,
+    "sentinel": 3,
+    "splunk": 2,
+    "wazuh": 1,
+    "crowdstrike": 1,
+    "total": 10
+  },
+  "playbooks": {
+    "claw": 1,
+    "soar": 1,
+    "total": 2
+  },
+  "policies": {
+    "conditional_access": 1,
+    "governance": 1,
+    "total": 2
+  },
+  "docs": [
+    "threat_context.md",
+    "deployment_guide.md",
+    "validation_guide.md"
+  ],
+  "created": "2025-03-28",
+  "last_updated": "2025-03-28",
+  "mitre": [
+    "T1098.001",
+    "T1078.004",
+    "T1562.008",
+    "T1550.001",
+    "T1578"
+  ],
+  "stacks": [
+    "sentinel",
+    "sigma",
+    "splunk",
+    "wazuh",
+    "crowdstrike"
+  ]
+}

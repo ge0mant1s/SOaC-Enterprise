@@ -1,0 +1,27 @@
+// Control Plane Logging Disruption Detection
+// Detects attempts to disable CloudTrail, VPC Flow Logs, or GuardDuty
+// MITRE: T1562.008
+let timewindow = 1h;
+AWSCloudTrail
+| where TimeGenerated > ago(timewindow)
+| where EventName in ("StopLogging", "DeleteTrail", "UpdateTrail",
+    "DeleteFlowLogs", "DeleteLogGroup", "DeleteDetector",
+    "DisableGuardDuty", "UpdateDetector")
+| extend Actor = UserIdentityArn
+| extend TargetResource = case(
+    EventName has "Trail", extract(@"trailName[\":\s]+(\w+)", 1, tostring(RequestParameters)),
+    EventName has "FlowLog", extract(@"flowLogId[\":\s]+(fl-\w+)", 1, tostring(RequestParameters)),
+    EventName has "Detector", extract(@"detectorId[\":\s]+(\w+)", 1, tostring(RequestParameters)),
+    "unknown")
+| summarize
+    DisruptionActions = make_set(EventName, 10),
+    ActionCount = count(),
+    TargetResources = make_set(TargetResource, 10),
+    Regions = make_set(AWSRegion, 10)
+    by Actor, SourceIpAddress, bin(TimeGenerated, 15m)
+| extend RiskScore = case(
+    ActionCount >= 3, "CRITICAL",
+    ActionCount >= 2, "HIGH",
+    "MEDIUM")
+| project TimeGenerated, Actor, SourceIpAddress,
+    DisruptionActions, TargetResources, Regions, RiskScore

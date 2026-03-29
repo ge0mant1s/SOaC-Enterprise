@@ -1,0 +1,50 @@
+title: Cloud IAM Privilege Escalation via Policy Modification
+id: c3f2a1d0-5e8b-4c7a-a2f6-4g9b3d8e0c01
+status: production
+level: critical
+description: |
+  Detects IAM privilege escalation through policy attachment, role assumption,
+  or permission boundary modification in AWS/Azure cloud environments.
+  Lynx group uses this technique to gain control plane access.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.privilege_escalation
+  - attack.t1098.001
+  - attack.t1078.004
+  - attack.persistence
+  - attack.t1098
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection_attach_policy:
+    eventName:
+      - 'AttachUserPolicy'
+      - 'AttachRolePolicy'
+      - 'AttachGroupPolicy'
+      - 'PutUserPolicy'
+      - 'PutRolePolicy'
+    requestParameters.policyArn|contains:
+      - 'AdministratorAccess'
+      - 'IAMFullAccess'
+      - 'PowerUserAccess'
+  selection_assume_role:
+    eventName: 'AssumeRole'
+    requestParameters.roleArn|contains:
+      - 'OrganizationAccountAccessRole'
+      - 'AdminRole'
+  selection_boundary_modify:
+    eventName:
+      - 'DeleteUserPermissionsBoundary'
+      - 'DeleteRolePermissionsBoundary'
+      - 'PutUserPermissionsBoundary'
+  filter_trusted:
+    userIdentity.arn|contains:
+      - 'AWSServiceRole'
+      - 'aws-service-role'
+  condition: (selection_attach_policy or selection_assume_role or selection_boundary_modify) and not filter_trusted
+falsepositives:
+  - Cloud administrators performing authorized policy changes
+  - Infrastructure-as-code deployments (Terraform, CloudFormation)

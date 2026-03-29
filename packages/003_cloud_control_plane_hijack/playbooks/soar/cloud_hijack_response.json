@@ -1,0 +1,59 @@
+{
+  "name": "Cloud Control Plane Hijack Response",
+  "version": "1.0.0",
+  "description": "SOAR workflow for cloud control plane compromise investigation and remediation",
+  "trigger": {
+    "type": "alert",
+    "source": ["Microsoft Sentinel", "AWS GuardDuty", "CrowdStrike Falcon Cloud"],
+    "conditions": {
+      "alert_name_pattern": "*iam*escalation*|*control*plane*|*cloud*hijack*",
+      "severity": ["critical", "high"]
+    }
+  },
+  "phases": [
+    {
+      "name": "Triage",
+      "steps": [
+        {"action": "enrich_identity", "source": "AWS IAM", "parameters": {"lookup": "identity_arn", "include": ["policies", "recent_activity", "mfa_status"]}},
+        {"action": "check_threat_intel", "source": "CrowdStrike Intel", "parameters": {"lookup": "source_ip"}},
+        {"action": "classify_severity", "rules": {"logging_disabled": "critical", "admin_policy_attached": "critical", "cross_account_pivot": "high"}}
+      ]
+    },
+    {
+      "name": "Containment",
+      "steps": [
+        {"action": "execute_playbook", "playbook": "contain-cloud-control-plane-compromise", "wait_for_completion": true},
+        {"action": "update_ticket", "fields": {"status": "Containment Active", "priority": "P1"}}
+      ]
+    },
+    {
+      "name": "Investigation",
+      "steps": [
+        {"action": "query_cloudtrail", "timerange": "-48h", "focus": "compromised_identity"},
+        {"action": "map_blast_radius", "parameters": {"include": ["accounts", "resources", "data_access"]}},
+        {"action": "timeline_builder", "sources": ["cloudtrail", "vpc_flow_logs", "guardduty"]}
+      ]
+    },
+    {
+      "name": "Remediation",
+      "steps": [
+        {"action": "rotate_all_credentials", "scope": "affected_accounts"},
+        {"action": "review_iam_policies", "parameters": {"enforce_least_privilege": true}},
+        {"action": "verify_logging_integrity", "parameters": {"check_all_regions": true}}
+      ]
+    },
+    {
+      "name": "Post-Incident",
+      "steps": [
+        {"action": "generate_report", "template": "cloud_compromise_report"},
+        {"action": "update_scp_guardrails", "parameters": {"prevent_logging_disable": true}},
+        {"action": "schedule_lessons_learned", "parameters": {"within_days": 3}}
+      ]
+    }
+  ],
+  "sla": {
+    "containment": "10m",
+    "logging_restoration": "15m",
+    "full_investigation": "12h"
+  }
+}

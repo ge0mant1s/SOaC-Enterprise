@@ -1,0 +1,48 @@
+{
+  "policy_name": "SOaC Cloud Control Plane Protection - Conditional Access",
+  "version": "1.0.0",
+  "description": "Conditional access policies for cloud control plane operations",
+  "rules": [
+    {
+      "name": "Require MFA for Cloud Admin Operations",
+      "conditions": {
+        "user_role": ["Global Administrator", "Cloud Administrator", "IAM Administrator"],
+        "application": ["AWS Console", "Azure Portal", "GCP Console"]
+      },
+      "actions": {
+        "grant": "require_mfa",
+        "session_controls": {
+          "sign_in_frequency": "1h",
+          "persistent_browser": "never",
+          "cloud_app_security": "monitor"
+        }
+      }
+    },
+    {
+      "name": "Block Legacy Auth for Cloud Admins",
+      "conditions": {
+        "user_role": ["*Administrator*", "*Admin*"],
+        "client_app": ["legacy_auth", "exchange_activesync", "imap", "pop3"]
+      },
+      "actions": {
+        "grant": "block"
+      }
+    },
+    {
+      "name": "Restrict Privileged Cloud Actions to Compliant Devices",
+      "conditions": {
+        "application": ["AWS Console", "Azure Portal"],
+        "device_compliance": "non_compliant"
+      },
+      "actions": {
+        "grant": "block",
+        "exception": "break_glass_accounts"
+      }
+    }
+  ],
+  "metadata": {
+    "package": "pkg-003",
+    "mitre_techniques": ["T1098.001", "T1078.004", "T1562.008"],
+    "last_updated": "2025-03-28"
+  }
+}

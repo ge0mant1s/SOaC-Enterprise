@@ -1,0 +1,18 @@
+index=aws sourcetype="aws:cloudtrail"
+  eventName IN ("StopLogging","DeleteTrail","UpdateTrail","DeleteFlowLogs",
+    "DeleteLogGroup","DeleteDetector","DisableGuardDuty","UpdateDetector",
+    "DisableOrganizationsAccess","LeaveOrganization")
+| stats count as disruption_count
+  dc(eventName) as unique_disruptions
+  values(eventName) as disruption_actions
+  values(awsRegion) as affected_regions
+  min(_time) as firstTime max(_time) as lastTime
+  BY userIdentity.arn sourceIPAddress
+| rename userIdentity.arn as actor sourceIPAddress as src_ip
+| eval risk_score=case(
+    disruption_count >= 3, "CRITICAL",
+    disruption_count >= 2, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1562.008,T1098"
+| table firstTime lastTime actor src_ip disruption_count disruption_actions affected_regions risk_score mitre_techniques
+| sort -disruption_count

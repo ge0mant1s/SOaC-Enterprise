@@ -1,0 +1,35 @@
+title: Cross-Account Role Assumption Pivot
+id: c3f2a1d0-5e8b-4c7a-a2f6-4g9b3d8e0c03
+status: production
+level: high
+description: |
+  Detects cross-account role assumptions that may indicate an attacker
+  pivoting between cloud accounts using assumed roles, a technique
+  associated with Lynx and similar cloud-focused threat actors.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.lateral_movement
+  - attack.t1550.001
+  - attack.privilege_escalation
+  - attack.t1078.004
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection_cross_account:
+    eventName: 'AssumeRole'
+    resources.accountId|ne: userIdentity.accountId
+  selection_rapid:
+    eventName: 'AssumeRole'
+  filter_service_roles:
+    userIdentity.type: 'AWSService'
+  condition: selection_cross_account and not filter_service_roles
+  timeframe: 30m
+  count:
+    field: resources.accountId
+    gte: 3
+falsepositives:
+  - Multi-account administration by cloud platform teams
+  - CI/CD pipelines with cross-account deployment roles

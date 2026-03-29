@@ -1,0 +1,30 @@
+{
+  "scenario_id": "pkg-003-replay",
+  "title": "Cloud Control Plane Hijack Replay",
+  "phases": [
+    {"phase": "Initial Access", "timestamp_offset": 0, "events": [
+      {"type": "authentication", "detail": "Compromised IAM access key used from novel IP", "source": "CloudTrail"},
+      {"type": "api_call", "detail": "GetCallerIdentity — attacker validates access", "source": "CloudTrail"}
+    ]},
+    {"phase": "Reconnaissance", "timestamp_offset": 180, "events": [
+      {"type": "api_call", "detail": "ListUsers, ListRoles, ListPolicies — IAM enumeration", "source": "CloudTrail"},
+      {"type": "api_call", "detail": "DescribeTrails — mapping logging infrastructure", "source": "CloudTrail"}
+    ]},
+    {"phase": "Privilege Escalation", "timestamp_offset": 600, "events": [
+      {"type": "api_call", "detail": "AttachUserPolicy — AdministratorAccess attached to compromised user", "source": "CloudTrail"},
+      {"type": "api_call", "detail": "DeleteUserPermissionsBoundary — guardrail removed", "source": "CloudTrail"}
+    ]},
+    {"phase": "Defense Evasion", "timestamp_offset": 900, "events": [
+      {"type": "api_call", "detail": "StopLogging on primary CloudTrail", "source": "CloudTrail"},
+      {"type": "api_call", "detail": "DeleteFlowLogs on production VPC", "source": "CloudTrail"}
+    ]},
+    {"phase": "Lateral Movement", "timestamp_offset": 1200, "events": [
+      {"type": "api_call", "detail": "AssumeRole to 3 cross-account roles", "source": "CloudTrail"},
+      {"type": "api_call", "detail": "AuthorizeSecurityGroupIngress — 0.0.0.0/0 on port 22", "source": "CloudTrail"}
+    ]},
+    {"phase": "Containment", "timestamp_offset": 1500, "events": [
+      {"type": "response", "detail": "CLAW: IAM sessions revoked, deny-all policy attached", "source": "SOAR"},
+      {"type": "response", "detail": "CLAW: CloudTrail logging restored and verified", "source": "SOAR"}
+    ]}
+  ]
+}

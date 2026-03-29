@@ -1,0 +1,12 @@
+{
+  "package_id": "pkg-003",
+  "evidence_version": "1.0.0",
+  "generated": "2025-03-28T00:00:00Z",
+  "test_cases": [
+    {"id": "TC-003-001", "name": "IAM Admin Policy Attachment", "input": "Simulate AttachUserPolicy with AdministratorAccess policy ARN", "expected_detections": ["iam_privilege_escalation", "iam_escalation_chain", "100201"], "mitre_technique": "T1098.001", "severity": "critical"},
+    {"id": "TC-003-002", "name": "CloudTrail Logging Disruption", "input": "Simulate StopLogging and DeleteFlowLogs API calls", "expected_detections": ["control_plane_tampering", "control_plane_logging_disruption", "100202"], "mitre_technique": "T1562.008", "severity": "critical"},
+    {"id": "TC-003-003", "name": "Cross-Account Role Pivot", "input": "Simulate 4 AssumeRole calls to different accounts in 20 minutes", "expected_detections": ["cross_account_pivot", "100203"], "mitre_technique": "T1550.001", "severity": "high"},
+    {"id": "TC-003-004", "name": "Security Group Exposure", "input": "Simulate AuthorizeSecurityGroupIngress with 0.0.0.0/0 CIDR", "expected_detections": ["control_plane_tampering", "100204"], "mitre_technique": "T1578", "severity": "high"},
+    {"id": "TC-003-005", "name": "Full Cloud Hijack Chain", "input": "Execute complete replay scenario", "expected_detections": ["All rules", "CLAW auto-trigger"], "mitre_technique": "T1098.001", "severity": "critical", "sla": "containment_within_10m"}
+  ]
+}

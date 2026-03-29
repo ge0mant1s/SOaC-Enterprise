@@ -1,0 +1,62 @@
+{
+  "ioa_definitions": [
+    {
+      "name": "Cloud IAM Privilege Escalation",
+      "description": "Detects admin policy attachment and permission boundary removal in cloud environments",
+      "severity": "critical",
+      "platform": "cloud",
+      "tactic": "Privilege Escalation",
+      "technique": "T1098.001",
+      "disposition": "DETECT_AND_ALERT",
+      "pattern": {
+        "type": "cloud_api_activity",
+        "conditions": {
+          "event_names": ["AttachUserPolicy", "AttachRolePolicy", "PutUserPolicy", "DeleteUserPermissionsBoundary"],
+          "policy_pattern": ["*AdministratorAccess*", "*IAMFullAccess*"],
+          "exclude_principals": ["AWSServiceRole*"]
+        }
+      },
+      "response_actions": ["alert_soc", "enrich_identity", "check_mfa_status"]
+    },
+    {
+      "name": "Cloud Logging Infrastructure Destruction",
+      "description": "Detects disabling or deletion of cloud audit logging and monitoring",
+      "severity": "critical",
+      "platform": "cloud",
+      "tactic": "Defense Evasion",
+      "technique": "T1562.008",
+      "disposition": "BLOCK_AND_ALERT",
+      "pattern": {
+        "type": "cloud_api_activity",
+        "conditions": {
+          "event_names": ["StopLogging", "DeleteTrail", "DeleteFlowLogs", "DeleteDetector", "DisableGuardDuty"]
+        }
+      },
+      "response_actions": ["block_api_call", "alert_soc", "restore_logging"]
+    },
+    {
+      "name": "Rapid Cross-Account Pivot",
+      "description": "Detects rapid role assumptions across multiple cloud accounts indicating lateral movement",
+      "severity": "high",
+      "platform": "cloud",
+      "tactic": "Lateral Movement",
+      "technique": "T1550.001",
+      "disposition": "DETECT_AND_ALERT",
+      "pattern": {
+        "type": "cloud_api_activity",
+        "conditions": {
+          "event_name": "AssumeRole",
+          "cross_account": true,
+          "unique_accounts_per_hour": {"gte": 3}
+        }
+      },
+      "response_actions": ["alert_soc", "revoke_temporary_credentials"]
+    }
+  ],
+  "metadata": {
+    "package": "pkg-003",
+    "version": "1.0.0",
+    "last_updated": "2025-03-28",
+    "threat_actor": "Lynx"
+  }
+}

@@ -1,0 +1,30 @@
+// Azure Control Plane Abuse Detection
+// Detects Azure-specific control plane tampering: subscription transfers, management group changes
+// MITRE: T1098, T1578
+let timewindow = 1h;
+AzureActivity
+| where TimeGenerated > ago(timewindow)
+| where OperationNameValue in (
+    "Microsoft.Authorization/roleAssignments/write",
+    "Microsoft.Authorization/policyAssignments/delete",
+    "Microsoft.Resources/subscriptions/providers/write",
+    "Microsoft.Management/managementGroups/write",
+    "Microsoft.Security/securityContacts/delete",
+    "Microsoft.Insights/diagnosticSettings/delete",
+    "Microsoft.Network/networkSecurityGroups/securityRules/write")
+| extend CallerRole = Properties_d.CallerRole
+| extend TargetResource = _ResourceId
+| summarize
+    Operations = make_set(OperationNameValue, 10),
+    OpCount = count(),
+    TargetResources = make_set(TargetResource, 10),
+    FirstOp = min(TimeGenerated),
+    LastOp = max(TimeGenerated)
+    by Caller, CallerIpAddress, SubscriptionId
+| where OpCount >= 2
+| extend RiskScore = case(
+    Operations has_any ("policyAssignments/delete", "securityContacts/delete", "diagnosticSettings/delete"), "CRITICAL",
+    OpCount >= 5, "HIGH",
+    "MEDIUM")
+| project TimeGenerated = FirstOp, Caller, CallerIpAddress,
+    SubscriptionId, Operations, OpCount, RiskScore

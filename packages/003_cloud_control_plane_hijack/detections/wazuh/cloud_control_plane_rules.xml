@@ -1,0 +1,56 @@
+<!-- SOaC pkg-003: Cloud Control Plane Hijack Rules -->
+<group name="soac,cloud,iam,control_plane,">
+
+  <rule id="100201" level="14">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName" type="pcre2">(?:AttachUserPolicy|AttachRolePolicy|PutUserPolicy|PutRolePolicy)</field>
+    <field name="aws.requestParameters.policyArn" type="pcre2">(?:AdministratorAccess|IAMFullAccess|PowerUserAccess)</field>
+    <description>SOaC: Cloud IAM privilege escalation - admin policy attached by $(aws.userIdentity.arn)</description>
+    <mitre>
+      <id>T1098.001</id>
+      <id>T1078.004</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>cloud,iam,privilege_escalation,</group>
+  </rule>
+
+  <rule id="100202" level="15">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName" type="pcre2">(?:StopLogging|DeleteTrail|DeleteFlowLogs|DeleteDetector|DisableGuardDuty)</field>
+    <description>SOaC: Cloud logging disruption detected - $(aws.eventName) by $(aws.userIdentity.arn)</description>
+    <mitre>
+      <id>T1562.008</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>cloud,defense_evasion,logging,</group>
+  </rule>
+
+  <rule id="100203" level="13">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName">AssumeRole</field>
+    <field name="aws.resources.accountId" type="pcre2">(?!$(aws.userIdentity.accountId)).*</field>
+    <frequency>3</frequency>
+    <timeframe>1800</timeframe>
+    <description>SOaC: Rapid cross-account role assumptions detected - potential cloud pivot</description>
+    <mitre>
+      <id>T1550.001</id>
+      <id>T1078.004</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>cloud,lateral_movement,cross_account,</group>
+  </rule>
+
+  <rule id="100204" level="14">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName" type="pcre2">(?:AuthorizeSecurityGroupIngress|CreateSecurityGroup|ModifyVpcAttribute)</field>
+    <field name="aws.requestParameters" type="pcre2">0\.0\.0\.0/0</field>
+    <description>SOaC: Cloud network opened to internet - security group allows 0.0.0.0/0</description>
+    <mitre>
+      <id>T1578</id>
+      <id>T1098</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>cloud,network,exposure,</group>
+  </rule>
+
+</group>
