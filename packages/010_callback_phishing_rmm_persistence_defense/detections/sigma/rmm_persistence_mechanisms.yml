@@ -1,0 +1,22 @@
+title: RMM Tool Persistence and C2 Channel Establishment
+id: j9e0g8h7-1i4f-9k3g-h8j2-0m5h9j4k6i03
+status: production
+level: critical
+description: Detects RMM tools establishing persistence via services, scheduled tasks, or registry, and creating C2 communication channels.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags: [attack.persistence, attack.t1543.003, attack.t1053.005, attack.command_and_control, attack.t1219]
+logsource: {category: process_creation, product: windows}
+detection:
+  selection_service_install:
+    EventType: ServiceInstall
+    ServiceName|contains: ['AnyDesk', 'TeamViewer', 'ScreenConnect', 'ConnectWise', 'Atera', 'meshagent']
+  selection_scheduled_persistence:
+    Image|endswith: ['\\schtasks.exe']
+    CommandLine|contains: ['AnyDesk', 'TeamViewer', 'ScreenConnect', 'ConnectWise']
+  selection_registry_persistence:
+    TargetObject|contains: ['\\CurrentVersion\\Run', '\\CurrentVersion\\RunOnce']
+    Details|contains: ['AnyDesk', 'TeamViewer', 'ScreenConnect']
+  condition: selection_service_install or selection_scheduled_persistence or selection_registry_persistence
+falsepositives: [Approved RMM tool deployment by IT]

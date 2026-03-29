@@ -1,0 +1,17 @@
+| tstats summariesonly=t count min(_time) as firstTime max(_time) as lastTime
+  FROM datamodel=Endpoint.Processes
+  WHERE Processes.process_name IN ("AnyDesk.exe","TeamViewer.exe","ScreenConnect.exe",
+    "ConnectWiseControl.exe","AteraAgent.exe","SplashtopStreamer.exe","RustDesk.exe","meshagent.exe")
+  BY _time span=1h Processes.dest Processes.user Processes.process_name
+    Processes.parent_process_name Processes.process_path
+| rename Processes.* as *
+| where NOT match(process_path, "(?i)Program Files.ApprovedRMM")
+| stats count as execution_count dc(dest) as unique_hosts
+  values(dest) as hosts values(user) as users
+  values(parent_process_name) as parent_procs
+  min(firstTime) as firstTime max(lastTime) as lastTime
+  BY process_name
+| eval risk_score=case(unique_hosts >= 5, "CRITICAL", unique_hosts >= 2, "HIGH", true(), "MEDIUM")
+| eval mitre_techniques="T1219,T1133,T1566.003"
+| table firstTime lastTime process_name execution_count unique_hosts hosts users parent_procs risk_score mitre_techniques
+| sort -unique_hosts

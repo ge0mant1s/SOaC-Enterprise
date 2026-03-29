@@ -1,0 +1,26 @@
+// Callback Phishing Attack Chain Detection
+// Correlates suspicious emails with subsequent RMM tool installation
+// MITRE: T1566.003, T1219
+let timewindow = 4h;
+let suspicious_emails = EmailEvents
+| where TimeGenerated > ago(timewindow)
+| where Subject has_any ("invoice", "subscription", "renewal", "payment failed", "account suspended")
+| where SenderFromAddress has_any ("geeksquad", "norton", "mcafee", "paypal")
+    or AuthenticationDetails has "dmarc=fail"
+| summarize EmailCount = count(), Subjects = make_set(Subject, 5)
+    by RecipientEmailAddress, SenderFromAddress;
+let rmm_installs = DeviceProcessEvents
+| where TimeGenerated > ago(timewindow)
+| where FileName in ("AnyDesk.exe", "TeamViewer.exe", "ScreenConnect.exe",
+    "ConnectWiseControl.exe", "AteraAgent.exe")
+    or ProcessCommandLine has_any ("anydesk", "teamviewer", "screenconnect")
+| summarize RMMEvents = count(), RMMTools = make_set(FileName, 5)
+    by DeviceName, AccountUpn;
+suspicious_emails
+| join kind=inner rmm_installs on $left.RecipientEmailAddress == $right.AccountUpn
+| extend RiskScore = case(
+    EmailCount >= 1 and RMMEvents >= 1, "CRITICAL",
+    EmailCount >= 3, "HIGH",
+    "MEDIUM")
+| project RecipientEmailAddress, SenderFromAddress, Subjects,
+    DeviceName, RMMTools, RiskScore

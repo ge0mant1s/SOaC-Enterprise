@@ -1,0 +1,25 @@
+// Unauthorized RMM Tool Detection
+// Detects unapproved remote management tools indicating callback phishing success
+// MITRE: T1219, T1133
+let timewindow = 24h;
+let approved_rmm = dynamic(["ApprovedRMM.exe"]);
+DeviceProcessEvents
+| where TimeGenerated > ago(timewindow)
+| where FileName in ("AnyDesk.exe", "TeamViewer.exe", "ScreenConnect.exe",
+    "ConnectWiseControl.ClientService.exe", "AteraAgent.exe",
+    "SplashtopStreamer.exe", "RustDesk.exe", "meshagent.exe")
+| where FileName !in (approved_rmm)
+| summarize
+    ExecutionCount = count(),
+    UniqueDevices = dcount(DeviceName),
+    Devices = make_set(DeviceName, 10),
+    Users = make_set(AccountUpn, 10),
+    FirstSeen = min(TimeGenerated),
+    ParentProcesses = make_set(InitiatingProcessFileName, 5)
+    by FileName
+| extend RiskScore = case(
+    UniqueDevices >= 5, "CRITICAL",
+    UniqueDevices >= 2, "HIGH",
+    "MEDIUM")
+| project TimeGenerated = FirstSeen, FileName, ExecutionCount,
+    UniqueDevices, Users, ParentProcesses, RiskScore

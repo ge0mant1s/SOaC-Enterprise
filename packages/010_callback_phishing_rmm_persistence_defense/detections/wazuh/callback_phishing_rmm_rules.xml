@@ -1,0 +1,39 @@
+<!-- SOaC pkg-010: Callback Phishing & RMM Persistence Defense GTR-2025 -->
+<group name="soac,gtr2025,callback_phishing,rmm,">
+  <rule id="101101" level="13">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)(?:AnyDesk|TeamViewer|ScreenConnect|ConnectWise|AteraAgent|SplashtopStreamer|RustDesk|meshagent)\.exe$</field>
+    <description>SOaC GTR-2025: Unauthorized RMM tool execution detected - possible callback phishing result</description>
+    <mitre><id>T1219</id><id>T1566.003</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,rmm,callback_phishing,</group>
+  </rule>
+  <rule id="101102" level="14">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)(?:chrome|msedge|firefox)\.exe$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)(?:AnyDesk|TeamViewer|ScreenConnect)\.exe$</field>
+    <description>SOaC GTR-2025: RMM tool launched from browser - callback phishing chain detected</description>
+    <mitre><id>T1219</id><id>T1204.001</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,rmm,browser_download,</group>
+  </rule>
+  <rule id="101103" level="14">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:sc\s+create|schtasks\s+/create).*(?:AnyDesk|TeamViewer|ScreenConnect|ConnectWise)</field>
+    <description>SOaC GTR-2025: RMM persistence mechanism created via service or scheduled task</description>
+    <mitre><id>T1543.003</id><id>T1053.005</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,rmm,persistence,</group>
+  </rule>
+  <rule id="101104" level="12">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)(?:AnyDesk|TeamViewer|ScreenConnect)\.exe$</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">(?:443|80|7070|5938)</field>
+    <frequency>5</frequency>
+    <timeframe>3600</timeframe>
+    <description>SOaC GTR-2025: RMM C2 communication pattern - persistent remote access channel</description>
+    <mitre><id>T1219</id><id>T1071.001</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,rmm,c2,</group>
+  </rule>
+</group>

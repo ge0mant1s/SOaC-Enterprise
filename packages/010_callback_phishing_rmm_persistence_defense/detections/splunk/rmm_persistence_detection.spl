@@ -1,0 +1,17 @@
+| tstats summariesonly=t count min(_time) as firstTime max(_time) as lastTime
+  FROM datamodel=Endpoint.Services
+  WHERE Services.service_name IN ("*AnyDesk*","*TeamViewer*","*ScreenConnect*",
+    "*ConnectWise*","*Atera*","*meshagent*")
+  BY Services.dest Services.service_name Services.start_mode
+| rename Services.* as *
+| append [
+  | search index=main sourcetype="WinEventLog:Security" EventCode=4698
+    TaskContent IN ("*AnyDesk*","*TeamViewer*","*ScreenConnect*")
+  | stats count as sched_task_count values(TaskName) as tasks BY dest
+  ]
+| stats count as persistence_events values(service_name) as services
+  values(tasks) as scheduled_tasks
+  BY dest
+| eval risk_score=case(persistence_events >= 3, "CRITICAL", persistence_events >= 1, "HIGH", true(), "MEDIUM")
+| eval mitre_techniques="T1543.003,T1053.005,T1219"
+| table firstTime lastTime dest persistence_events services scheduled_tasks risk_score mitre_techniques

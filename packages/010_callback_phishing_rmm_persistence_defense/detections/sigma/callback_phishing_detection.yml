@@ -1,0 +1,19 @@
+title: Callback Phishing Initial Contact Detection
+id: j9e0g8h7-1i4f-9k3g-h8j2-0m5h9j4k6i01
+status: production
+level: high
+description: Detects callback phishing indicators including fake invoice emails, tech support scam patterns, and phone number-based social engineering.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags: [attack.initial_access, attack.t1566.003, attack.t1204.001]
+logsource: {product: m365, service: exchange}
+detection:
+  selection_callback_patterns:
+    Subject|contains: ['invoice', 'subscription', 'renewal', 'payment failed', 'account suspended', 'urgent action']
+    Body|re: '(?:1-8\d{2}|1-9\d{2}|8\d{2}|9\d{2})[-.\s]\d{3}[-.\s]\d{4}'
+  selection_impersonation:
+    SenderAddress|contains: ['geeksquad', 'norton', 'mcafee', 'paypal', 'amazon', 'microsoft']
+    AuthenticationResults|contains: 'dmarc=fail'
+  condition: selection_callback_patterns or selection_impersonation
+falsepositives: [Legitimate subscription renewal notifications, Actual vendor communications]

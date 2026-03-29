@@ -1,0 +1,23 @@
+title: Unauthorized RMM Tool Installation and Execution
+id: j9e0g8h7-1i4f-9k3g-h8j2-0m5h9j4k6i02
+status: production
+level: critical
+description: Detects installation and execution of remote monitoring and management (RMM) tools commonly abused after callback phishing for persistent access.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags: [attack.command_and_control, attack.t1219, attack.persistence, attack.t1133]
+logsource: {category: process_creation, product: windows}
+detection:
+  selection_rmm_install:
+    Image|endswith: ['\\AnyDesk.exe', '\\TeamViewer.exe', '\\ScreenConnect.exe', '\\ConnectWise*.exe', '\\AteraAgent.exe', '\\SplashtopStreamer.exe', '\\RustDesk.exe', '\\meshagent.exe']
+  selection_rmm_download:
+    Image|endswith: ['\\chrome.exe', '\\msedge.exe', '\\firefox.exe']
+    CommandLine|contains: ['anydesk.com', 'teamviewer.com', 'screenconnect.com', 'connectwise.com', 'atera.com', 'splashtop.com']
+  selection_rmm_service:
+    Image|endswith: '\\sc.exe'
+    CommandLine|contains: ['AnyDesk', 'TeamViewer', 'ScreenConnect', 'ConnectWise']
+  filter_approved:
+    Image|contains: ['\\Program Files\\ApprovedRMM\\']
+  condition: (selection_rmm_install or selection_rmm_download or selection_rmm_service) and not filter_approved
+falsepositives: [IT helpdesk using approved RMM tools, Vendor support sessions]

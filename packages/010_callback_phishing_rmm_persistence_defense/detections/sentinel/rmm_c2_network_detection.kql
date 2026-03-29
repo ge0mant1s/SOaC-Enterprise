@@ -1,0 +1,26 @@
+// RMM C2 Network Communication Detection
+// Detects network connections to known RMM service infrastructure
+// MITRE: T1219, T1071.001
+let timewindow = 24h;
+let rmm_domains = dynamic(["*.anydesk.com", "*.teamviewer.com", "*.screenconnect.com",
+    "*.connectwise.com", "*.atera.com", "*.splashtop.com", "*.rustdesk.com"]);
+DeviceNetworkEvents
+| where TimeGenerated > ago(timewindow)
+| where RemoteUrl has_any ("anydesk.com", "teamviewer.com", "screenconnect.com",
+    "connectwise.com", "atera.com", "splashtop.com", "rustdesk.com")
+| where ActionType == "ConnectionSuccess"
+| summarize
+    ConnectionCount = count(),
+    UniqueDestinations = dcount(RemoteUrl),
+    RMMServices = make_set(RemoteUrl, 10),
+    DataTransferred = sum(SentBytes + ReceivedBytes),
+    FirstConnection = min(TimeGenerated)
+    by DeviceName, InitiatingProcessFileName, AccountName
+| where ConnectionCount >= 5
+| extend RiskScore = case(
+    UniqueDestinations >= 3, "CRITICAL",
+    DataTransferred > 100000000, "HIGH",
+    "MEDIUM")
+| project TimeGenerated = FirstConnection, DeviceName, AccountName,
+    InitiatingProcessFileName, ConnectionCount, RMMServices,
+    DataTransferred, RiskScore

@@ -1,0 +1,18 @@
+name: contain-rmm-persistence-gtr2025
+version: "1.0.0"
+description: GTR-2025 response to callback phishing and unauthorized RMM tool persistence. Removes RMM tools, kills C2 channels, and contains affected hosts.
+severity: CRITICAL
+mitre_attack: {tactics: [Command and Control, Persistence, Initial Access], techniques: [T1219, T1543.003, T1566.003]}
+trigger: {source: sentinel_alert, conditions: [{alert_type: rmm_abuse_detection, severity: [critical, high]}], cooldown: 300}
+inputs:
+  affected_hosts: {type: list, required: true}
+  rmm_tools_detected: {type: list, required: true}
+  incident_id: {type: string, required: true}
+steps:
+  - {id: kill_rmm_processes, action: crowdstrike.kill_process, target: "{{ inputs.affected_hosts }}", parameters: {process_names: "{{ inputs.rmm_tools_detected }}", kill_tree: true}, timeout: 30, on_failure: continue}
+  - {id: remove_rmm_persistence, action: crowdstrike.remediate, target: "{{ inputs.affected_hosts }}", parameters: {remove_services: true, remove_scheduled_tasks: true, remove_registry_keys: true, rmm_patterns: "{{ inputs.rmm_tools_detected }}"}, timeout: 60, on_failure: alert}
+  - {id: block_rmm_network, action: firewall.block_domains, parameters: {domains: ["*.anydesk.com","*.teamviewer.com","*.screenconnect.com","*.connectwise.com","*.atera.com"], scope: organization}, timeout: 30, on_failure: alert}
+  - {id: collect_forensics, action: crowdstrike.forensic_collect, target: "{{ inputs.affected_hosts }}", parameters: {collect_types: [process_list, network_connections, services, scheduled_tasks, browser_history]}, timeout: 300, on_failure: continue}
+  - {id: notify_soc, action: notification.send, parameters: {channels: [soc_critical, it_helpdesk], template: rmm_persistence_gtr2025}, timeout: 10, on_failure: log}
+outputs: {rmm_removed: {value: "{{ steps.remove_rmm_persistence.status }}"}, network_blocked: {value: "{{ steps.block_rmm_network.status }}"}}
+governance: {requires_ai_oversight: true, blast_radius: organization}

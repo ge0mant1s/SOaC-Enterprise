@@ -1,0 +1,14 @@
+name: RMM Tool Governance & Callback Phishing Defense — GTR-2025
+version: "1.0.0"
+description: Governance for RMM tool control and callback phishing prevention.
+framework_alignment: [CrowdStrike GTR-2025, CIS Controls v8]
+rmm_governance:
+  approved_tools: [documented_and_limited]
+  unapproved_blocking: application_control_enforced
+  monitoring: all_rmm_activity_logged
+  periodic_review: quarterly
+callback_phishing_defense:
+  email_filtering: enhanced_callback_detection
+  user_training: quarterly_simulations
+  phone_verification: required_for_support_requests
+metadata: {package: pkg-010, mitre_techniques: ["T1219","T1543.003","T1566.003"], last_updated: "2025-03-28"}
