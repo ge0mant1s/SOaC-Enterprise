@@ -1,0 +1,45 @@
+title: EvilProxy Reverse Proxy Phishing Detection
+id: g6b7d5e4-8f1c-6h0d-e5g9-7j2e6g1h3f01
+status: production
+level: critical
+description: |
+  Detects authentication flows routed through EvilProxy reverse proxy infrastructure.
+  Identifies anomalous token issuance patterns and session characteristics consistent
+  with AitM credential harvesting.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.credential_access
+  - attack.t1557.001
+  - attack.t1539
+  - attack.initial_access
+  - attack.t1566.002
+logsource:
+  product: azure
+  service: signinlogs
+detection:
+  selection_suspicious_auth:
+    ResultType: 0
+    AuthenticationProtocol: 'transferToken'
+  selection_proxy_indicators:
+    NetworkLocationDetails|contains:
+      - 'untrustedNamedLocation'
+      - 'anonymousNetwork'
+  selection_user_agent_anomaly:
+    UserAgent|contains:
+      - 'python-requests'
+      - 'Go-http-client'
+      - 'axios'
+  selection_mfa_bypass:
+    MfaResult: 'satisfied'
+    ConditionalAccessStatus: 'success'
+    AuthenticationRequirement: 'multiFactorAuthentication'
+  filter_known:
+    IPAddress|cidr:
+      - '10.0.0.0/8'
+      - '172.16.0.0/12'
+  condition: (selection_suspicious_auth and selection_proxy_indicators) or (selection_user_agent_anomaly and selection_mfa_bypass) and not filter_known
+falsepositives:
+  - Users on VPN or anonymizing services
+  - Legitimate token transfer during SSO flows

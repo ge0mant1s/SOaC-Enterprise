@@ -1,0 +1,40 @@
+{
+  "ioa_definitions": [
+    {
+      "name": "AitM Phishing Session Detected",
+      "description": "Detects authentication sessions proxied through AitM phishing infrastructure like EvilProxy",
+      "severity": "critical",
+      "platform": "cloud",
+      "tactic": "Credential Access",
+      "technique": "T1557.001",
+      "disposition": "DETECT_AND_ALERT",
+      "pattern": {
+        "type": "authentication_anomaly",
+        "conditions": {
+          "token_anomaly": true,
+          "multi_ip_session": true,
+          "risk_indicators": ["anomalousToken", "unfamiliarFeatures"]
+        }
+      },
+      "response_actions": ["revoke_sessions", "force_password_reset", "alert_soc"]
+    },
+    {
+      "name": "MFA Fatigue Attack",
+      "description": "Detects push bombing attempts followed by successful MFA approval",
+      "severity": "critical",
+      "platform": "cloud",
+      "tactic": "Credential Access",
+      "technique": "T1621",
+      "disposition": "DETECT_AND_ALERT",
+      "pattern": {
+        "type": "mfa_pattern",
+        "conditions": {
+          "denial_count_10m": {"gte": 5},
+          "followed_by_success": true
+        }
+      },
+      "response_actions": ["revoke_sessions", "disable_push_mfa", "alert_soc"]
+    }
+  ],
+  "metadata": {"package": "pkg-006", "version": "1.0.0", "last_updated": "2025-03-28", "threat_actor": "EvilProxy"}
+}

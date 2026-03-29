@@ -1,0 +1,36 @@
+// Post-Phishing Account Takeover Detection
+// Detects post-compromise activities after successful credential harvest
+// MITRE: T1539, T1114.002
+let timewindow = 2h;
+let compromised_sessions = SigninLogs
+| where TimeGenerated > ago(timewindow)
+| where ResultType == 0
+| where RiskLevelDuringSignIn in ("high", "medium")
+| distinct UserPrincipalName, IPAddress;
+let post_compromise = union
+  (OfficeActivity
+  | where TimeGenerated > ago(timewindow)
+  | where Operation in ("New-InboxRule", "Set-InboxRule", "UpdateInboxRules",
+      "New-TransportRule", "MailItemsAccessed", "Send")
+  | extend ActionType = "email_manipulation"
+  | project TimeGenerated, UserId, Operation, ActionType, ClientIP),
+  (AuditLogs
+  | where TimeGenerated > ago(timewindow)
+  | where OperationName in ("Update user", "Add member to role",
+      "Consent to application", "Register device")
+  | extend ActionType = "account_modification"
+  | project TimeGenerated, UserId = tostring(InitiatedBy.user.userPrincipalName),
+      Operation = OperationName, ActionType, ClientIP = tostring(InitiatedBy.user.ipAddress));
+compromised_sessions
+| join kind=inner post_compromise on $left.UserPrincipalName == $right.UserId
+| summarize
+    PostCompromiseActions = make_set(Operation, 15),
+    ActionTypes = make_set(ActionType, 5),
+    ActionCount = count()
+    by UserPrincipalName, IPAddress
+| extend RiskScore = case(
+    ActionTypes has "email_manipulation" and ActionTypes has "account_modification", "CRITICAL",
+    ActionCount >= 5, "HIGH",
+    "MEDIUM")
+| project UserPrincipalName, IPAddress, ActionCount, PostCompromiseActions,
+    ActionTypes, RiskScore

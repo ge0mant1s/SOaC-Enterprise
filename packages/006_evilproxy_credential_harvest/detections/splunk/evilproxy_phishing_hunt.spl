@@ -1,0 +1,20 @@
+index=azure sourcetype="azure:aad:signin"
+  ResultType=0
+  (RiskLevelDuringSignIn IN ("high","medium")
+   OR RiskDetail IN ("anomalousToken","tokenIssuerAnomaly","unfamiliarFeatures"))
+| stats count as signin_count
+  dc(IPAddress) as unique_ips
+  values(IPAddress) as ip_list
+  values(Location) as locations
+  values(UserAgent) as user_agents
+  values(RiskDetail) as risk_details
+  min(_time) as firstTime max(_time) as lastTime
+  BY UserPrincipalName
+| where unique_ips >= 2
+| eval risk_score=case(
+    unique_ips >= 3 AND match(risk_details, "anomalousToken"), "CRITICAL",
+    unique_ips >= 2, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1557.001,T1539"
+| table firstTime lastTime UserPrincipalName signin_count unique_ips ip_list locations risk_details risk_score user_agents mitre_techniques
+| sort -risk_score

@@ -1,0 +1,24 @@
+index=azure sourcetype="azure:aad:signin"
+  (ResultType IN (500121,50074) OR StatusDetails="*MFA denied*")
+| bucket _time span=10m
+| stats count as denial_count
+  dc(IPAddress) as unique_ips
+  values(IPAddress) as source_ips
+  values(AppDisplayName) as target_apps
+  min(_time) as firstTime max(_time) as lastTime
+  BY UserPrincipalName _time
+| where denial_count >= 5
+| join type=left UserPrincipalName [
+  | search index=azure sourcetype="azure:aad:signin" ResultType=0
+    AuthenticationRequirement="multiFactorAuthentication"
+    earliest=-30m
+  | stats count as success_after_denials BY UserPrincipalName
+  ]
+| eval mfa_compromised=if(success_after_denials > 0, "YES", "NO")
+| eval risk_score=case(
+    mfa_compromised="YES", "CRITICAL",
+    denial_count >= 10, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1621,T1110"
+| table firstTime lastTime UserPrincipalName denial_count mfa_compromised success_after_denials unique_ips risk_score target_apps mitre_techniques
+| sort -risk_score

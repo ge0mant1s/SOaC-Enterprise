@@ -1,0 +1,32 @@
+// EvilProxy AitM Phishing Detection
+// Correlates anomalous sign-in patterns with known proxy infrastructure indicators
+// MITRE: T1557.001, T1539
+let timewindow = 1h;
+let suspicious_signins = SigninLogs
+| where TimeGenerated > ago(timewindow)
+| where ResultType == 0
+| where RiskLevelDuringSignIn in ("high", "medium")
+    or RiskDetail has_any ("anomalousToken", "tokenIssuerAnomaly", "unfamiliarFeatures")
+| extend SessionId = CorrelationId
+| extend UserAgent = UserAgent
+| extend TokenProtection = case(
+    AuthenticationProcessingDetails has "tokenProtection", "protected",
+    "unprotected");
+let multi_ip_sessions = SigninLogs
+| where TimeGenerated > ago(timewindow)
+| where ResultType == 0
+| summarize
+    UniqueIPs = dcount(IPAddress),
+    IPs = make_set(IPAddress, 10),
+    Locations = make_set(strcat(Location, " - ", City), 5)
+    by UserPrincipalName, CorrelationId
+| where UniqueIPs >= 2;
+suspicious_signins
+| join kind=inner multi_ip_sessions on $left.UserPrincipalName == $right.UserPrincipalName
+| extend RiskScore = case(
+    TokenProtection == "unprotected" and UniqueIPs >= 2, "CRITICAL",
+    RiskLevelDuringSignIn == "high", "CRITICAL",
+    UniqueIPs >= 3, "HIGH",
+    "MEDIUM")
+| project TimeGenerated, UserPrincipalName, IPAddress, RiskScore,
+    TokenProtection, UniqueIPs, IPs, Locations, RiskDetail, UserAgent

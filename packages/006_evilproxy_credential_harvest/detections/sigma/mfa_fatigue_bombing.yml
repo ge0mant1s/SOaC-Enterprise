@@ -1,0 +1,33 @@
+title: MFA Fatigue/Bombing Attack Detection
+id: g6b7d5e4-8f1c-6h0d-e5g9-7j2e6g1h3f02
+status: production
+level: high
+description: |
+  Detects MFA fatigue attacks where adversaries repeatedly trigger push notifications
+  hoping the victim approves one. EvilProxy and similar tools automate this technique.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.credential_access
+  - attack.t1621
+  - attack.t1110
+logsource:
+  product: azure
+  service: signinlogs
+detection:
+  selection_mfa_deny:
+    ResultType:
+      - 500121
+      - 50074
+    Status.errorCode: 500121
+  selection_rapid:
+    Status.additionalDetails|contains: 'MFA denied'
+  condition: selection_mfa_deny or selection_rapid
+  timeframe: 10m
+  count:
+    field: UserPrincipalName
+    gte: 5
+falsepositives:
+  - Users with connectivity issues failing MFA repeatedly
+  - MFA configuration errors

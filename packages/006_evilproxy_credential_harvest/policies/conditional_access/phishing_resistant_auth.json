@@ -1,0 +1,10 @@
+{
+  "policy_name": "SOaC Phishing-Resistant Authentication - Conditional Access",
+  "version": "1.0.0",
+  "rules": [
+    {"name": "Require Phishing-Resistant MFA for Admins", "conditions": {"user_role": ["Global Administrator", "Security Administrator", "Exchange Administrator"]}, "actions": {"grant": "require_authentication_strength", "authentication_strength": "phishing_resistant", "methods": ["fido2", "windows_hello", "certificate_based"]}},
+    {"name": "Block Legacy Auth Protocols", "conditions": {"client_app": ["exchange_activesync", "imap", "pop3", "smtp", "other_clients"]}, "actions": {"grant": "block"}},
+    {"name": "Continuous Access Evaluation", "conditions": {"all_users": true}, "actions": {"session_controls": {"continuous_access_evaluation": "strict", "sign_in_frequency": "1h", "persistent_browser": "never"}}}
+  ],
+  "metadata": {"package": "pkg-006", "mitre_techniques": ["T1557.001", "T1539", "T1621"], "last_updated": "2025-03-28"}
+}

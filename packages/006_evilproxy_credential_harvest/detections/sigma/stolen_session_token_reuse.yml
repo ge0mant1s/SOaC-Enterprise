@@ -1,0 +1,35 @@
+title: Stolen Session Token Reuse After AitM Phishing
+id: g6b7d5e4-8f1c-6h0d-e5g9-7j2e6g1h3f03
+status: production
+level: critical
+description: |
+  Detects session token reuse from different IP addresses/locations after
+  successful authentication, indicating stolen session cookies from
+  EvilProxy or similar AitM phishing infrastructure.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.credential_access
+  - attack.t1539
+  - attack.lateral_movement
+  - attack.t1550.001
+logsource:
+  product: azure
+  service: signinlogs
+detection:
+  selection_token_reuse:
+    ResultType: 0
+    TokenIssuerType: 'AzureAD'
+  selection_anomaly:
+    RiskLevel|contains:
+      - 'high'
+      - 'medium'
+    RiskDetail|contains:
+      - 'anomalousToken'
+      - 'tokenIssuerAnomaly'
+      - 'unfamiliarFeatures'
+  condition: selection_token_reuse and selection_anomaly
+falsepositives:
+  - Legitimate users traveling between locations
+  - VPN switching

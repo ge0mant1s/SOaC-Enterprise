@@ -1,0 +1,34 @@
+// MFA Fatigue/Push Bombing Detection
+// Detects rapid MFA denial patterns indicating push fatigue attacks
+// MITRE: T1621
+let timewindow = 30m;
+let mfa_threshold = 5;
+SigninLogs
+| where TimeGenerated > ago(timewindow)
+| where ResultType in (500121, 50074)
+    or (Status has "MFA denied" or Status has "MFA request not approved")
+| summarize
+    DenialCount = count(),
+    SourceIPs = make_set(IPAddress, 10),
+    UniqueSourceIPs = dcount(IPAddress),
+    UserAgents = make_set(UserAgent, 5),
+    FirstDenial = min(TimeGenerated),
+    LastDenial = max(TimeGenerated),
+    AppTargets = make_set(AppDisplayName, 5)
+    by UserPrincipalName
+| where DenialCount >= mfa_threshold
+| join kind=leftouter (
+    SigninLogs
+    | where TimeGenerated > ago(timewindow)
+    | where ResultType == 0
+    | where AuthenticationRequirement == "multiFactorAuthentication"
+    | summarize SuccessAfterDenials = count() by UserPrincipalName
+) on UserPrincipalName
+| extend MFACompromised = isnotempty(SuccessAfterDenials) and SuccessAfterDenials > 0
+| extend RiskScore = case(
+    MFACompromised, "CRITICAL",
+    DenialCount >= 10, "HIGH",
+    "MEDIUM")
+| project TimeGenerated = FirstDenial, UserPrincipalName, DenialCount,
+    MFACompromised, SuccessAfterDenials, UniqueSourceIPs, RiskScore,
+    SourceIPs, AppTargets
