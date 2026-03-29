@@ -1,0 +1,30 @@
+// Pre-Encryption Service Termination
+// Detects mass service stops targeting backup, database, and security services
+// MITRE: T1489, T1562.001
+let timewindow = 10m;
+let critical_services = dynamic(["MSSQLSERVER", "SQLAgent", "MsDtsServer",
+    "vss", "SQLBrowser", "MSSQL", "vmms", "vmcompute",
+    "Veeam", "BackupExecAgent", "wbengine", "SepMasterService",
+    "McAfeeFramework", "mfemms", "WinDefend"]);
+DeviceProcessEvents
+| where Timestamp > ago(timewindow)
+| where (FileName == "net.exe" and ProcessCommandLine has "stop")
+    or (FileName == "sc.exe" and ProcessCommandLine has "stop")
+    or (FileName == "taskkill.exe" and ProcessCommandLine has "/f")
+    or (FileName == "powershell.exe" and ProcessCommandLine has "Stop-Service")
+| extend TargetService = extract(@"(?:stop|Stop-Service)\s+[\"']?(\w+)", 1, ProcessCommandLine)
+| where isnotempty(TargetService)
+| summarize
+    StoppedServices = make_set(TargetService, 20),
+    ServiceCount = dcount(TargetService),
+    Commands = make_set(ProcessCommandLine, 10),
+    ParentProcesses = make_set(InitiatingProcessFileName, 5)
+    by DeviceId, DeviceName, bin(Timestamp, 5m)
+| where ServiceCount >= 3
+| extend CriticalServicesHit = set_intersect(StoppedServices, critical_services)
+| extend RiskScore = case(
+    array_length(CriticalServicesHit) >= 3, "CRITICAL",
+    ServiceCount >= 5, "HIGH",
+    "MEDIUM")
+| project Timestamp, DeviceName, ServiceCount, StoppedServices,
+    CriticalServicesHit, RiskScore, ParentProcesses

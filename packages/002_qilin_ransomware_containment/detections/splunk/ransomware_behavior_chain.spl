@@ -1,0 +1,25 @@
+| tstats summariesonly=t count min(_time) as firstTime max(_time) as lastTime
+  FROM datamodel=Endpoint.Filesystem
+  WHERE Filesystem.action IN ("created","modified","renamed")
+    AND (Filesystem.file_name="*.qilin" OR Filesystem.file_name="*.encrypted"
+         OR Filesystem.file_name="*README_TO_RESTORE*" OR Filesystem.file_name="*HOW_TO_DECRYPT*")
+  BY _time span=5m Filesystem.dest Filesystem.user Filesystem.process_name Filesystem.file_path
+| rename Filesystem.* as *
+| stats count as file_ops dc(file_path) as unique_files min(firstTime) as firstTime max(lastTime) as lastTime
+  values(process_name) as processes values(file_path) as sample_paths
+  BY dest user
+| where unique_files >= 50
+| join type=left dest [
+  | search index=main sourcetype="WinEventLog:Security" EventCode=4688
+    (CommandLine="*vssadmin*delete*shadows*" OR CommandLine="*wmic*shadowcopy*delete*"
+     OR CommandLine="*bcdedit*recoveryenabled*no*")
+  | stats count as anti_recovery_count values(CommandLine) as recovery_cmds BY dest
+  ]
+| eval risk_score=case(
+    unique_files > 500 AND anti_recovery_count > 0, "CRITICAL",
+    unique_files > 200, "HIGH",
+    unique_files > 50, "MEDIUM",
+    true(), "LOW")
+| eval mitre_techniques="T1486,T1490,T1489"
+| table firstTime lastTime dest user unique_files file_ops processes risk_score anti_recovery_count recovery_cmds mitre_techniques sample_paths
+| sort -unique_files

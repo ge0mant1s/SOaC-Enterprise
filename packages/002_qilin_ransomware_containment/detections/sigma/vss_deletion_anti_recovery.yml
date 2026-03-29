@@ -1,0 +1,45 @@
+title: Volume Shadow Copy Deletion - Anti-Recovery Technique
+id: d8f3a2e1-4b7c-4e9a-b1d5-3f8a2c7e9b03
+status: production
+level: critical
+description: |
+  Detects deletion of Volume Shadow Copies, a technique used by Qilin and most
+  ransomware families to prevent file recovery. Also detects bcdedit modifications
+  to disable recovery mode.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.impact
+  - attack.t1490
+  - attack.defense_evasion
+  - attack.t1070
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_vssadmin:
+    Image|endswith: '\\vssadmin.exe'
+    CommandLine|contains:
+      - 'delete shadows'
+      - 'resize shadowstorage'
+  selection_wmic_shadow:
+    Image|endswith: '\\wmic.exe'
+    CommandLine|contains: 'shadowcopy delete'
+  selection_bcdedit:
+    Image|endswith: '\\bcdedit.exe'
+    CommandLine|contains:
+      - 'recoveryenabled no'
+      - 'bootstatuspolicy ignoreallfailures'
+  selection_powershell_vss:
+    Image|endswith:
+      - '\\powershell.exe'
+      - '\\pwsh.exe'
+    CommandLine|contains:
+      - 'Get-WmiObject Win32_ShadowCopy'
+      - 'Remove-WmiObject'
+      - 'Win32_ShadowCopy'
+  condition: selection_vssadmin or selection_wmic_shadow or selection_bcdedit or selection_powershell_vss
+falsepositives:
+  - System administrators managing shadow copies
+  - Disk cleanup operations

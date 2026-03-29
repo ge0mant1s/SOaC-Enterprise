@@ -1,0 +1,26 @@
+// Ransomware Lateral Movement via SMB
+// Detects rapid SMB connections from single host indicating propagation
+// MITRE: T1021.002, T1570
+let timewindow = 30m;
+let connection_threshold = 10;
+DeviceNetworkEvents
+| where Timestamp > ago(timewindow)
+| where RemotePort in (445, 139)
+| where ActionType == "ConnectionSuccess"
+| summarize
+    UniqueTargets = dcount(RemoteIP),
+    TargetList = make_set(RemoteIP, 20),
+    ConnectionCount = count(),
+    FirstConnection = min(Timestamp),
+    LastConnection = max(Timestamp),
+    InitiatingProcesses = make_set(InitiatingProcessFileName, 5)
+    by DeviceId, DeviceName, LocalIP
+| where UniqueTargets >= connection_threshold
+| extend SpreadRate = round(todouble(UniqueTargets) / datetime_diff('minute', LastConnection, FirstConnection), 2)
+| extend RiskScore = case(
+    UniqueTargets > 50, "CRITICAL",
+    UniqueTargets > 20, "HIGH",
+    "MEDIUM")
+| project Timestamp = FirstConnection, DeviceName, LocalIP,
+    UniqueTargets, ConnectionCount, SpreadRate, RiskScore,
+    InitiatingProcesses, TargetList

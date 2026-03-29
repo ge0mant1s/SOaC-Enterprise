@@ -1,0 +1,736 @@
+{
+  "schema_version": "1.0.0",
+  "harness_level": 3,
+  "package_id": "pkg-002",
+  "package_name": "Ransomware Containment & Response",
+  "scenario_id": "pkg-002",
+  "scenario_title": "Qilin Ransomware Containment",
+  "generated_at": "2026-03-18T12:13:36.887Z",
+  "summary": {
+    "total_steps": 77,
+    "body_steps": 9,
+    "brain_steps": 10,
+    "purpose_steps": 13,
+    "edge_steps": 6,
+    "detection_triggers": 3,
+    "playbook_actions": 18,
+    "mitre_techniques_declared": 4,
+    "mitre_techniques_exercised": 4,
+    "coverage_pct": 100
+  },
+  "mitre_coverage": [
+    {
+      "technique_id": "T1486",
+      "tactic": "Impact",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        11,
+        13,
+        14,
+        30,
+        42
+      ],
+      "detected_by": "ransomware-encryption-detection",
+      "responded_by": "ransomware-containment-response"
+    },
+    {
+      "technique_id": "T1059",
+      "tactic": "Execution",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        11,
+        13,
+        14,
+        30,
+        42
+      ],
+      "detected_by": "ransomware-encryption-detection",
+      "responded_by": "ransomware-containment-response"
+    },
+    {
+      "technique_id": "T1068",
+      "tactic": "Privilege Escalation",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        11,
+        13,
+        14,
+        42
+      ],
+      "detected_by": "ransomware-encryption-detection",
+      "responded_by": "ransomware-containment-response"
+    },
+    {
+      "technique_id": "T1490",
+      "tactic": "Impact",
+      "exercised_by_scenario": true,
+      "exercised_at_steps": [
+        8,
+        11,
+        13,
+        14,
+        17
+      ],
+      "detected_by": "ransomware-encryption-detection",
+      "responded_by": "ransomware-containment-response"
+    }
+  ],
+  "replay_timeline": [
+    {
+      "step_index": 0,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 1,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "╔══════════════════════════════════════════════════════════════╗",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 2,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "║   SCENARIO: QILIN RANSOMWARE CONTAINMENT — pkg-002         ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 3,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "║   Ransomware Detonation → Isolation → Forensics → Response  ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 4,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "╚══════════════════════════════════════════════════════════════╝",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 5,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 6,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Loading scenario: Qilin Ransomware Containment",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 7,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Threat actor profile: Qilin (Ransomware-as-a-Service)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 8,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] MITRE ATT&CK: T1486, T1059, T1068, T1490",
+      "artifact_hit": null,
+      "mitre_match": [
+        "T1486",
+        "T1059",
+        "T1068",
+        "T1490"
+      ]
+    },
+    {
+      "step_index": 9,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Signals: CrowdStrike Falcon, Microsoft Defender, Splunk ES",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 10,
+      "phase": null,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 11,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "━━━ PHASE 1: THE BODY — Endpoint Telemetry Analysis ━━━━━━━━━",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1486",
+        "T1059",
+        "T1068",
+        "T1490"
+      ]
+    },
+    {
+      "step_index": 12,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 13,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] CrowdStrike Falcon alert: HIGH severity detection",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1486",
+        "T1059",
+        "T1068",
+        "T1490"
+      ]
+    },
+    {
+      "step_index": 14,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] DetectionType: RansomwareActivity | Host: WS-FIN-042",
+      "artifact_hit": "detection.yaml",
+      "mitre_match": [
+        "T1486",
+        "T1059",
+        "T1068",
+        "T1490"
+      ]
+    },
+    {
+      "step_index": 15,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Process chain: outlook.exe → cmd.exe → powershell.exe → qilin.exe",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 16,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ powershell.exe -enc [Base64 payload] -nop -w hidden",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 17,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ vssadmin.exe delete shadows /all /quiet  (T1490)",
+      "artifact_hit": null,
+      "mitre_match": [
+        "T1490"
+      ]
+    },
+    {
+      "step_index": 18,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   ├─ bcdedit.exe /set {default} recoveryenabled no",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 19,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY]   └─ qilin.exe -encrypt -ext .qilin -note README_RESTORE.txt",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 20,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY] File entropy spike: 47 files encrypted in 12 seconds",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 21,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY] Shadow copies deleted | Recovery disabled | Encryption active",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 22,
+      "phase": 1,
+      "pillar": "BODY",
+      "text": "[BODY] Risk Score: CRITICAL | Confidence: 99%",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 23,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "[BODY] Forwarding to The Brain for immediate analysis...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 24,
+      "phase": 1,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 25,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "━━━ PHASE 2: THE BRAIN — Ransomware Analysis ━━━━━━━━━━━━━━━━",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 26,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 27,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] CRITICAL detection received: RansomwareActivity",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 28,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Governance: CRITICAL severity → autonomous containment authorized",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 29,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "[BRAIN] Analyzing behavioral intent...",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 30,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Process tree: matches Qilin execution chain (T1059 + T1486)",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": [
+        "T1059",
+        "T1486"
+      ]
+    },
+    {
+      "step_index": 31,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ VSS deletion + recovery disable = pre-encryption preparation",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 32,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ File entropy analysis: encryption in progress (AES-256)",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 33,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   ├─ Lateral movement indicators: SMB scanning on port 445",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 34,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN]   └─ No data exfiltration detected (yet) — containment window open",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 35,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Confidence: 99% | Blast radius: 1 host (containable)",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 36,
+      "phase": 2,
+      "pillar": "BRAIN",
+      "text": "[BRAIN] Recommended playbook: isolate-compromised-host v1.1.0",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 37,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "[BRAIN] Decision: APPROVE — time-critical autonomous execution",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 38,
+      "phase": 2,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 39,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "━━━ PHASE 3: THE PURPOSE — Host Isolation Playbook ━━━━━━━━━━",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 40,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 41,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Loading: isolate-compromised-host v1.1.0",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 42,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] severity: CRITICAL | mitre_attack: [T1486, T1059, T1068]",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": [
+        "T1486",
+        "T1059",
+        "T1068"
+      ]
+    },
+    {
+      "step_index": 43,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 44,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 1/5: verify_host_identity",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 45,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: crowdstrike_api | GET /devices/entities/devices/v2",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 46,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Host confirmed: WS-FIN-042 | OS: Win11 | Agent: active",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 47,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 2/5: network_containment",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 48,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: crowdstrike_api | POST /devices/entities/devices-actions/v2",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 49,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Network isolation ACTIVE — host quarantined",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 50,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 3/5: kill_malicious_process",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 51,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: crowdstrike_rtr | session: RTR-2026-042",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 52,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ qilin.exe (PID 4872) terminated | powershell.exe (PID 3104) terminated",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 53,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 4/5: capture_forensic_snapshot",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 54,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: crowdstrike_rtr | action: memory_dump + disk_image",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 55,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ Memory dump: 4.2GB captured | Evidence preserved",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 56,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW] Step 5/5: create_incident_ticket",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 57,
+      "phase": 3,
+      "pillar": "PURPOSE",
+      "text": "[CLAW]   target: jira | project: SOC-IR",
+      "artifact_hit": "playbook.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 58,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "[CLAW]   └─ ✓ JIRA SOC-IR-2026-042 created | Severity: P1",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 59,
+      "phase": 3,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 60,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "━━━ PHASE 4: THE NERVOUS SYSTEM — Network Enforcement ━━━━━━━",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 61,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 62,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Receiving host containment enforcement...",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 63,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] HMAC-SHA256 signature: VERIFIED ✓",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 64,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Enforcing session block...",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 65,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Action: block_host | Scope: WS-FIN-042 | Duration: indefinite",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 66,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   ├─ Firewall rule: DENY ALL from 10.1.42.15 ✓",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 67,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   ├─ DNS sinkhole: qilin C2 domains → 127.0.0.1 ✓",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 68,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[EDGE]   └─ SMB lateral movement blocked on subnet 10.1.42.0/24 ✓",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 69,
+      "phase": 4,
+      "pillar": "EDGE",
+      "text": "[EDGE] Enforcement ID: EDGE-ENF-2026-QILIN-002",
+      "artifact_hit": "policy.yaml",
+      "mitre_match": []
+    },
+    {
+      "step_index": 70,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 71,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "╔══════════════════════════════════════════════════════════════╗",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 72,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   ✓ SCENARIO COMPLETE: Qilin Ransomware Containment        ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 73,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   Time to Contain: 2.1s | Encrypted Files: 47 | Spread: 0  ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 74,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "║   Forensic Evidence: Captured | JIRA Ticket: SOC-IR-2026   ║",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 75,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "╚══════════════════════════════════════════════════════════════╝",
+      "artifact_hit": null,
+      "mitre_match": []
+    },
+    {
+      "step_index": 76,
+      "phase": 4,
+      "pillar": "SYSTEM",
+      "text": "[SYSTEM] Lab safety policy enforced. No production systems affected.",
+      "artifact_hit": null,
+      "mitre_match": []
+    }
+  ],
+  "artifacts_used": {
+    "detection": "detection.yaml",
+    "playbook": "playbook.yaml",
+    "policy": "policy.yaml",
+    "metadata": "metadata.yml"
+  },
+  "verdict": "PASS",
+  "verdict_reason": "All 4 declared MITRE techniques (from metadata.yml) validated by replay heuristics. 3 detection triggers, 18 playbook actions observed."
+}

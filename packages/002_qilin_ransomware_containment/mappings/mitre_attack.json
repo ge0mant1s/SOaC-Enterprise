@@ -1,0 +1,14 @@
+{
+  "package_id": "pkg-002",
+  "framework": "MITRE ATT&CK v14",
+  "techniques": [
+    {"id": "T1486", "name": "Data Encrypted for Impact", "tactic": "Impact", "detections": ["ransomware_encryption_activity", "ransomware_encryption_chain", "ransomware_behavior_chain"]},
+    {"id": "T1490", "name": "Inhibit System Recovery", "tactic": "Impact", "detections": ["vss_deletion_anti_recovery", "service_stop_pre_encryption"]},
+    {"id": "T1489", "name": "Service Stop", "tactic": "Impact", "detections": ["service_stop_pre_encryption"]},
+    {"id": "T1021.002", "name": "SMB/Windows Admin Shares", "tactic": "Lateral Movement", "detections": ["lateral_movement_smb_ransomware", "ransomware_lateral_spread", "lateral_movement_ransomware"]},
+    {"id": "T1570", "name": "Lateral Tool Transfer", "tactic": "Lateral Movement", "detections": ["lateral_movement_smb_ransomware"]},
+    {"id": "T1562.001", "name": "Disable or Modify Tools", "tactic": "Defense Evasion", "detections": ["service_stop_pre_encryption"]},
+    {"id": "T1080", "name": "Taint Shared Content", "tactic": "Lateral Movement", "detections": ["lateral_movement_smb_ransomware"]},
+    {"id": "T1070", "name": "Indicator Removal", "tactic": "Defense Evasion", "detections": ["vss_deletion_anti_recovery"]}
+  ]
+}

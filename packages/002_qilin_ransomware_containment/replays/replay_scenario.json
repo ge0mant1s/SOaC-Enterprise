@@ -1,0 +1,57 @@
+{
+  "scenario_id": "pkg-002-replay",
+  "title": "Qilin Ransomware Attack Chain Replay",
+  "description": "Full attack chain simulation from initial access through encryption and containment",
+  "phases": [
+    {
+      "phase": "Initial Access",
+      "timestamp_offset": 0,
+      "events": [
+        {"type": "authentication", "detail": "Compromised VPN credential login from unusual geolocation", "source": "Azure AD"},
+        {"type": "process", "detail": "PowerShell execution via scheduled task on WORKSTATION-42", "source": "CrowdStrike"}
+      ]
+    },
+    {
+      "phase": "Credential Harvesting",
+      "timestamp_offset": 300,
+      "events": [
+        {"type": "process", "detail": "Chrome credential harvesting via GPO-deployed PowerShell", "source": "CrowdStrike"},
+        {"type": "file", "detail": "Browser credential database accessed: Login Data, Cookies", "source": "Sysmon"}
+      ]
+    },
+    {
+      "phase": "Lateral Movement",
+      "timestamp_offset": 900,
+      "events": [
+        {"type": "network", "detail": "SMB connections to 18 hosts from WORKSTATION-42 in 10 minutes", "source": "Firewall"},
+        {"type": "authentication", "detail": "Pass-the-hash authentication across domain", "source": "Domain Controller"}
+      ]
+    },
+    {
+      "phase": "Pre-Encryption",
+      "timestamp_offset": 1800,
+      "events": [
+        {"type": "process", "detail": "vssadmin.exe delete shadows /all /quiet", "source": "Sysmon"},
+        {"type": "process", "detail": "net stop MSSQLSERVER, vss, Veeam, WinDefend", "source": "Sysmon"},
+        {"type": "process", "detail": "bcdedit /set {default} recoveryenabled no", "source": "Sysmon"}
+      ]
+    },
+    {
+      "phase": "Encryption",
+      "timestamp_offset": 2100,
+      "events": [
+        {"type": "file", "detail": "Mass file rename to .qilin extension — 2,847 files in 3 minutes", "source": "Sysmon"},
+        {"type": "file", "detail": "README_TO_RESTORE.txt dropped in every directory", "source": "Sysmon"}
+      ]
+    },
+    {
+      "phase": "Containment",
+      "timestamp_offset": 2400,
+      "events": [
+        {"type": "response", "detail": "CLAW playbook triggered — host network contained via CrowdStrike", "source": "SOAR"},
+        {"type": "response", "detail": "SMB ports blocked on affected segment", "source": "Firewall"},
+        {"type": "response", "detail": "Compromised accounts disabled in Azure AD", "source": "Azure AD"}
+      ]
+    }
+  ]
+}

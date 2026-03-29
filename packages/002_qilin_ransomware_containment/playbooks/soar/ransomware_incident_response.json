@@ -1,0 +1,59 @@
+{
+  "name": "Qilin Ransomware Incident Response",
+  "version": "1.0.0",
+  "description": "End-to-end SOAR workflow for ransomware containment, investigation, and recovery",
+  "trigger": {
+    "type": "alert",
+    "source": ["Microsoft Sentinel", "CrowdStrike Falcon"],
+    "conditions": {
+      "alert_name_pattern": "*ransomware*|*encryption*|*qilin*",
+      "severity": ["critical", "high"]
+    }
+  },
+  "phases": [
+    {
+      "name": "Triage",
+      "steps": [
+        {"action": "enrich_alert", "source": "VirusTotal", "parameters": {"lookup": "file_hash", "from": "alert.indicators"}},
+        {"action": "enrich_alert", "source": "CrowdStrike Intel", "parameters": {"lookup": "threat_actor", "query": "Qilin"}},
+        {"action": "classify_severity", "rules": {"encryption_detected": "critical", "lateral_movement_only": "high"}}
+      ]
+    },
+    {
+      "name": "Containment",
+      "steps": [
+        {"action": "execute_playbook", "playbook": "isolate-and-contain-ransomware", "wait_for_completion": true},
+        {"action": "update_ticket", "fields": {"status": "Containment Active", "priority": "P1"}}
+      ]
+    },
+    {
+      "name": "Investigation",
+      "steps": [
+        {"action": "query_logs", "source": "Sentinel", "query": "ransomware_encryption_chain", "timerange": "-24h"},
+        {"action": "timeline_builder", "sources": ["endpoint_events", "network_events", "auth_events"]},
+        {"action": "ioc_extraction", "sources": ["memory_dump", "disk_snapshot", "network_capture"]}
+      ]
+    },
+    {
+      "name": "Recovery",
+      "steps": [
+        {"action": "assess_backup_integrity", "parameters": {"check_vss": true, "check_offsite": true}},
+        {"action": "initiate_restore", "parameters": {"source": "latest_clean_backup", "verify_integrity": true}},
+        {"action": "validate_restoration", "parameters": {"sample_size": 100, "checksum_verify": true}}
+      ]
+    },
+    {
+      "name": "Post-Incident",
+      "steps": [
+        {"action": "generate_report", "template": "ransomware_incident_report"},
+        {"action": "update_detection_rules", "parameters": {"new_iocs": "extracted_iocs"}},
+        {"action": "schedule_lessons_learned", "parameters": {"within_days": 5}}
+      ]
+    }
+  ],
+  "sla": {
+    "containment": "15m",
+    "initial_assessment": "1h",
+    "full_investigation": "24h"
+  }
+}

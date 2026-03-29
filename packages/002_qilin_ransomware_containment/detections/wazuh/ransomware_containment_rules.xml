@@ -1,0 +1,55 @@
+<!-- SOaC pkg-002: Qilin Ransomware Containment Rules -->
+<group name="soac,ransomware,qilin,">
+
+  <rule id="100101" level="15">
+    <if_sid>550,553</if_sid>
+    <field name="win.eventdata.targetFilename" type="pcre2">(?:\.(qilin|encrypted|locked|crypted)$|README_TO_RESTORE|HOW_TO_DECRYPT)</field>
+    <description>SOaC: Ransomware file encryption activity detected - $(win.eventdata.targetFilename)</description>
+    <mitre>
+      <id>T1486</id>
+      <id>T1490</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>ransomware,encryption,impact,</group>
+  </rule>
+
+  <rule id="100102" level="14">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:vssadmin.*delete\s+shadows|wmic.*shadowcopy\s+delete|bcdedit.*recoveryenabled\s+no)</field>
+    <description>SOaC: Anti-recovery technique detected - Volume Shadow Copy deletion or recovery mode disabled</description>
+    <mitre>
+      <id>T1490</id>
+      <id>T1070</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>ransomware,anti_recovery,impact,</group>
+  </rule>
+
+  <rule id="100103" level="13">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)(?:net\s+stop|sc\s+stop|Stop-Service).*(?:MSSQL|vss|Veeam|BackupExec|wbengine|WinDefend)</field>
+    <description>SOaC: Critical service termination detected - pre-encryption preparation</description>
+    <mitre>
+      <id>T1489</id>
+      <id>T1562.001</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>ransomware,service_stop,</group>
+  </rule>
+
+  <rule id="100104" level="12">
+    <if_sid>92000</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)(?:psexec|wmic|cmd)\.exe$</field>
+    <field name="win.eventdata.destinationPort">445</field>
+    <frequency>5</frequency>
+    <timeframe>600</timeframe>
+    <description>SOaC: Rapid SMB lateral movement detected - possible ransomware propagation</description>
+    <mitre>
+      <id>T1021.002</id>
+      <id>T1570</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>ransomware,lateral_movement,</group>
+  </rule>
+
+</group>

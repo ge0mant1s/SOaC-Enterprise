@@ -1,0 +1,43 @@
+title: SMB Lateral Movement for Ransomware Propagation
+id: d8f3a2e1-4b7c-4e9a-b1d5-3f8a2c7e9b02
+status: production
+level: high
+description: |
+  Detects SMB-based lateral movement patterns used by Qilin and similar ransomware
+  families to spread across network shares before encryption.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.lateral_movement
+  - attack.t1021.002
+  - attack.t1570
+  - attack.t1080
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  selection_smb:
+    DestinationPort:
+      - 445
+      - 139
+    Initiated: 'true'
+  selection_process:
+    Image|endswith:
+      - '\\cmd.exe'
+      - '\\powershell.exe'
+      - '\\wmic.exe'
+      - '\\psexec.exe'
+      - '\\rundll32.exe'
+  filter_normal:
+    Image|endswith:
+      - '\\explorer.exe'
+      - '\\svchost.exe'
+  condition: selection_smb and selection_process and not filter_normal
+  timeframe: 10m
+  count:
+    field: DestinationIp
+    gte: 5
+falsepositives:
+  - IT administration tools performing bulk operations
+  - Network monitoring solutions

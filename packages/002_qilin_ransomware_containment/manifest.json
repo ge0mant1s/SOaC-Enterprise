@@ -1,0 +1,71 @@
+{
+  "package_id": "pkg-002",
+  "version": "1.0.0",
+  "title": "Qilin Ransomware Containment",
+  "description": "Full ransomware containment lifecycle from initial encryption detection through host isolation and recovery.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "category": "Ransomware",
+  "tags": [
+    "ransomware",
+    "qilin",
+    "encryption",
+    "containment",
+    "lateral-movement",
+    "vss-deletion"
+  ],
+  "threat_actor": "Qilin",
+  "github_path": "packages/002_qilin_ransomware_containment",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre_techniques": [
+    "T1486",
+    "T1490",
+    "T1489",
+    "T1021.002",
+    "T1570"
+  ],
+  "detections": {
+    "sigma": 3,
+    "sentinel": 3,
+    "splunk": 2,
+    "wazuh": 1,
+    "crowdstrike": 1,
+    "total": 10
+  },
+  "playbooks": {
+    "claw": 1,
+    "soar": 1,
+    "total": 2
+  },
+  "policies": {
+    "conditional_access": 1,
+    "governance": 1,
+    "total": 2
+  },
+  "docs": [
+    "threat_context.md",
+    "deployment_guide.md",
+    "validation_guide.md"
+  ],
+  "created": "2025-03-28",
+  "last_updated": "2025-03-28",
+  "mitre": [
+    "T1486",
+    "T1490",
+    "T1489",
+    "T1021.002",
+    "T1570"
+  ],
+  "stacks": [
+    "sentinel",
+    "sigma",
+    "splunk",
+    "wazuh",
+    "crowdstrike"
+  ]
+}

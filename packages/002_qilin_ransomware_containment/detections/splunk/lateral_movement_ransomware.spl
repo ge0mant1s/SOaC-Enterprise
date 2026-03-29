@@ -1,0 +1,25 @@
+| tstats summariesonly=t count min(_time) as firstTime max(_time) as lastTime
+  FROM datamodel=Network_Traffic.All_Traffic
+  WHERE All_Traffic.dest_port IN (445,139)
+    AND All_Traffic.action="allowed"
+  BY _time span=10m All_Traffic.src All_Traffic.dest All_Traffic.dest_port All_Traffic.app
+| rename All_Traffic.* as *
+| stats dc(dest) as unique_targets count as total_connections
+  values(dest) as target_ips min(firstTime) as firstTime max(lastTime) as lastTime
+  BY src
+| where unique_targets >= 10
+| join type=left src [
+  | search index=main sourcetype="WinEventLog:Security"
+    (EventCode=4624 LogonType=3)
+  | stats dc(TargetUserName) as unique_accounts values(TargetUserName) as accounts BY IpAddress
+  | rename IpAddress as src
+  ]
+| eval spread_velocity = round(unique_targets / ((lastTime - firstTime) / 60), 2)
+| eval risk_score=case(
+    unique_targets > 50, "CRITICAL",
+    unique_targets > 20 AND unique_accounts > 1, "HIGH",
+    unique_targets > 10, "MEDIUM",
+    true(), "LOW")
+| eval mitre_techniques="T1021.002,T1570,T1080"
+| table firstTime lastTime src unique_targets total_connections spread_velocity risk_score unique_accounts accounts target_ips mitre_techniques
+| sort -unique_targets

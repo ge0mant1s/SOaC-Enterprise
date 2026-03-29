@@ -1,0 +1,19 @@
+{
+  "id": "pkg-002",
+  "title": "Qilin Ransomware Containment",
+  "subtitle": "Advanced ransomware response from detection through containment and recovery",
+  "difficulty": 3,
+  "category": "Ransomware",
+  "steps": [
+    {"phase": "Initial Access", "title": "Compromised VPN Credential", "description": "Attacker gains access via stolen VPN credentials purchased from initial access broker.", "role": "Red Team"},
+    {"phase": "Discovery", "title": "Network Reconnaissance", "description": "Attacker enumerates network shares, domain controllers, and backup infrastructure.", "role": "Red Team"},
+    {"phase": "Credential Theft", "title": "Chrome Credential Harvesting", "description": "Deploy GPO-based PowerShell to harvest Chrome stored credentials across domain.", "role": "Red Team"},
+    {"phase": "Lateral Movement", "title": "SMB Propagation", "description": "Use harvested credentials to spread across network via SMB admin shares.", "role": "Red Team"},
+    {"phase": "Detection", "title": "Lateral Movement Alert", "description": "Sentinel detects anomalous SMB connection burst from single source host.", "role": "Blue Team"},
+    {"phase": "Pre-Encryption", "title": "Anti-Recovery Preparation", "description": "Delete VSS snapshots, stop backup services, disable Windows recovery.", "role": "Red Team"},
+    {"phase": "Detection", "title": "VSS Deletion Alert", "description": "Sigma and Wazuh rules detect shadow copy deletion and service stops.", "role": "Blue Team"},
+    {"phase": "Encryption", "title": "Ransomware Deployment", "description": "Deploy Qilin encryptor — 2,847 files encrypted in 3 minutes.", "role": "Red Team"},
+    {"phase": "Containment", "title": "Automated Containment", "description": "CLAW playbook auto-triggers: network isolate, kill processes, block SMB.", "role": "Blue Team"},
+    {"phase": "Recovery", "title": "Damage Assessment & Restore", "description": "Assess encryption scope, verify backup integrity, initiate restoration.", "role": "Blue Team"}
+  ]
+}

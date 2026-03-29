@@ -1,0 +1,16 @@
+{
+  "package_id": "pkg-002",
+  "detection_coverage": {
+    "sigma": {"count": 3, "files": ["ransomware_encryption_activity.yml", "lateral_movement_smb_ransomware.yml", "vss_deletion_anti_recovery.yml"]},
+    "sentinel": {"count": 3, "files": ["ransomware_encryption_chain.kql", "ransomware_lateral_spread.kql", "service_stop_pre_encryption.kql"]},
+    "splunk": {"count": 2, "files": ["ransomware_behavior_chain.spl", "lateral_movement_ransomware.spl"]},
+    "wazuh": {"count": 1, "files": ["ransomware_containment_rules.xml"], "rule_ids": ["100101", "100102", "100103", "100104"]},
+    "crowdstrike": {"count": 1, "files": ["ransomware_ioa_definitions.json"]}
+  },
+  "response_coverage": {
+    "claw": {"count": 1, "files": ["isolate_and_contain_ransomware.yaml"]},
+    "soar": {"count": 1, "files": ["ransomware_incident_response.json"]}
+  },
+  "total_detections": 10,
+  "total_response_playbooks": 2
+}

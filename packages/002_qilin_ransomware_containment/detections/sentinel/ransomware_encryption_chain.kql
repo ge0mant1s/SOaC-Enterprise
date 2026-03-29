@@ -1,0 +1,37 @@
+// Qilin Ransomware Encryption Chain Detection
+// Correlates file modification bursts with process execution anomalies
+// MITRE: T1486, T1490, T1489
+let timewindow = 15m;
+let encryption_threshold = 100;
+let file_events = DeviceFileEvents
+| where Timestamp > ago(timewindow)
+| where ActionType in ("FileRenamed", "FileModified", "FileCreated")
+| where FileName endswith ".qilin"
+    or FileName endswith ".encrypted"
+    or FileName contains "README_TO_RESTORE"
+    or FileName contains "HOW_TO_DECRYPT"
+| summarize
+    FileCount = dcount(FileName),
+    UniqueExtensions = dcount(tostring(split(FileName, ".")[-1])),
+    FirstSeen = min(Timestamp),
+    LastSeen = max(Timestamp),
+    SampleFiles = make_set(FileName, 10)
+    by DeviceId, DeviceName, InitiatingProcessFileName;
+let process_events = DeviceProcessEvents
+| where Timestamp > ago(timewindow)
+| where FileName in ("vssadmin.exe", "wmic.exe", "bcdedit.exe")
+    or (FileName == "powershell.exe" and ProcessCommandLine has_any("shadowcopy", "Win32_ShadowCopy"))
+| summarize
+    AntiRecoveryCommands = make_set(ProcessCommandLine, 5),
+    RecoveryToolCount = dcount(FileName)
+    by DeviceId, DeviceName;
+file_events
+| where FileCount >= encryption_threshold
+| join kind=leftouter process_events on DeviceId
+| extend RiskScore = case(
+    FileCount > 500 and RecoveryToolCount > 0, "CRITICAL",
+    FileCount > 200, "HIGH",
+    FileCount > 100, "MEDIUM",
+    "LOW")
+| project Timestamp = FirstSeen, DeviceName, InitiatingProcessFileName,
+    FileCount, UniqueExtensions, AntiRecoveryCommands, RiskScore, SampleFiles

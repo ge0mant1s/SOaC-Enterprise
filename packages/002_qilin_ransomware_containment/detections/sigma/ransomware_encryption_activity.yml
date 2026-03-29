@@ -1,0 +1,45 @@
+title: Ransomware File Encryption Activity
+id: d8f3a2e1-4b7c-4e9a-b1d5-3f8a2c7e9b01
+status: production
+level: critical
+description: |
+  Detects mass file modification patterns consistent with ransomware encryption.
+  Qilin ransomware typically renames files with .qilin extension and drops ransom notes.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.impact
+  - attack.t1486
+  - attack.t1490
+  - attack.t1489
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection_extension:
+    TargetFilename|endswith:
+      - '.qilin'
+      - '.encrypted'
+      - '.locked'
+      - '.crypted'
+  selection_ransom_note:
+    TargetFilename|contains:
+      - 'README_TO_RESTORE'
+      - 'RECOVER-FILES'
+      - 'HOW_TO_DECRYPT'
+  selection_mass_rename:
+    EventType: 'FileRename'
+  filter_backup:
+    TargetFilename|contains:
+      - '\\Backup\\'
+      - '\\Recycle.Bin\\'
+  condition: (selection_extension or selection_ransom_note) and not filter_backup
+  timeframe: 5m
+  count:
+    field: TargetFilename
+    gte: 50
+falsepositives:
+  - Legitimate bulk file renaming operations
+  - File encryption tools used by IT departments
+  - Backup software with encryption features

@@ -1,0 +1,54 @@
+{
+  "policy_name": "SOaC Ransomware Response - Conditional Access",
+  "version": "1.0.0",
+  "description": "Conditional access policies triggered during ransomware incidents",
+  "rules": [
+    {
+      "name": "Block Compromised Host Authentication",
+      "conditions": {
+        "device_compliance": "non_compliant",
+        "risk_signal": "ransomware_detected",
+        "device_state": "network_contained"
+      },
+      "actions": {
+        "grant": "block",
+        "session_controls": {
+          "sign_in_frequency": "every_time",
+          "persistent_browser": "never"
+        }
+      }
+    },
+    {
+      "name": "Enforce MFA During Active Incident",
+      "conditions": {
+        "incident_active": true,
+        "incident_type": "ransomware",
+        "user_risk": ["high", "medium"]
+      },
+      "actions": {
+        "grant": "require_mfa",
+        "session_controls": {
+          "sign_in_frequency": "1h",
+          "app_enforced_restrictions": true,
+          "disable_token_persistence": true
+        }
+      }
+    },
+    {
+      "name": "Restrict Lateral Movement Paths",
+      "conditions": {
+        "client_app": ["legacy_auth", "exchange_activesync"],
+        "incident_active": true
+      },
+      "actions": {
+        "grant": "block",
+        "reason": "Legacy authentication blocked during ransomware response"
+      }
+    }
+  ],
+  "metadata": {
+    "package": "pkg-002",
+    "mitre_techniques": ["T1486", "T1021.002"],
+    "last_updated": "2025-03-28"
+  }
+}

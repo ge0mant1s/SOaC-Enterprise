@@ -1,0 +1,53 @@
+{
+  "package_id": "pkg-002",
+  "evidence_version": "1.0.0",
+  "generated": "2025-03-28T00:00:00Z",
+  "test_cases": [
+    {
+      "id": "TC-002-001",
+      "name": "Ransomware Encryption Burst",
+      "description": "Simulate mass file encryption with Qilin extension",
+      "input": "Generate 500+ file rename events to .qilin extension within 5 minutes on single host",
+      "expected_detections": ["ransomware_encryption_activity", "ransomware_encryption_chain", "100101"],
+      "mitre_technique": "T1486",
+      "severity": "critical"
+    },
+    {
+      "id": "TC-002-002",
+      "name": "Volume Shadow Copy Deletion",
+      "description": "Simulate VSS deletion and recovery mode tampering",
+      "input": "Execute vssadmin delete shadows /all /quiet and bcdedit /set recoveryenabled no",
+      "expected_detections": ["vss_deletion_anti_recovery", "service_stop_pre_encryption", "100102"],
+      "mitre_technique": "T1490",
+      "severity": "critical"
+    },
+    {
+      "id": "TC-002-003",
+      "name": "SMB Lateral Propagation",
+      "description": "Simulate rapid SMB connections for ransomware spread",
+      "input": "Generate SMB connections to 15+ unique IPs from single host within 10 minutes",
+      "expected_detections": ["lateral_movement_smb_ransomware", "ransomware_lateral_spread", "100104"],
+      "mitre_technique": "T1021.002",
+      "severity": "high"
+    },
+    {
+      "id": "TC-002-004",
+      "name": "Critical Service Termination",
+      "description": "Simulate stopping backup, database, and security services",
+      "input": "Execute net stop for MSSQLSERVER, vss, Veeam, BackupExecAgent, WinDefend",
+      "expected_detections": ["service_stop_pre_encryption", "100103"],
+      "mitre_technique": "T1489",
+      "severity": "high"
+    },
+    {
+      "id": "TC-002-005",
+      "name": "Full Chain Containment",
+      "description": "End-to-end attack chain triggering automated containment",
+      "input": "Execute complete replay scenario from initial access through encryption",
+      "expected_detections": ["All detection rules", "CLAW playbook auto-trigger"],
+      "mitre_technique": "T1486",
+      "severity": "critical",
+      "sla": "containment_within_15m"
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+name: isolate-and-contain-ransomware
+version: "1.0.0"
+description: |
+  Automated containment playbook for Qilin ransomware incidents. Immediately
+  isolates affected hosts, stops lateral movement, preserves forensic evidence,
+  and initiates recovery procedures.
+severity: CRITICAL
+mitre_attack:
+  tactics: [Impact, Lateral Movement, Defense Evasion]
+  techniques: [T1486, T1490, T1489, T1021.002, T1570]
+trigger:
+  source: sentinel_alert
+  conditions:
+    - alert_type: "ransomware_encryption_chain"
+      severity: ["critical", "high"]
+    - alert_type: "ransomware_lateral_spread"
+      severity: ["critical", "high"]
+  cooldown: 300
+inputs:
+  affected_hosts:
+    type: list
+    description: "List of compromised host identifiers"
+    required: true
+  incident_id:
+    type: string
+    description: "SOAR incident tracking ID"
+    required: true
+  containment_scope:
+    type: enum
+    values: [host_only, network_segment, full_network]
+    default: host_only
+steps:
+  - id: network_isolate
+    action: crowdstrike.network_contain
+    description: "Immediately network-contain all affected hosts via CrowdStrike RTR"
+    target: "{{ inputs.affected_hosts }}"
+    parameters:
+      containment_type: "full"
+      allow_dns: false
+      preserve_agent_communication: true
+    timeout: 60
+    on_failure: continue
+
+  - id: kill_encryption_processes
+    action: crowdstrike.kill_process
+    description: "Terminate active encryption processes on affected hosts"
+    target: "{{ inputs.affected_hosts }}"
+    parameters:
+      process_patterns:
+        - "*.qilin*"
+        - "encrypt*"
+        - "ransom*"
+      kill_tree: true
+    timeout: 30
+    on_failure: continue
+
+  - id: block_smb_lateral
+    action: firewall.block_port
+    description: "Block SMB ports on affected network segment to prevent further propagation"
+    target: network_segment
+    parameters:
+      ports: [445, 139]
+      direction: both
+      scope: "{{ inputs.containment_scope }}"
+      exceptions:
+        - domain_controllers
+        - backup_servers
+    timeout: 30
+    on_failure: alert
+
+  - id: collect_memory_dump
+    action: crowdstrike.memory_dump
+    description: "Capture volatile memory from affected hosts for forensic analysis"
+    target: "{{ inputs.affected_hosts }}"
+    parameters:
+      output_format: "raw"
+      include_process_list: true
+      include_network_connections: true
+    timeout: 300
+    on_failure: continue
+
+  - id: snapshot_disk_state
+    action: system.disk_snapshot
+    description: "Create disk snapshots of affected hosts for evidence preservation"
+    target: "{{ inputs.affected_hosts }}"
+    parameters:
+      snapshot_type: "incremental"
+      compress: true
+    timeout: 600
+    on_failure: continue
+
+  - id: disable_compromised_accounts
+    action: azure_ad.disable_user
+    description: "Disable any user accounts used during the attack"
+    target: "{{ steps.collect_memory_dump.outputs.compromised_accounts }}"
+    parameters:
+      revoke_sessions: true
+      revoke_tokens: true
+      block_sign_in: true
+    timeout: 30
+    on_failure: alert
+
+  - id: assess_encryption_damage
+    action: scan.file_assessment
+    description: "Assess encryption damage scope across affected hosts"
+    target: "{{ inputs.affected_hosts }}"
+    parameters:
+      scan_paths: ["C:\\", "D:\\", "E:\\"]
+      check_extensions: [".qilin", ".encrypted", ".locked"]
+      report_format: "json"
+    timeout: 300
+    on_failure: continue
+
+  - id: notify_incident_team
+    action: notification.send
+    description: "Escalate to incident response team with full context"
+    parameters:
+      channels: ["soc_critical", "ir_team", "ciso_direct"]
+      template: "ransomware_containment"
+      data:
+        incident_id: "{{ inputs.incident_id }}"
+        affected_hosts: "{{ inputs.affected_hosts }}"
+        containment_scope: "{{ inputs.containment_scope }}"
+        encryption_assessment: "{{ steps.assess_encryption_damage.outputs }}"
+    timeout: 10
+    on_failure: log
+
+outputs:
+  containment_status:
+    value: "{{ steps.network_isolate.status }}"
+  evidence_collected:
+    value:
+      memory_dumps: "{{ steps.collect_memory_dump.outputs }}"
+      disk_snapshots: "{{ steps.snapshot_disk_state.outputs }}"
+  damage_assessment:
+    value: "{{ steps.assess_encryption_damage.outputs }}"
+
+rollback:
+  steps:
+    - action: crowdstrike.lift_containment
+      target: "{{ inputs.affected_hosts }}"
+    - action: firewall.unblock_port
+      parameters:
+        ports: [445, 139]
+    - action: azure_ad.enable_user
+      target: "{{ steps.disable_compromised_accounts.target }}"
+
+governance:
+  requires_ai_oversight: true
+  blast_radius: network_segment
+  approval_required_for:
+    - full_network containment
+    - account_disabling

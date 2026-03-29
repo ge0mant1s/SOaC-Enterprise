@@ -1,0 +1,63 @@
+{
+  "ioa_definitions": [
+    {
+      "name": "Qilin Ransomware Encryption Burst",
+      "description": "Detects rapid file modification patterns consistent with Qilin ransomware encryption activity",
+      "severity": "critical",
+      "platform": "windows",
+      "tactic": "Impact",
+      "technique": "T1486",
+      "disposition": "BLOCK_AND_ALERT",
+      "pattern": {
+        "type": "file_activity",
+        "conditions": {
+          "file_extension_pattern": ["*.qilin", "*.encrypted", "*.locked"],
+          "file_operations_per_minute": { "gte": 100 },
+          "ransom_note_pattern": ["*README_TO_RESTORE*", "*HOW_TO_DECRYPT*"]
+        }
+      },
+      "response_actions": ["isolate_host", "kill_process_tree", "collect_forensics"]
+    },
+    {
+      "name": "Volume Shadow Copy Destruction",
+      "description": "Detects VSS deletion and recovery mode tampering used by ransomware",
+      "severity": "critical",
+      "platform": "windows",
+      "tactic": "Impact",
+      "technique": "T1490",
+      "disposition": "BLOCK_AND_ALERT",
+      "pattern": {
+        "type": "process_execution",
+        "conditions": {
+          "process_name": ["vssadmin.exe", "wmic.exe", "bcdedit.exe"],
+          "command_line_pattern": ["*delete shadows*", "*shadowcopy delete*", "*recoveryenabled no*"]
+        }
+      },
+      "response_actions": ["block_execution", "alert_soc", "snapshot_memory"]
+    },
+    {
+      "name": "Ransomware SMB Propagation",
+      "description": "Detects rapid outbound SMB connections from non-standard processes indicating ransomware lateral spread",
+      "severity": "high",
+      "platform": "windows",
+      "tactic": "Lateral Movement",
+      "technique": "T1021.002",
+      "disposition": "DETECT_AND_ALERT",
+      "pattern": {
+        "type": "network_activity",
+        "conditions": {
+          "destination_port": [445, 139],
+          "unique_destinations_per_minute": { "gte": 10 },
+          "excluded_processes": ["explorer.exe", "svchost.exe"]
+        }
+      },
+      "response_actions": ["network_contain", "alert_soc"]
+    }
+  ],
+  "metadata": {
+    "package": "pkg-002",
+    "version": "1.0.0",
+    "last_updated": "2025-03-28",
+    "threat_actor": "Qilin"
+  }
+}

@@ -1,0 +1,65 @@
+name: Ransomware Resilience Governance Policy
+version: "1.0.0"
+description: |
+  Organizational governance policy for ransomware resilience including backup
+  requirements, network segmentation, and incident response readiness.
+framework_alignment:
+  - NIST CSF 2.0
+  - CIS Controls v8
+  - MITRE D3FEND
+
+backup_requirements:
+  strategy: "3-2-1-1"
+  details:
+    copies: 3
+    media_types: 2
+    offsite_copies: 1
+    immutable_copies: 1
+  testing:
+    frequency: monthly
+    scope: "full_restore_validation"
+    document_results: true
+  retention:
+    minimum_days: 90
+    immutable_minimum_days: 30
+
+network_segmentation:
+  enforce_smb_controls: true
+  restrict_admin_protocols:
+    ports: [445, 139, 3389, 5985, 5986]
+    policy: "deny_by_default"
+    exceptions: "documented_and_approved"
+  micro_segmentation:
+    critical_assets: required
+    database_servers: required
+    backup_infrastructure: required
+
+endpoint_hardening:
+  disable_macros: true
+  application_whitelisting: required
+  credential_guard: enabled
+  attack_surface_reduction:
+    rules:
+      - block_office_child_processes
+      - block_credential_stealing
+      - block_untrusted_usb
+  edr_requirements:
+    coverage: "100_percent"
+    response_capability: "automated_containment"
+
+incident_readiness:
+  tabletop_exercises:
+    frequency: quarterly
+    scenarios: ["ransomware", "double_extortion", "supply_chain"]
+  communication_plan:
+    internal_notification: "within_15m"
+    executive_briefing: "within_1h"
+    regulatory_notification: "per_jurisdiction"
+  decision_framework:
+    ransom_payment: "board_approval_required"
+    law_enforcement: "mandatory_notification"
+
+metadata:
+  package: pkg-002
+  mitre_techniques: ["T1486", "T1490", "T1489", "T1021.002"]
+  last_updated: "2025-03-28"
