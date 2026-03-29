@@ -1,0 +1,65 @@
+apiVersion: soac.io/v1
+kind: PackageMetadata
+
+package:
+  id: "pkg-007"
+  name: "Cloud IAM Privilege Escalation"
+  version: "1.0.0"
+  description: "Detect and respond to IAM role chaining, cross-account pivoting, and cloud privilege abuse in AWS, Azure, and GCP."
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  updated: "2026-03-16T00:00:00Z"
+  status: "released"
+  license: "Apache-2.0"
+
+threat:
+  mitre_attack:
+    - technique_id: "T1078.004"
+      technique_name: "Cloud Accounts"
+      tactic: "Defense Evasion"
+    - technique_id: "T1548"
+      technique_name: "Abuse Elevation Control Mechanism"
+      tactic: "Privilege Escalation"
+    - technique_id: "T1484"
+      technique_name: "Domain Policy Modification"
+      tactic: "Defense Evasion"
+  threat_actors: []
+  severity: "CRITICAL"
+
+artifacts:
+  detections:
+    - path: "detection.yaml"
+      name: "cloud-iam-privesc-detection"
+      platforms: ["sigma"]
+  playbooks:
+    - path: "playbook.yaml"
+      name: "cloud-iam-privesc-containment"
+      severity: "CRITICAL"
+  policies:
+    - path: "policy.yaml"
+      name: "cloud-iam-lab-policy"
+      scope: "package"
+  simulations:
+    - scenario_id: "pkg-007"
+      name: "Cloud IAM Privilege Escalation Lab Scenario"
+
+stakeholders:
+  - role: "platform"
+    relevance: "primary"
+  - role: "detection"
+    relevance: "primary"
+
+signals_required:
+  - name: "AWS CloudTrail"
+    type: "cloud"
+  - name: "Azure Activity Log"
+    type: "cloud"
+  - name: "GCP Admin Activity"
+    type: "cloud"
+
+dependencies: []
+
+validation:
+  harness_level: 2
+  last_validated: "2026-03-16T00:00:00Z"
+  evidence_bundle: ""
