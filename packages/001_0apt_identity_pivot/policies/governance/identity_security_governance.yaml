@@ -1,13 +1,17 @@
 apiVersion: soacframe.io/v1
 kind: Policy
 metadata:
+  name: identity-security-governance
+  package_id: pkg-001
+  version: "1.0.0"
   author: SOaC Framework Team
   scope: identity
 
 spec:
   description: >
     Governance policy for identity security controls and best practices to
-    protect enterprise identities and access management.
+    protect enterprise identities and access management, specifically targeting
+    AITM and session hijacking resilience.
 
   authentication_controls:
     mfa_policy:
