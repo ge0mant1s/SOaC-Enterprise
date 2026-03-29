@@ -1,15 +1,11 @@
-# SOaC Governance Policy — Supply Chain Security for AI/ML Dependencies
-# Enforces package integrity, approved registries, and runtime controls
-# for Python AI/ML libraries including LiteLLM.
-
-apiVersion: soacframe.io/v1
+apiVersion: soac.io/v1
 kind: Policy
 metadata:
   name: ai-ml-supply-chain-security
   package_id: pkg-012
   version: "1.0.0"
   author: SOaC Community
-  scope: supply_chain_security
+  scope: environment
 
 spec:
   description: >
