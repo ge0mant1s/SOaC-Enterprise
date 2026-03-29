@@ -1,0 +1,58 @@
+name: contain-saas-extortion-gtr2025
+version: "1.0.0"
+description: GTR-2025 aligned response to SaaS data extortion. Blocks data exfiltration, revokes sharing, preserves evidence for legal proceedings.
+severity: CRITICAL
+mitre_attack:
+  tactics: [Exfiltration, Impact, Collection]
+  techniques: [T1567.002, T1657, T1213, T1098.003]
+trigger:
+  source: sentinel_alert
+  conditions:
+    - alert_type: gtr2025_saas_extortion
+      severity: [critical, high]
+  cooldown: 300
+inputs:
+  affected_users: {type: list, required: true}
+  compromised_apps: {type: list, required: false}
+  incident_id: {type: string, required: true}
+steps:
+  - id: block_external_sharing
+    action: m365.restrict_sharing
+    description: "Immediately disable all anonymous and external sharing links"
+    target: "{{ inputs.affected_users }}"
+    parameters: {disable_anonymous_links: true, revoke_external_access: true}
+    timeout: 30
+    on_failure: alert
+  - id: revoke_oauth_access
+    action: azure_ad.revoke_consent
+    target: "{{ inputs.compromised_apps }}"
+    parameters: {revoke_all_permissions: true, disable_app: true}
+    timeout: 30
+    on_failure: alert
+  - id: preserve_audit_evidence
+    action: m365.export_audit
+    description: "Export full audit trail for legal hold"
+    parameters: {timerange: 90d, legal_hold: true, include: [file_access, sharing, email, signin]}
+    timeout: 600
+    on_failure: continue
+  - id: assess_data_exposure
+    action: dlp.full_assessment
+    target: "{{ inputs.affected_users }}"
+    parameters: {classify_all_accessed: true, check_sensitivity_labels: true}
+    timeout: 300
+    on_failure: continue
+  - id: notify_legal_and_executive
+    action: notification.send
+    parameters:
+      channels: [legal_team, ciso_direct, executive_team, soc_critical]
+      template: saas_extortion_gtr2025
+    timeout: 10
+    on_failure: log
+outputs:
+  sharing_blocked: {value: "{{ steps.block_external_sharing.status }}"}
+  data_exposure: {value: "{{ steps.assess_data_exposure.outputs }}"}
+  evidence_preserved: {value: "{{ steps.preserve_audit_evidence.status }}"}
+governance:
+  requires_ai_oversight: true
+  blast_radius: tenant
+  approval_required_for: [legal_hold, executive_notification]

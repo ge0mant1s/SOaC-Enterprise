@@ -1,0 +1,15 @@
+index=azure sourcetype="azure:aad:audit"
+  operationName IN ("Update OAuth2PermissionGrant","Add delegated permission grant",
+    "Update service principal","Add service principal credentials")
+| spath "targetResources{}.displayName" output=app_name
+| spath "targetResources{}.modifiedProperties{}.newValue" output=changes
+| where match(changes, "(?i)ReadWrite|FullControl|full_access|passwordCredential")
+| stats count as mod_count
+  values(operationName) as actions
+  values(changes) as modifications
+  min(_time) as firstTime max(_time) as lastTime
+  BY app_name initiatedBy.user.userPrincipalName
+| where mod_count >= 2
+| eval risk_score=case(mod_count >= 5, "CRITICAL", mod_count >= 3, "HIGH", true(), "MEDIUM")
+| eval mitre_techniques="T1098.003,T1530,T1657"
+| table firstTime lastTime app_name initiatedBy.user.userPrincipalName mod_count actions risk_score mitre_techniques

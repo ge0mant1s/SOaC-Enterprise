@@ -1,0 +1,23 @@
+title: SaaS Data Extortion Indicators - GTR-2025
+id: i8d9f7g6-0h3e-8j2f-g7i1-9l4g8i3j5h01
+status: production
+level: critical
+description: Detects data staging and extortion preparation via SaaS platforms, including bulk exports, sharing policy changes, and external forwarding.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags: [attack.exfiltration, attack.t1567.002, attack.collection, attack.t1213, attack.impact, attack.t1657]
+logsource: {product: m365, service: unified_audit}
+detection:
+  selection_bulk_export:
+    Operation: [FileDownloaded, FileSyncDownloadedFull, SearchExportDownloaded]
+  selection_sharing_change:
+    Operation: [SharingPolicyChanged, AnonymousLinkCreated, SharingSet]
+    ModifiedProperties.NewValue|contains: [Anyone, Anonymous]
+  selection_external_forward:
+    Operation: [New-InboxRule, Set-InboxRule]
+    Parameters.ForwardTo|contains: '@'
+  condition: selection_bulk_export or selection_sharing_change or selection_external_forward
+  timeframe: 1h
+  count: {field: ObjectId, gte: 50}
+falsepositives: [Authorized data migration, Business sharing workflows]

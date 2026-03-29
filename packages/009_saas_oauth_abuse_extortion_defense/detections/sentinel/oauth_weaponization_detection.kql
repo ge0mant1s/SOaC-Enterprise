@@ -1,0 +1,21 @@
+// OAuth Application Weaponization Detection
+// Detects OAuth apps escalating privileges and accessing data for extortion
+// MITRE: T1098.003, T1530
+let timewindow = 24h;
+AuditLogs
+| where TimeGenerated > ago(timewindow)
+| where OperationName in ("Update OAuth2PermissionGrant", "Add delegated permission grant",
+    "Update service principal", "Add service principal credentials")
+| extend AppId = tostring(TargetResources[0].id)
+| extend AppName = tostring(TargetResources[0].displayName)
+| extend ModifiedBy = tostring(InitiatedBy.user.userPrincipalName)
+| extend Changes = tostring(TargetResources[0].modifiedProperties)
+| where Changes has_any ("ReadWrite", "FullControl", "full_access", "passwordCredential")
+| summarize
+    ModCount = count(),
+    Actions = make_set(OperationName, 10),
+    FirstMod = min(TimeGenerated)
+    by AppId, AppName, ModifiedBy
+| where ModCount >= 2
+| extend RiskScore = case(ModCount >= 5, "CRITICAL", ModCount >= 3, "HIGH", "MEDIUM")
+| project TimeGenerated = FirstMod, AppName, AppId, ModifiedBy, ModCount, Actions, RiskScore

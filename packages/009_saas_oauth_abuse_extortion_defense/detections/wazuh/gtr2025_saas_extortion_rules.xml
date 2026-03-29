@@ -1,0 +1,40 @@
+<!-- SOaC pkg-009: SaaS OAuth Abuse & Extortion Defense GTR-2025 Rules -->
+<group name="soac,gtr2025,saas,extortion,">
+  <rule id="101001" level="14">
+    <if_sid>87802</if_sid>
+    <field name="o365.Operation" type="pcre2">(?:FileDownloaded|FileSyncDownloadedFull|SearchExportDownloaded)</field>
+    <frequency>50</frequency>
+    <timeframe>3600</timeframe>
+    <description>SOaC GTR-2025: Mass data download from SaaS platform - possible extortion staging</description>
+    <mitre><id>T1567.002</id><id>T1213</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,saas,extortion,staging,</group>
+  </rule>
+  <rule id="101002" level="13">
+    <if_sid>87802</if_sid>
+    <field name="o365.Operation" type="pcre2">(?:AnonymousLinkCreated|SharingSet|SharingPolicyChanged)</field>
+    <field name="o365.TargetUserOrGroupName" type="pcre2">(?:Anyone|Anonymous|External)</field>
+    <description>SOaC GTR-2025: SaaS sharing policy changed to allow anonymous/external access</description>
+    <mitre><id>T1567.002</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,saas,sharing,exposure,</group>
+  </rule>
+  <rule id="101003" level="14">
+    <if_sid>87801</if_sid>
+    <field name="azure.operationName" type="pcre2">(?:Update OAuth2PermissionGrant|Add delegated permission grant)</field>
+    <field name="azure.properties.modifiedProperties" type="pcre2">(?:ReadWrite|FullControl|full_access)</field>
+    <description>SOaC GTR-2025: OAuth permission escalation for data access - extortion enablement</description>
+    <mitre><id>T1098.003</id><id>T1530</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,saas,oauth,escalation,</group>
+  </rule>
+  <rule id="101004" level="12">
+    <if_sid>87802</if_sid>
+    <field name="o365.Operation">Send</field>
+    <field name="o365.Recipients" type="pcre2">(?:.*,){49,}</field>
+    <description>SOaC GTR-2025: Mass email sent - possible extortion communication</description>
+    <mitre><id>T1657</id></mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,saas,extortion,communication,</group>
+  </rule>
+</group>

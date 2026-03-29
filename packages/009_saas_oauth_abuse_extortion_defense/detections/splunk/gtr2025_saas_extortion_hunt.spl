@@ -1,0 +1,23 @@
+index=o365 sourcetype="o365:management:activity"
+  Operation IN ("FileDownloaded","FileSyncDownloadedFull","SearchExportDownloaded",
+    "AnonymousLinkCreated","SharingSet","New-InboxRule")
+| eval event_category=case(
+    match(Operation, "Downloaded|Export"), "data_staging",
+    match(Operation, "Link|Sharing"), "sharing_change",
+    match(Operation, "InboxRule"), "email_forwarding",
+    true(), "other")
+| stats count as total_events
+  dc(OfficeObjectId) as unique_objects
+  dc(event_category) as category_count
+  values(event_category) as categories
+  values(Operation) as operations
+  min(_time) as firstTime max(_time) as lastTime
+  BY UserId ClientIP
+| where total_events >= 50 AND category_count >= 2
+| eval risk_score=case(
+    total_events >= 200 AND category_count >= 3, "CRITICAL",
+    total_events >= 100, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1567.002,T1213,T1657"
+| table firstTime lastTime UserId ClientIP total_events unique_objects categories risk_score operations mitre_techniques
+| sort -total_events

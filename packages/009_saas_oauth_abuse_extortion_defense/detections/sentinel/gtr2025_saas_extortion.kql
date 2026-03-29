@@ -1,0 +1,25 @@
+// GTR-2025 SaaS Data Extortion Detection
+// Correlates data staging with sharing policy changes and external communication
+// MITRE: T1567.002, T1213, T1657
+let timewindow = 6h;
+let data_staging = OfficeActivity
+| where TimeGenerated > ago(timewindow)
+| where Operation in ("FileDownloaded", "FileSyncDownloadedFull", "SearchExportDownloaded")
+| summarize DownloadCount = count(), UniqueFiles = dcount(OfficeObjectId),
+    FileTypes = make_set(tostring(split(OfficeObjectId, ".")[-1]), 10)
+    by UserId, ClientIP, bin(TimeGenerated, 1h);
+let sharing_changes = OfficeActivity
+| where TimeGenerated > ago(timewindow)
+| where Operation in ("AnonymousLinkCreated", "SharingSet", "SharingPolicyChanged")
+| where TargetUserOrGroupName has_any ("Anyone", "Anonymous", "External")
+| summarize ShareCount = count(), SharedItems = make_set(OfficeObjectId, 10)
+    by UserId;
+data_staging
+| where DownloadCount >= 50
+| join kind=leftouter sharing_changes on UserId
+| extend RiskScore = case(
+    DownloadCount >= 200 and ShareCount >= 5, "CRITICAL",
+    DownloadCount >= 100, "HIGH",
+    "MEDIUM")
+| project TimeGenerated, UserId, ClientIP, DownloadCount, UniqueFiles,
+    ShareCount, RiskScore, FileTypes

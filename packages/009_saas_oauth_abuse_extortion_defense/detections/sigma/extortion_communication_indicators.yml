@@ -1,0 +1,22 @@
+title: Extortion Communication Indicators via SaaS Channels
+id: i8d9f7g6-0h3e-8j2f-g7i1-9l4g8i3j5h03
+status: production
+level: high
+description: Detects indicators of extortion communications via corporate SaaS platforms.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags: [attack.impact, attack.t1657, attack.t1491.002]
+logsource: {product: m365, service: unified_audit}
+detection:
+  selection_mass_email:
+    Operation: Send
+    Recipients|count_gt: 50
+  selection_teams_external:
+    Operation: [MemberAdded, MessageSent]
+    CommunicationType: Federated
+  selection_site_defacement:
+    Operation: [PageModified, SiteDesignApplied]
+    SiteUrl|contains: [intranet, portal, home]
+  condition: selection_mass_email or selection_teams_external or selection_site_defacement
+falsepositives: [Legitimate mass communications, External vendor collaboration]

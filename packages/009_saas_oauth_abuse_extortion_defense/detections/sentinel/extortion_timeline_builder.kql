@@ -1,0 +1,20 @@
+// Extortion Attack Timeline Builder
+// Builds attack timeline from initial access through data staging to extortion
+// MITRE: T1657, T1567.002
+let timewindow = 48h;
+let all_events = union
+    (SigninLogs | where TimeGenerated > ago(timewindow) | where RiskLevelDuringSignIn in ("high","medium")
+     | project TimeGenerated, Actor=UserPrincipalName, EventType="RiskySignIn", Detail=strcat("Risk: ", RiskDetail)),
+    (AuditLogs | where TimeGenerated > ago(timewindow) | where OperationName has_any ("Consent", "OAuth", "service principal")
+     | project TimeGenerated, Actor=tostring(InitiatedBy.user.userPrincipalName), EventType="OAuthActivity", Detail=OperationName),
+    (OfficeActivity | where TimeGenerated > ago(timewindow) | where Operation in ("FileDownloaded","AnonymousLinkCreated","New-InboxRule")
+     | project TimeGenerated, Actor=UserId, EventType="DataActivity", Detail=Operation);
+all_events
+| order by TimeGenerated asc
+| summarize Events=make_list(pack("time", TimeGenerated, "type", EventType, "detail", Detail), 50),
+    EventTypes=make_set(EventType), TotalEvents=count()
+    by Actor
+| where array_length(EventTypes) >= 2
+| extend IsExtortionPattern = EventTypes has "RiskySignIn" and EventTypes has "DataActivity"
+| where IsExtortionPattern
+| project Actor, TotalEvents, EventTypes, Events

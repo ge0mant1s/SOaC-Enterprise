@@ -1,0 +1,21 @@
+title: OAuth Application Weaponization for Data Extortion
+id: i8d9f7g6-0h3e-8j2f-g7i1-9l4g8i3j5h02
+status: production
+level: high
+description: Detects OAuth apps being used as weapons for data access and extortion after initial consent.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags: [attack.persistence, attack.t1098.003, attack.collection, attack.t1530]
+logsource: {product: azure, service: auditlogs}
+detection:
+  selection_scope_elevation:
+    Operation: [Update OAuth2PermissionGrant, Add delegated permission grant]
+    ModifiedProperties.NewValue|contains: [ReadWrite, FullControl, full_access]
+  selection_credential_rotation:
+    Operation: [Update service principal, Add service principal credentials]
+    ModifiedProperties.NewValue|contains: [passwordCredential, keyCredential]
+  condition: selection_scope_elevation or selection_credential_rotation
+  timeframe: 24h
+  count: {field: Target.ServicePrincipalId, gte: 3}
+falsepositives: [Application credential rotation by DevOps, Authorized scope changes]
