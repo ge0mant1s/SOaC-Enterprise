@@ -1,1 +1,0 @@
-alert tcp any any -> any any (msg:"Sandworm C2 Heartbeat Detected"; content:"|01 02 03 04|"; depth:4; sid:1000008;)

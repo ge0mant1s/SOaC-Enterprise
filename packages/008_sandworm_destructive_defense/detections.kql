@@ -1,6 +1,0 @@
-
-// Detects lateral movement tools commonly used by Sandworm (Impacket/PsExec)
-DeviceProcessEvents
-| where ProcessCommandLine has_any ("psexec", "remcom", "smbexec", "wmiexec")
-| where AccountName !contains "svc_" // Exclude known service accounts
-| extend DiscoveryType = "Sandworm_Lateral_Movement"

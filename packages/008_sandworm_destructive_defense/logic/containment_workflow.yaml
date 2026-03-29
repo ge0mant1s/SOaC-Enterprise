@@ -1,9 +1,0 @@
-workflow: Destructive_Malware_Emergency_Stop
-trigger:
-  source: Brain_Wiper_Alert
-  severity: Critical
-actions:
-  - action: CrowdStrike_Network_Isolate
-  - action: VSS_Admin_Protect_Shadow_Copies
-  - action: Disable_Domain_Admin_Accounts
-  - action: Trigger_Immutable_Backup_Sync
