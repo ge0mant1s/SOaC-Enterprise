@@ -1,0 +1,59 @@
+<!--
+  SOaC pkg-011: GenAI & LLM Abuse Defense GTR-2025
+  Wazuh Rule IDs: 101201 - 101204
+  MITRE ATT&CK: T1190, T1041, T1195.002, T1496
+-->
+<group name="soac,genai,llm_abuse,gtr_2025">
+
+  <!-- Rule 101201: Prompt Injection via Web Proxy -->
+  <rule id="101201" level="12">
+    <if_sid>31101</if_sid>
+    <url type="pcre2">(/v1/chat/completions|/api/generate|/api/chat|/inference)</url>
+    <match type="pcre2">(?i)(ignore previous instructions|you are now DAN|jailbreak|disregard your system prompt|reveal your instructions|ADMIN_OVERRIDE)</match>
+    <description>SOaC-011: Prompt injection attempt detected against GenAI endpoint - $(url)</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+    <group>genai,prompt_injection,owasp_llm01</group>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- Rule 101202: Sensitive Data in LLM Response -->
+  <rule id="101202" level="13">
+    <if_sid>31101</if_sid>
+    <url type="pcre2">(/v1/chat/completions|/api/generate|/inference)</url>
+    <status>200</status>
+    <match type="pcre2">(?i)(BEGIN\s+PRIVATE\s+KEY|AKIA[A-Z0-9]{16}|password\s*[:=]\s*\S+|secret_key\s*[:=])</match>
+    <description>SOaC-011: Sensitive data detected in GenAI/LLM API response - potential data exfiltration</description>
+    <mitre>
+      <id>T1041</id>
+    </mitre>
+    <group>genai,data_leak,owasp_llm06</group>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- Rule 101203: Untrusted Model Registry Download -->
+  <rule id="101203" level="10">
+    <if_sid>530,533</if_sid>
+    <match type="pcre2">(?i)(huggingface\.co|civitai\.com|modelscope\.cn).*(\.bin|\.pt|\.safetensors|\.gguf|\.pkl)</match>
+    <description>SOaC-011: AI model download from external registry detected - verify supply chain integrity</description>
+    <mitre>
+      <id>T1195.002</id>
+    </mitre>
+    <group>genai,supply_chain,model_download</group>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- Rule 101204: Excessive LLM API Consumption -->
+  <rule id="101204" level="11" frequency="50" timeframe="300">
+    <if_matched_sid>101201</if_matched_sid>
+    <same_source_ip />
+    <description>SOaC-011: Excessive GenAI API requests from single source - potential abuse or resource theft</description>
+    <mitre>
+      <id>T1496</id>
+    </mitre>
+    <group>genai,api_abuse,resource_theft</group>
+    <options>no_full_log</options>
+  </rule>
+
+</group>

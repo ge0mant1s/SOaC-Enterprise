@@ -1,0 +1,49 @@
+title: GenAI Prompt Injection Attempt via Web Application
+id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+status: experimental
+description: |
+  Detects potential prompt injection attempts against GenAI/LLM endpoints by
+  identifying suspicious payloads in HTTP POST bodies targeting common AI API
+  paths. Covers jailbreak prefixes, system prompt extraction, and instruction
+  override patterns observed in OWASP LLM Top 10 (LLM01).
+author: SOaC Framework - GTR-2025 GenAI Defense
+date: 2025/03/15
+modified: 2025/03/28
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://atlas.mitre.org/techniques/AML.T0051
+  - https://embracethered.com/blog/posts/2023/chatgpt-plugin-vulns/
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - cve.2024-5184
+  - gtr.2025
+logsource:
+  category: proxy
+  product: web
+detection:
+  selection_endpoint:
+    c-uri|contains:
+      - '/v1/chat/completions'
+      - '/v1/engines/'
+      - '/api/generate'
+      - '/api/chat'
+      - '/inference'
+      - '/predict'
+  selection_injection:
+    cs-body|contains:
+      - 'ignore previous instructions'
+      - 'ignore all prior'
+      - 'disregard your system prompt'
+      - 'you are now DAN'
+      - 'jailbreak'
+      - 'system prompt:'
+      - 'reveal your instructions'
+      - '<<<OVERRIDE>>>'
+      - 'ADMIN_OVERRIDE'
+  condition: selection_endpoint and selection_injection
+falsepositives:
+  - Red team exercises testing LLM security
+  - Security researchers performing authorized prompt injection testing
+  - Legitimate AI safety evaluation frameworks
+level: high

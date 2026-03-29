@@ -1,0 +1,60 @@
+{
+  "package": "pkg-011",
+  "framework": "MITRE ATT&CK v15 + MITRE ATLAS",
+  "techniques": [
+    {
+      "id": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "tactic": "Initial Access",
+      "description": "Prompt injection attacks against public-facing GenAI/LLM API endpoints",
+      "detections": ["genai_prompt_injection_attempt.yml", "genai_prompt_injection_sentinel.kql", "genai_prompt_injection.spl", "wazuh:101201"],
+      "data_sources": ["Application Log", "Network Traffic"]
+    },
+    {
+      "id": "T1041",
+      "name": "Exfiltration Over C2 Channel",
+      "tactic": "Exfiltration",
+      "description": "Sensitive data extracted through LLM API responses including credentials and PII",
+      "detections": ["genai_data_exfiltration_via_llm.yml", "genai_data_leak_sentinel.kql", "genai_sensitive_data_exposure.spl", "wazuh:101202"],
+      "data_sources": ["Network Traffic Content", "Application Log"]
+    },
+    {
+      "id": "T1195.002",
+      "name": "Compromise Software Supply Chain",
+      "tactic": "Initial Access",
+      "description": "Distribution of backdoored ML models via public registries (Hugging Face, etc.)",
+      "detections": ["genai_model_poisoning_supply_chain.yml", "wazuh:101203", "genai_abuse_ioa.json"],
+      "data_sources": ["File Creation", "Process Creation"]
+    },
+    {
+      "id": "T1496",
+      "name": "Resource Hijacking",
+      "tactic": "Impact",
+      "description": "Unauthorized use of cloud AI/GPU resources for inference or training",
+      "detections": ["genai_model_abuse_sentinel.kql", "wazuh:101204"],
+      "data_sources": ["Cloud Service", "Network Traffic"]
+    }
+  ],
+  "atlas_techniques": [
+    {
+      "id": "AML.T0051",
+      "name": "LLM Prompt Injection",
+      "description": "Direct and indirect prompt injection to manipulate LLM behavior"
+    },
+    {
+      "id": "AML.T0048",
+      "name": "Exfiltration via ML API",
+      "description": "Data extraction through model API responses"
+    },
+    {
+      "id": "AML.T0019",
+      "name": "Publish Poisoned Datasets",
+      "description": "Backdoored model distribution through public registries"
+    },
+    {
+      "id": "AML.T0034",
+      "name": "Cost Harvesting",
+      "description": "Unauthorized API consumption using stolen credentials"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "policy_id": "ca-011-genai-security",
+  "name": "GenAI & LLM Security Conditional Access Policy",
+  "version": "1.0",
+  "package": "pkg-011",
+  "description": "Conditional access controls for GenAI/LLM platform access enforcing MFA, approved clients, network restrictions, and DLP controls",
+  "conditions": {
+    "applications": {
+      "include": ["OpenAI API", "Azure OpenAI", "AWS Bedrock", "Google Vertex AI", "Custom LLM Endpoints"]
+    },
+    "users": {"include": ["All Users"], "exclude": ["AI Platform Service Accounts"]},
+    "client_apps": {"include": ["approved_ai_clients"], "block": ["unknown", "legacy_auth"]},
+    "locations": {"include": ["corporate_network", "approved_vpn"]},
+    "risk_level": {"sign_in_risk": ["medium", "high"], "user_risk": ["medium", "high"]}
+  },
+  "grant_controls": {
+    "operator": "AND",
+    "controls": ["mfa_required", "compliant_device", "approved_client_app", "terms_of_use_ai_policy"]
+  },
+  "session_controls": {
+    "sign_in_frequency": "4h",
+    "persistent_browser": false,
+    "cloud_app_security": {
+      "enabled": true,
+      "dlp_policies": ["pii_detection", "credential_detection", "ip_detection"]
+    },
+    "token_lifetime": {"access_token": "1h", "refresh_token": "8h"}
+  },
+  "enforcement": "enabled"
+}

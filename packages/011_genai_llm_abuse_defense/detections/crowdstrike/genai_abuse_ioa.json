@@ -1,0 +1,66 @@
+{
+  "name": "SOaC-011 GenAI LLM Abuse Indicators",
+  "description": "CrowdStrike Falcon IOA rules detecting GenAI/LLM abuse patterns including prompt injection payloads in process arguments, unauthorized model file downloads, and suspicious AI framework process chains",
+  "platform": ["Windows", "Linux", "macOS"],
+  "severity": "High",
+  "mitre_attack": ["T1190", "T1041", "T1195.002", "T1496"],
+  "rules": [
+    {
+      "name": "Prompt Injection Payload in Process Args",
+      "description": "Detects prompt injection strings passed as command-line arguments to AI/LLM processes",
+      "rule_type": "IOA",
+      "indicator_type": "ProcessCreation",
+      "pattern": {
+        "CommandLine": {
+          "contains_any": [
+            "ignore previous instructions",
+            "you are now DAN",
+            "disregard your system prompt",
+            "jailbreak",
+            "ADMIN_OVERRIDE"
+          ]
+        },
+        "ParentImageFileName": {
+          "contains_any": ["python", "node", "java", "dotnet"]
+        }
+      },
+      "severity": "High",
+      "action": "detect"
+    },
+    {
+      "name": "Unauthorized AI Model File Download",
+      "description": "Detects download of large AI model files from untrusted sources",
+      "rule_type": "IOA",
+      "indicator_type": "FileCreation",
+      "pattern": {
+        "FileName": {
+          "ends_with_any": [".bin", ".pt", ".safetensors", ".gguf", ".pkl", ".onnx"]
+        },
+        "FileSizeBytes": { "greater_than": 104857600 },
+        "SourceProcess": {
+          "CommandLine": {
+            "contains_any": ["curl", "wget", "Invoke-WebRequest", "git lfs"]
+          }
+        }
+      },
+      "severity": "Medium",
+      "action": "detect"
+    },
+    {
+      "name": "Suspicious AI Framework Execution Chain",
+      "description": "Detects AI inference processes spawning shell or network tools indicating potential abuse",
+      "rule_type": "IOA",
+      "indicator_type": "ProcessCreation",
+      "pattern": {
+        "ParentCommandLine": {
+          "contains_any": ["transformers", "langchain", "llama.cpp", "ollama", "vllm"]
+        },
+        "ImageFileName": {
+          "contains_any": ["cmd.exe", "powershell.exe", "bash", "sh", "curl", "wget", "ncat", "nc"]
+        }
+      },
+      "severity": "High",
+      "action": "detect"
+    }
+  ]
+}

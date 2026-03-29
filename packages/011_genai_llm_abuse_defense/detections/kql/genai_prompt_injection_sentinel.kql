@@ -1,0 +1,37 @@
+// GenAI Prompt Injection Detection - Microsoft Sentinel
+// Detects prompt injection attempts against LLM/GenAI API endpoints
+// MITRE ATT&CK: T1190 | OWASP LLM01 | MITRE ATLAS: AML.T0051
+// GTR-2025: GenAI & LLM Abuse Defense
+
+let injection_patterns = dynamic([
+    "ignore previous instructions",
+    "ignore all prior",
+    "disregard your system prompt",
+    "you are now DAN",
+    "jailbreak",
+    "reveal your instructions",
+    "ADMIN_OVERRIDE",
+    "system prompt:"
+]);
+let ai_endpoints = dynamic([
+    "/v1/chat/completions", "/v1/engines/",
+    "/api/generate", "/api/chat", "/inference"
+]);
+CommonSecurityLog
+| where TimeGenerated > ago(1h)
+| where RequestMethod == "POST"
+| where RequestURL has_any (ai_endpoints)
+| where RequestBody has_any (injection_patterns)
+| extend InjectionType = case(
+    RequestBody has "DAN", "DAN Jailbreak",
+    RequestBody has "ignore previous", "Instruction Override",
+    RequestBody has "system prompt", "Prompt Extraction",
+    "Generic Injection"
+)
+| project TimeGenerated, SourceIP, RequestURL, InjectionType,
+    UserAgent = RequestClientApplication
+| summarize AttemptCount = count(), DistinctTypes = dcount(InjectionType),
+    FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+    by SourceIP, RequestURL
+| where AttemptCount >= 3
+| sort by AttemptCount desc

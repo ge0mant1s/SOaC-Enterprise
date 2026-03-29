@@ -1,0 +1,75 @@
+name: CLAW - GenAI Prompt Injection Incident Response
+id: claw-011-prompt-injection
+version: "1.0"
+framework: CLAW
+package: pkg-011
+classification: TLP:AMBER
+description: >
+  Automated response playbook for prompt injection attacks against GenAI/LLM
+  endpoints. Covers detection triage, payload analysis, session termination,
+  IP blocking, and forensic evidence collection per OWASP LLM Top 10.
+trigger:
+  source: SIEM
+  rule_ids:
+    - "sigma:genai_prompt_injection_attempt"
+    - "kql:genai_prompt_injection_sentinel"
+    - "wazuh:101201"
+phases:
+  - phase: detect
+    name: Prompt Injection Alert Triage
+    steps:
+      - id: pi-d1
+        action: enrich_alert
+        description: Extract injection payload, source IP, target endpoint, and user session
+        tool: SIEM API
+      - id: pi-d2
+        action: classify_injection
+        description: Categorize injection type (jailbreak, extraction, override) and severity
+        tool: Custom Script
+      - id: pi-d3
+        action: threat_intel_lookup
+        description: Check source IP against known AI attack infrastructure
+        tool: Threat Intel Platform
+  - phase: contain
+    name: Immediate Containment
+    steps:
+      - id: pi-c1
+        action: terminate_session
+        description: Invalidate the user session associated with the injection attempt
+        tool: Identity Provider API
+        condition: "severity in ['high', 'critical']"
+      - id: pi-c2
+        action: block_source
+        description: Add source IP to WAF/proxy block list with 24h TTL
+        tool: WAF API
+      - id: pi-c3
+        action: rate_limit_endpoint
+        description: Apply emergency rate limit to targeted AI endpoint
+        tool: API Gateway
+  - phase: investigate
+    name: Deep Analysis
+    steps:
+      - id: pi-i1
+        action: query_historical
+        description: Search for all requests from source IP in last 72 hours
+        tool: SIEM
+      - id: pi-i2
+        action: analyze_response_data
+        description: Check if any LLM responses contained sensitive data
+        tool: DLP Scanner
+  - phase: recover
+    name: Recovery and Hardening
+    steps:
+      - id: pi-r1
+        action: update_waf_rules
+        description: Deploy updated WAF rules with new injection patterns
+        tool: WAF API
+      - id: pi-r2
+        action: rotate_api_keys
+        description: Rotate AI platform API keys if prompt extraction was successful
+        tool: Secrets Manager
+        condition: "injection_type == 'prompt_extraction' and data_leaked == true"
+sla:
+  detection_to_containment: 10m
+  containment_to_investigation: 30m
+  full_resolution: 4h

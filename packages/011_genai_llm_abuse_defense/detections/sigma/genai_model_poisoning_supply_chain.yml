@@ -1,0 +1,50 @@
+title: GenAI Model Supply Chain Compromise Indicators
+id: c3d4e5f6-a7b8-9012-cdef-123456789012
+status: experimental
+description: |
+  Detects indicators of AI model supply chain compromise including unauthorized
+  model downloads from untrusted registries, model file hash mismatches, and
+  suspicious model loading patterns. Maps to OWASP LLM05 (Supply Chain
+  Vulnerabilities) and MITRE ATLAS AML.T0019 (Publish Poisoned Datasets).
+author: SOaC Framework - GTR-2025 GenAI Defense
+date: 2025/03/15
+modified: 2025/03/28
+references:
+  - https://atlas.mitre.org/techniques/AML.T0019
+  - https://jfrog.com/blog/data-scientists-targeted-by-malicious-hugging-face-ml-models/
+  - https://hiddenlayer.com/research/weaponizing-machine-learning-models-with-ransomware/
+tags:
+  - attack.persistence
+  - attack.t1195.002
+  - gtr.2025
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  selection_download:
+    CommandLine|contains:
+      - 'huggingface.co'
+      - 'civitai.com'
+      - 'modelscope.cn'
+    CommandLine|contains:
+      - 'wget'
+      - 'curl'
+      - 'git clone'
+      - 'git lfs'
+  filter_trusted:
+    CommandLine|contains:
+      - '--revision main'
+      - 'verified=true'
+  selection_pickle:
+    CommandLine|contains:
+      - 'pickle.load'
+      - 'torch.load'
+      - 'joblib.load'
+    CommandLine|contains:
+      - '--trust-remote-code'
+      - 'allow_pickle=True'
+  condition: (selection_download and not filter_trusted) or selection_pickle
+falsepositives:
+  - Data science teams downloading models from approved registries
+  - ML pipeline automation with proper verification
+level: medium

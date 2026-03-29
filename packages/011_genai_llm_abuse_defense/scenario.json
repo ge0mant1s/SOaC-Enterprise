@@ -1,0 +1,107 @@
+{
+  "package_id": "pkg-011",
+  "title": "GenAI & LLM Abuse Attack Scenario",
+  "version": "1.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Reconnaissance",
+      "pillar": "Offense",
+      "title": "Enumerate AI Endpoints",
+      "text": "Attacker discovers exposed GenAI/LLM API endpoints (/v1/chat/completions, /api/generate) through API documentation or directory brute-forcing.",
+      "mitre": ["T1595.002"],
+      "artifact": "validation/evidence_bundle.json"
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "DAN Jailbreak Prompt Injection",
+      "text": "Attacker sends DAN (Do Anything Now) jailbreak payloads to bypass system prompt restrictions and extract internal instructions from the LLM.",
+      "mitre": ["T1190"],
+      "artifact": "validation/evidence_bundle.json"
+    },
+    {
+      "step_index": 3,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Defense",
+      "title": "Prompt Injection Alert Fires",
+      "text": "Sigma/KQL/Wazuh rules detect injection patterns in HTTP POST body. Wazuh rule 101201 triggers Level 12 alert. CLAW playbook initiates triage.",
+      "mitre": ["T1190"],
+      "artifact": "detections/sigma/genai_prompt_injection_attempt.yml"
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Exfiltration",
+      "pillar": "Offense",
+      "title": "Extract Credentials via Crafted Queries",
+      "text": "Using knowledge from prompt extraction, attacker crafts queries that cause the LLM to leak database credentials (password: Pr0dDB!Secret2025) and AWS access keys (AKIAIOSFODNN7EXAMPLE) in responses.",
+      "mitre": ["T1041"],
+      "artifact": "validation/evidence_bundle.json"
+    },
+    {
+      "step_index": 5,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Defense",
+      "title": "Data Leakage Alert & Containment",
+      "text": "Data exfiltration rules detect sensitive patterns (AWS keys, private keys) in LLM responses. Wazuh rule 101202 fires at Level 13. CLAW data-exfil playbook disables endpoint and initiates credential rotation.",
+      "mitre": ["T1041"],
+      "artifact": "detections/sigma/genai_data_exfiltration_via_llm.yml"
+    },
+    {
+      "step_index": 6,
+      "role": "Red Team",
+      "phase": "Supply Chain",
+      "pillar": "Offense",
+      "title": "Distribute Backdoored Model on Hugging Face",
+      "text": "Attacker publishes a trojaned model (backdoor-llama-7b) on Hugging Face with malicious pickle payload that executes reverse shell on torch.load().",
+      "mitre": ["T1195.002"],
+      "artifact": "validation/evidence_bundle.json"
+    },
+    {
+      "step_index": 7,
+      "role": "Victim",
+      "phase": "Compromise",
+      "pillar": "Offense",
+      "title": "Data Scientist Downloads Poisoned Model",
+      "text": "Internal data scientist clones the trojan model and loads it with weights_only=False, triggering embedded reverse shell via pickle deserialization.",
+      "mitre": ["T1195.002"],
+      "artifact": "validation/evidence_bundle.json"
+    },
+    {
+      "step_index": 8,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Defense",
+      "title": "Supply Chain Compromise Detection",
+      "text": "Sigma rule detects untrusted model download + unsafe loading pattern. Wazuh rule 101203 fires. CrowdStrike IOA detects AI framework process spawning shell commands.",
+      "mitre": ["T1195.002"],
+      "artifact": "detections/sigma/genai_model_poisoning_supply_chain.yml"
+    },
+    {
+      "step_index": 9,
+      "role": "Red Team",
+      "phase": "Impact",
+      "pillar": "Offense",
+      "title": "LLMjacking - Massive Unauthorized Inference",
+      "text": "Using stolen API credentials from Phase 2, attacker runs 2,847 unauthorized inference requests per hour across 8 models, consuming $462 in compute costs.",
+      "mitre": ["T1496"],
+      "artifact": "validation/evidence_bundle.json"
+    },
+    {
+      "step_index": 10,
+      "role": "Blue Team",
+      "phase": "Response",
+      "pillar": "Defense",
+      "title": "Resource Abuse Detection & Full Containment",
+      "text": "KQL anomaly detection identifies 3-sigma deviation in API consumption. Wazuh rule 101204 frequency alert triggers. SOAR orchestration revokes API keys, blocks source IPs, and initiates full incident response.",
+      "mitre": ["T1496"],
+      "artifact": "detections/kql/genai_model_abuse_sentinel.kql"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "package": "pkg-011",
+  "title": "GenAI & LLM Abuse Defense GTR-2025",
+  "matrix": {
+    "sigma": {
+      "rules": 3,
+      "coverage": ["prompt_injection", "data_exfiltration", "supply_chain"],
+      "files": [
+        "detections/sigma/genai_prompt_injection_attempt.yml",
+        "detections/sigma/genai_data_exfiltration_via_llm.yml",
+        "detections/sigma/genai_model_poisoning_supply_chain.yml"
+      ]
+    },
+    "sentinel": {
+      "rules": 3,
+      "coverage": ["prompt_injection", "data_leak", "api_abuse"],
+      "files": [
+        "detections/kql/genai_prompt_injection_sentinel.kql",
+        "detections/kql/genai_data_leak_sentinel.kql",
+        "detections/kql/genai_model_abuse_sentinel.kql"
+      ]
+    },
+    "splunk": {
+      "rules": 2,
+      "coverage": ["prompt_injection", "data_exposure"],
+      "files": [
+        "detections/splunk/genai_prompt_injection.spl",
+        "detections/splunk/genai_sensitive_data_exposure.spl"
+      ]
+    },
+    "wazuh": {
+      "rules": 4,
+      "rule_ids": ["101201", "101202", "101203", "101204"],
+      "coverage": ["prompt_injection", "data_leak", "model_download", "api_abuse"],
+      "files": ["detections/wazuh/genai_abuse_rules.xml"]
+    },
+    "crowdstrike": {
+      "rules": 3,
+      "coverage": ["prompt_injection_process", "model_download", "framework_abuse"],
+      "files": ["detections/crowdstrike/genai_abuse_ioa.json"]
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "id": "soar-011-genai-incident",
+  "name": "SOAR - GenAI & LLM Abuse Incident Orchestration",
+  "version": "1.0",
+  "description": "Automated SOAR workflow for GenAI/LLM security incidents including prompt injection, data exfiltration, model abuse, and supply chain compromise",
+  "trigger": {
+    "type": "alert",
+    "sources": ["Sigma", "Sentinel KQL", "Wazuh", "CrowdStrike Falcon"],
+    "rule_pattern": "genai_*|llm_*|SOaC-011*"
+  },
+  "playbook_steps": [
+    {
+      "step": 1,
+      "name": "Alert Enrichment",
+      "action": "enrich",
+      "integrations": ["Active Directory", "AI Platform API", "VirusTotal", "AbuseIPDB"]
+    },
+    {
+      "step": 2,
+      "name": "Incident Classification",
+      "action": "classify",
+      "categories": ["prompt_injection", "data_exfil", "model_abuse", "supply_chain"]
+    },
+    {
+      "step": 3,
+      "name": "Automated Containment",
+      "action": "contain",
+      "sub_actions": {
+        "prompt_injection": ["block_source_ip", "terminate_session", "rate_limit_endpoint"],
+        "data_exfil": ["disable_endpoint", "revoke_credentials", "notify_privacy"],
+        "model_abuse": ["throttle_api_key", "block_source", "alert_platform_team"],
+        "supply_chain": ["quarantine_model_file", "block_registry", "scan_endpoints"]
+      }
+    },
+    {
+      "step": 4,
+      "name": "Evidence Collection",
+      "action": "collect",
+      "artifacts": ["request_logs", "response_payloads", "model_metadata", "network_flows"]
+    },
+    {
+      "step": 5,
+      "name": "Notification & Escalation",
+      "action": "notify",
+      "channels": {
+        "critical": ["security_ops", "ciso", "privacy_team", "legal"],
+        "high": ["security_ops", "ai_platform_team"],
+        "medium": ["security_ops"]
+      }
+    },
+    {
+      "step": 6,
+      "name": "Resolution & Lessons Learned",
+      "action": "resolve",
+      "outputs": ["incident_report", "detection_updates", "policy_recommendations"]
+    }
+  ],
+  "sla": {
+    "p1_critical": {"acknowledge": "5m", "contain": "15m", "resolve": "4h"},
+    "p2_high": {"acknowledge": "15m", "contain": "30m", "resolve": "8h"},
+    "p3_medium": {"acknowledge": "1h", "contain": "4h", "resolve": "24h"}
+  }
+}

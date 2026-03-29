@@ -1,0 +1,27 @@
+// GenAI Model Abuse & Excessive API Consumption - Microsoft Sentinel
+// Detects abnormal LLM API usage indicating abuse or resource theft
+// MITRE ATT&CK: T1496 | OWASP LLM04 | MITRE ATLAS: AML.T0034
+
+let ai_endpoints = dynamic([
+    "/v1/chat/completions", "/v1/engines/",
+    "/api/generate", "/api/chat", "/inference"
+]);
+let baseline = CommonSecurityLog
+| where TimeGenerated between(ago(7d) .. ago(1d))
+| where RequestURL has_any (ai_endpoints)
+| summarize AvgReq = count() / (6.0 * 24) by SourceIP
+| summarize GlobalAvg = avg(AvgReq), GlobalStdDev = stdev(AvgReq);
+CommonSecurityLog
+| where TimeGenerated > ago(1h)
+| where RequestURL has_any (ai_endpoints)
+| summarize RequestCount = count(), DistinctEndpoints = dcount(RequestURL),
+    AvgResponseSize = avg(toint(SentBytes))
+    by SourceIP
+| extend Threshold = toscalar(baseline | project GlobalAvg + 3 * GlobalStdDev)
+| where RequestCount > Threshold or RequestCount > 500
+| extend AbuseIndicator = case(
+    RequestCount > 1000, "Critical - Resource Theft",
+    RequestCount > 500, "High - Excessive Consumption",
+    "Elevated Usage"
+)
+| sort by RequestCount desc

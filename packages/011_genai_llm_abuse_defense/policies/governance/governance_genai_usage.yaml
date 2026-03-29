@@ -1,0 +1,67 @@
+id: gov-011-genai-usage
+name: GenAI & LLM Acceptable Use Governance Policy
+version: "1.0"
+package: pkg-011
+classification: TLP:AMBER
+effective_date: "2025-03-15"
+review_cycle: quarterly
+owner: AI Security Committee
+
+purpose: >
+  Establishes security governance for GenAI and LLM technologies addressing
+  prompt security, data protection, model integrity, and supply chain trust
+  per CrowdStrike GTR-2025 findings on adversarial AI abuse.
+
+scope:
+  - All GenAI/LLM platforms (cloud and self-hosted)
+  - All users accessing AI services
+  - Third-party AI integrations and plugins
+  - AI model training and fine-tuning pipelines
+
+controls:
+  input_security:
+    - id: GEN-IS-001
+      control: Implement input validation and sanitization on all LLM API endpoints
+      standard: OWASP LLM01
+      frequency: continuous
+    - id: GEN-IS-002
+      control: Deploy prompt injection detection rules across SIEM platforms
+      standard: MITRE ATLAS AML.T0051
+      frequency: continuous
+  output_security:
+    - id: GEN-OS-001
+      control: Implement output filtering to prevent sensitive data disclosure
+      standard: OWASP LLM06
+      frequency: continuous
+    - id: GEN-OS-002
+      control: Log and audit all LLM API responses for compliance monitoring
+      standard: NIST AI 100-1
+      frequency: continuous
+  model_integrity:
+    - id: GEN-MI-001
+      control: Maintain approved model registry with cryptographic verification
+      standard: OWASP LLM05
+      frequency: weekly
+    - id: GEN-MI-002
+      control: Scan model files for embedded malicious payloads before deployment
+      standard: MITRE ATLAS AML.T0019
+      frequency: per_deployment
+  usage_governance:
+    - id: GEN-UG-001
+      control: Enforce rate limiting and usage quotas on all AI API endpoints
+      standard: OWASP LLM04
+      frequency: continuous
+    - id: GEN-UG-002
+      control: Conduct quarterly AI security awareness training
+      standard: NIST AI RMF
+      frequency: quarterly
+
+compliance_mapping:
+  - framework: NIST AI RMF
+    controls: [MAP 1.1, MEASURE 2.5, MANAGE 3.1]
+  - framework: OWASP LLM Top 10
+    controls: [LLM01, LLM04, LLM05, LLM06]
+  - framework: MITRE ATLAS
+    controls: [AML.T0019, AML.T0034, AML.T0048, AML.T0051]
+  - framework: EU AI Act
+    controls: [Art. 9, Art. 15]

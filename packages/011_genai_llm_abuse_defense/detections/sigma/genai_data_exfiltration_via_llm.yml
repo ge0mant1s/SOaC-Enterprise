@@ -1,0 +1,40 @@
+title: Sensitive Data Exfiltration via LLM API Response
+id: b2c3d4e5-f6a7-8901-bcde-f12345678901
+status: experimental
+description: |
+  Detects potential data exfiltration through LLM responses by monitoring for
+  patterns indicating PII, credentials, or internal data in AI API responses.
+  Maps to OWASP LLM06 (Sensitive Information Disclosure) and MITRE ATLAS
+  AML.T0048.002 (Exfiltration via ML API).
+author: SOaC Framework - GTR-2025 GenAI Defense
+date: 2025/03/15
+modified: 2025/03/28
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+  - https://atlas.mitre.org/techniques/AML.T0048
+  - https://www.wiz.io/blog/wiz-research-discovers-genai-data-leakage
+tags:
+  - attack.exfiltration
+  - attack.t1041
+  - gtr.2025
+logsource:
+  category: proxy
+  product: web
+detection:
+  selection_response:
+    sc-status: 200
+    c-uri|contains:
+      - '/v1/chat/completions'
+      - '/api/generate'
+      - '/inference'
+  selection_sensitive:
+    sc-body|re:
+      - '(?i)(password|passwd|secret_key|api_key|access_token)\s*[:=]\s*\S+'
+      - '\b\d{3}-\d{2}-\d{4}\b'
+      - '(?i)BEGIN\s+(RSA\s+)?PRIVATE\s+KEY'
+      - '(?i)(AKIA|ASIA)[A-Z0-9]{16}'
+  condition: selection_response and selection_sensitive
+falsepositives:
+  - Legitimate security training content about credential patterns
+  - Code generation responses containing example credentials
+level: high

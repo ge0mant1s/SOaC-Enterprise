@@ -1,0 +1,27 @@
+`comment("GenAI Sensitive Data Exposure via LLM - Splunk")`
+`comment("MITRE ATT&CK: T1041 | OWASP LLM06 | MITRE ATLAS: AML.T0048")`
+`comment("GTR-2025: GenAI & LLM Abuse Defense")`
+
+index=proxy OR index=web sourcetype=stream:http
+    (uri="*/v1/chat/completions*" OR uri="*/api/generate*" OR uri="*/inference*")
+    status=200
+| eval response_text=coalesce(response_body, dest_content)
+| where isnotnull(response_text)
+| eval has_private_key=if(match(response_text, "(?i)BEGIN\s+(RSA\s+)?PRIVATE\s+KEY"), 1, 0)
+| eval has_aws_key=if(match(response_text, "(AKIA|ASIA)[A-Z0-9]{16}"), 1, 0)
+| eval has_credentials=if(match(response_text, "(?i)(password|secret_key|api_key)\s*[:=]\s*\S+"), 1, 0)
+| eval has_ssn=if(match(response_text, "\d{3}-\d{2}-\d{4}"), 1, 0)
+| where has_private_key=1 OR has_aws_key=1 OR has_credentials=1 OR has_ssn=1
+| eval leak_type=mvappend(
+    if(has_private_key=1, "Private Key", null()),
+    if(has_aws_key=1, "AWS Credential", null()),
+    if(has_credentials=1, "Password/Secret", null()),
+    if(has_ssn=1, "PII (SSN)", null())
+)
+| stats count as leak_count
+    values(leak_type) as data_types
+    earliest(_time) as first_seen
+    latest(_time) as last_seen
+    by src_ip, uri
+| sort -leak_count
+| `genai_data_leak_filter`

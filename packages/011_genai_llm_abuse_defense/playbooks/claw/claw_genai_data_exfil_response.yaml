@@ -1,0 +1,74 @@
+name: CLAW - GenAI Data Exfiltration Response
+id: claw-011-data-exfil
+version: "1.0"
+framework: CLAW
+package: pkg-011
+classification: TLP:RED
+description: >
+  Response playbook for data exfiltration via LLM/GenAI API responses.
+  Addresses OWASP LLM06 scenarios where sensitive data is leaked through
+  model responses including credentials, PII, and internal documents.
+trigger:
+  source: SIEM
+  rule_ids:
+    - "sigma:genai_data_exfiltration_via_llm"
+    - "kql:genai_data_leak_sentinel"
+    - "wazuh:101202"
+phases:
+  - phase: detect
+    name: Data Leak Alert Triage
+    steps:
+      - id: dl-d1
+        action: extract_leak_details
+        description: Parse alert for leaked data type, endpoint, requesting user
+        tool: SIEM API
+      - id: dl-d2
+        action: classify_data_sensitivity
+        description: Determine data classification level of leaked content
+        tool: DLP Engine
+  - phase: contain
+    name: Immediate Data Protection
+    steps:
+      - id: dl-c1
+        action: disable_endpoint
+        description: Temporarily disable the leaking AI endpoint
+        tool: API Gateway
+        condition: "classification_level in ['confidential', 'restricted']"
+      - id: dl-c2
+        action: revoke_leaked_credentials
+        description: If leaked data includes credentials, initiate emergency rotation
+        tool: Secrets Manager
+        condition: "'credentials' in data_categories"
+      - id: dl-c3
+        action: notify_privacy_team
+        description: Alert privacy/compliance team if PII detected in leak
+        tool: Notification Service
+        condition: "'PII' in data_categories"
+  - phase: investigate
+    name: Scope Assessment
+    steps:
+      - id: dl-i1
+        action: audit_training_data
+        description: Determine if sensitive data was in model training data or RAG pipeline
+        tool: AI Platform API
+      - id: dl-i2
+        action: enumerate_affected_users
+        description: Identify all users who received sensitive data in responses
+        tool: SIEM
+  - phase: recover
+    name: Remediation
+    steps:
+      - id: dl-r1
+        action: deploy_output_filter
+        description: Implement PII/credential scrubbing on AI response pipeline
+        tool: AI Gateway
+      - id: dl-r2
+        action: retrain_or_purge
+        description: If training data contamination confirmed, initiate model retrain
+        tool: ML Pipeline
+        condition: "training_data_contaminated == true"
+sla:
+  detection_to_containment: 5m
+  containment_to_investigation: 20m
+  full_resolution: 8h
+  breach_notification: 72h

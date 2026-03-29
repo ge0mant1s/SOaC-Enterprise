@@ -1,0 +1,27 @@
+// GenAI Data Leakage via LLM Response - Microsoft Sentinel
+// Detects sensitive data patterns in AI/LLM API responses
+// MITRE ATT&CK: T1041 | OWASP LLM06 | MITRE ATLAS: AML.T0048
+
+let sensitive_patterns = dynamic([
+    "BEGIN PRIVATE KEY", "AKIA", "ASIA",
+    "password:", "secret_key:", "api_key:"
+]);
+let ai_endpoints = dynamic([
+    "/v1/chat/completions", "/api/generate", "/inference"
+]);
+CommonSecurityLog
+| where TimeGenerated > ago(1h)
+| where RequestURL has_any (ai_endpoints)
+| where EventOutcome == "200"
+| where Message has_any (sensitive_patterns)
+| extend LeakType = case(
+    Message has "PRIVATE KEY", "Private Key Exposure",
+    Message has "AKIA", "AWS Credential Leak",
+    Message has "password:", "Credential Disclosure",
+    "API Token Exposure"
+)
+| project TimeGenerated, SourceIP, DestinationIP, RequestURL, LeakType
+| summarize LeakCount = count(), LeakTypes = make_set(LeakType),
+    FirstSeen = min(TimeGenerated), LastSeen = max(TimeGenerated)
+    by SourceIP, RequestURL
+| sort by LeakCount desc

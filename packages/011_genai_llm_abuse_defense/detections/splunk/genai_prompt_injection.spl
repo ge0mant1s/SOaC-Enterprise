@@ -1,0 +1,32 @@
+`comment("GenAI Prompt Injection Detection - Splunk")`
+`comment("MITRE ATT&CK: T1190 | OWASP LLM01 | MITRE ATLAS: AML.T0051")`
+`comment("GTR-2025: GenAI & LLM Abuse Defense")`
+
+index=proxy OR index=web sourcetype=stream:http
+    (uri="*/v1/chat/completions*" OR uri="*/api/generate*" OR uri="*/api/chat*" OR uri="*/inference*")
+    http_method=POST
+| eval request_lower=lower(form_data)
+| search request_lower="*ignore previous instructions*"
+    OR request_lower="*ignore all prior*"
+    OR request_lower="*disregard your system prompt*"
+    OR request_lower="*you are now dan*"
+    OR request_lower="*jailbreak*"
+    OR request_lower="*reveal your instructions*"
+    OR request_lower="*admin_override*"
+    OR request_lower="*system prompt:*"
+| eval injection_type=case(
+    match(request_lower, "dan"), "DAN Jailbreak",
+    match(request_lower, "ignore previous|ignore all prior"), "Instruction Override",
+    match(request_lower, "system prompt|reveal your"), "Prompt Extraction",
+    match(request_lower, "admin_override"), "Admin Override",
+    1=1, "Generic Injection"
+)
+| stats count as attempt_count
+    dc(injection_type) as distinct_types
+    values(injection_type) as injection_types
+    earliest(_time) as first_seen
+    latest(_time) as last_seen
+    by src_ip, uri
+| where attempt_count >= 3
+| sort -attempt_count
+| `genai_prompt_injection_filter`
