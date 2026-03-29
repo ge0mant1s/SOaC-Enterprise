@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - "session-*"
+      - "session-"
   workflow_dispatch:
 
 jobs:
@@ -16,16 +16,31 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (full fetch)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0           # full fetch to avoid missing files
+          persist-credentials: true
+          submodules: recursive   # enable if repo uses submodules; remove if not needed
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           check-latest: false
+
+      - name: Show repo root + packages debug
+        run: |
+          echo "WORKSPACE: $GITHUB_WORKSPACE"
+          echo "PWD:" && pwd
+          echo "Repo root listing:"
+          ls -la "${GITHUB_WORKSPACE}" || true
+          echo "packages/ listing (if present):"
+          ls -la "${GITHUB_WORKSPACE}/packages" || true
+          echo "tools/ listing:"
+          ls -la "${GITHUB_WORKSPACE}/tools" || true
+          echo "tools/soac-harness listing:"
+          ls -la "${GITHUB_WORKSPACE}/tools/soac-harness" || true
 
       - name: Cache npm & node_modules
         uses: actions/cache@v4
@@ -50,15 +65,13 @@ jobs:
 
       - name: Run unit tests
         working-directory: tools/soac-harness
-        run: npm test
+        run: |
+          # validate path now points to repo-root/packages from tools/soac-harness
+          npx ts-node src/index.ts validate --path ../../packages --level 2
 
       - name: Harness v3.0 validation (schema + package checks)
         working-directory: tools/soac-harness
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
         run: |
-          npx -y ts-node --transpile-only scripts/validate-packages.ts
-
-      - name: Build
-        working-directory: tools/soac-harness
-        run: npm run build
+          npx -y ts-node --
