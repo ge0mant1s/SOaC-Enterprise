@@ -39,7 +39,6 @@ detection:
       - 'pickle.load'
       - 'torch.load'
       - 'joblib.load'
-    CommandLine|contains:
       - '--trust-remote-code'
       - 'allow_pickle=True'
   condition: (selection_download and not filter_trusted) or selection_pickle
