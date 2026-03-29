@@ -2,23 +2,20 @@
 # Enforces package integrity, approved registries, and runtime controls
 # for Python AI/ML libraries including LiteLLM.
 
-apiVersion: soac.io/v1
+apiVersion: soacframe.io/v1
 kind: Policy
 metadata:
   name: ai-ml-supply-chain-security
   package_id: pkg-012
   version: "1.0.0"
   author: SOaC Community
+  scope: supply_chain_security
 
 spec:
-  scope:
-    environments:
-      - production
-      - staging
-    teams:
-      - platform-engineering
-      - data-science
-      - ml-ops
+  description: >
+    Governance policy outlining security requirements and controls for
+    software and AI model supply chain integrity, focusing on Python 
+    environments and AI/ML library dependencies.
 
   package_management:
     approved_registries:
