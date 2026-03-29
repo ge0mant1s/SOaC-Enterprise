@@ -1,0 +1,56 @@
+<!--
+  SOaC Package: pkg-001 — 0APT Identity Pivot
+  Wazuh Detection Rules for AitM Session Hijack and Identity Pivot
+  MITRE ATT&CK: T1557.001, T1078.004, T1539
+-->
+<group name="soac,identity,aitm,">
+
+  <!-- Rule: Okta suspicious multi-IP session -->
+  <rule id="100701" level="13">
+    <if_sid>87700</if_sid>
+    <field name="eventType">user.session.start</field>
+    <field name="outcome.result">SUCCESS</field>
+    <description>SOaC: Okta successful session from monitored user — correlate with multi-IP detection (T1557.001)</description>
+    <mitre>
+      <id>T1557.001</id>
+      <id>T1539</id>
+    </mitre>
+    <group>identity,aitm,pci_dss_10.2.5,</group>
+  </rule>
+
+  <!-- Rule: Azure AD impossible travel -->
+  <rule id="100702" level="14">
+    <if_sid>87700</if_sid>
+    <field name="data.ResultType">0</field>
+    <description>SOaC: Azure AD successful sign-in — check for impossible travel patterns (T1078.004)</description>
+    <mitre>
+      <id>T1078.004</id>
+    </mitre>
+    <group>identity,cloud_accounts,pci_dss_10.2.5,</group>
+  </rule>
+
+  <!-- Rule: Suspicious User-Agent in authentication -->
+  <rule id="100703" level="12">
+    <if_sid>100701</if_sid>
+    <field name="client.userAgent.rawUserAgent" type="pcre2">python-requests|Go-http-client|curl/|headless</field>
+    <description>SOaC: Suspicious User-Agent in Okta authentication — possible AitM proxy (T1557.001)</description>
+    <mitre>
+      <id>T1557.001</id>
+    </mitre>
+    <group>identity,aitm,proxy,</group>
+  </rule>
+
+  <!-- Composite: Multiple sessions from different IPs within 15 minutes -->
+  <rule id="100704" level="15" frequency="3" timeframe="900">
+    <if_matched_sid>100701</if_matched_sid>
+    <same_field>actor.alternateId</same_field>
+    <description>SOaC: CRITICAL - Multiple Okta sessions from different IPs for same user within 15 minutes — AitM session hijack confirmed</description>
+    <mitre>
+      <id>T1557.001</id>
+      <id>T1539</id>
+      <id>T1078.004</id>
+    </mitre>
+    <group>identity,aitm,critical,pci_dss_11.4,</group>
+  </rule>
+
+</group>

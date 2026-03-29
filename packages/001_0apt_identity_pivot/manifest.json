@@ -1,0 +1,19 @@
+{
+  "package_id": "pkg-001",
+  "version": "1.0.0",
+  "title": "0APT Identity Pivot",
+  "description": "Detect and contain AitM phishing, session hijacking, and identity-based attacks across Okta, Entra ID, and Azure AD. Simulates the 0APT threat actor TTPs targeting enterprise identity infrastructure.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "category": "Identity & Access",
+  "tags": ["identity", "aitm", "phishing", "session-hijack", "okta", "entra-id"],
+  "threat_actor": "0APT",
+  "github_path": "packages/001_0apt_identity_pivot",
+  "roles": ["Red Team", "Blue Team", "SOC", "CISO"],
+  "mitre": ["T1557.001", "T1078.004", "T1539"],
+  "stacks": ["sentinel", "sigma", "splunk", "wazuh", "crowdstrike"],
+  "created": "2026-03-28",
+  "updated": "2026-03-28",
+  "license": "Apache-2.0",
+  "author": "SOaC Community"
+}

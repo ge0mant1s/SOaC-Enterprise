@@ -1,0 +1,9 @@
+{
+  "package_id": "pkg-001",
+  "framework": "MITRE ATT&CK v15",
+  "techniques": [
+    {"id": "T1557.001", "name": "AitM: LLMNR/NBT-NS Poisoning", "tactic": "Credential Access", "detections": ["aitm_session_hijack.yml", "aitm_proxy_detection.yml", "aitm_multi_ip_session.kql"]},
+    {"id": "T1078.004", "name": "Valid Accounts: Cloud Accounts", "tactic": "Defense Evasion", "detections": ["identity_pivot_cloud_accounts.kql", "identity_pivot_detection.spl"]},
+    {"id": "T1539", "name": "Steal Web Session Cookie", "tactic": "Credential Access", "detections": ["stolen_session_token_reuse.yml", "aitm_multi_ip_session.kql"]}
+  ]
+}

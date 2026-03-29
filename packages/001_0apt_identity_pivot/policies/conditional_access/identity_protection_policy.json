@@ -1,0 +1,26 @@
+{
+  "policy_id": "ca-001-001",
+  "display_name": "SOaC: Identity Protection - AitM Defense",
+  "description": "Enforces phishing-resistant MFA, blocks suspicious sign-in patterns, and requires compliant devices for high-value application access. Directly counters AitM/0APT identity pivot TTPs.",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "applications": {"includeApplications": ["All"]},
+    "users": {"includeUsers": ["All"], "excludeGroups": ["Emergency-Break-Glass"]},
+    "signInRiskLevels": ["high", "medium"],
+    "userRiskLevels": ["high"],
+    "locations": {"includeLocations": ["All"], "excludeLocations": ["AllTrusted"]}
+  },
+  "grantControls": {
+    "operator": "AND",
+    "builtInControls": ["mfa", "compliantDevice"],
+    "authenticationStrength": {
+      "combinationConfigurations": ["fido2", "windowsHelloForBusiness"]
+    }
+  },
+  "sessionControls": {
+    "signInFrequency": {"value": 1, "type": "hours", "isEnabled": true},
+    "persistentBrowser": {"mode": "never", "isEnabled": true},
+    "continuousAccessEvaluation": {"mode": "strictEnforcement"}
+  },
+  "metadata": {"package_id": "pkg-001", "mitre_defense": ["T1557.001", "T1078.004", "T1539"]}
+}

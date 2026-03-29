@@ -1,0 +1,65 @@
+{
+  "ioa_definitions": [
+    {
+      "id": "ioa-001-001",
+      "name": "0APT AitM - Credential Interception Proxy",
+      "description": "Detects processes associated with AitM proxy tools (Evilginx2, Modlishka, EvilProxy) running on endpoints",
+      "severity": "CRITICAL",
+      "mitre_attack": ["T1557.001", "T1566.002"],
+      "platform": ["Windows", "Linux"],
+      "type": "CustomIOA",
+      "rule_group": "SOaC Identity Defense",
+      "disposition": "DETECT_AND_ALERT",
+      "conditions": {
+        "process_operations": {
+          "process_name": ["evilginx*", "modlishka*", "muraena*"],
+          "command_line_contains_any": [
+            "phishlets",
+            "lures",
+            "--proxy",
+            "evilginx",
+            "modlishka"
+          ]
+        },
+        "file_operations": {
+          "file_path_pattern": ["**/evilginx/**", "**/phishlets/**", "**/.evilginx/**"]
+        }
+      },
+      "response_actions": ["ALERT_SOC", "KILL_PROCESS", "QUARANTINE_FILE"]
+    },
+    {
+      "id": "ioa-001-002",
+      "name": "0APT AitM - Session Token Extraction",
+      "description": "Detects processes extracting browser session tokens and cookies from local storage",
+      "severity": "HIGH",
+      "mitre_attack": ["T1539", "T1555.003"],
+      "platform": ["Windows", "Linux", "macOS"],
+      "type": "CustomIOA",
+      "rule_group": "SOaC Identity Defense",
+      "disposition": "DETECT_AND_ALERT",
+      "conditions": {
+        "file_operations": {
+          "file_path_pattern": [
+            "**/Cookies/**",
+            "**/Login Data/**",
+            "**/Local Storage/**",
+            "**/.okta/**",
+            "**/msal_token_cache*"
+          ],
+          "event_types": ["FileRead"]
+        },
+        "process_context": {
+          "exclude_process": ["chrome.exe", "msedge.exe", "firefox.exe", "safari"]
+        }
+      },
+      "response_actions": ["ALERT_SOC", "CAPTURE_PROCESS_TREE"]
+    }
+  ],
+  "metadata": {
+    "package_id": "pkg-001",
+    "version": "1.0.0",
+    "author": "SOaC Community",
+    "created": "2026-03-28",
+    "falcon_api_compatible": true
+  }
+}

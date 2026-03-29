@@ -1,0 +1,24 @@
+| comment("0APT Identity Pivot - Cloud Identity Lateral Movement")
+| comment("MITRE ATT&CK: T1078.004")
+| comment("Detects users accessing new cloud applications not in their baseline")
+
+index=main sourcetype=azure:signinlogs ResultType=0
+| stats
+    dc(AppDisplayName) as app_count,
+    values(AppDisplayName) as apps_accessed,
+    dc(IPAddress) as unique_ips,
+    values(IPAddress) as ip_list,
+    count as total_signins
+  by UserPrincipalName
+  span=24h
+| join type=left UserPrincipalName [
+    search index=main sourcetype=azure:signinlogs ResultType=0 earliest=-30d latest=-1d
+    | stats values(AppDisplayName) as baseline_apps by UserPrincipalName
+]
+| eval new_apps=mvfilter(NOT match(apps_accessed, mvjoin(baseline_apps, "|")))
+| eval new_app_count=mvcount(new_apps)
+| where new_app_count >= 2
+| eval risk_score=case(new_app_count>=5, 95, new_app_count>=3, 80, 65)
+| eval risk_level=case(risk_score>=80, "HIGH", "MEDIUM")
+| table _time, UserPrincipalName, new_apps, new_app_count, unique_ips, total_signins, risk_score, risk_level
+| sort -risk_score

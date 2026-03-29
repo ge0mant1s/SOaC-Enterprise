@@ -1,0 +1,30 @@
+| comment("0APT Identity Pivot - AitM Session Anomaly Detection")
+| comment("MITRE ATT&CK: T1557.001, T1539, T1078.004")
+| comment("Correlates authentication logs to detect session hijacking patterns")
+
+index=main sourcetype=okta:system eventType="user.session.start" outcome.result="SUCCESS"
+| eval geo_key=mvjoin(mvappend('client.geographicalContext.city', 'client.geographicalContext.country'), "_")
+| stats
+    dc(client.ipAddress) as unique_ips,
+    dc(client.geographicalContext.city) as unique_cities,
+    dc(client.geographicalContext.country) as unique_countries,
+    dc(client.userAgent.rawUserAgent) as unique_uas,
+    values(client.ipAddress) as ip_list,
+    values(client.geographicalContext.city) as city_list,
+    count as session_count,
+    earliest(_time) as first_seen,
+    latest(_time) as last_seen
+  by actor.alternateId
+  span=15m
+| where unique_ips > 2 OR (unique_countries > 1 AND unique_cities > 2)
+| eval risk_score=case(
+    unique_countries > 2, 100,
+    unique_ips > 3, 90,
+    unique_ips > 2 AND unique_uas > 2, 85,
+    75)
+| eval risk_level=case(risk_score>=90, "CRITICAL", risk_score>=75, "HIGH", "MEDIUM")
+| eval mitre="T1557.001, T1539, T1078.004"
+| eval alert_name="AitM Session Hijack - Multiple IP Authentication"
+| table _time, actor.alternateId, unique_ips, unique_cities, unique_countries,
+        ip_list, city_list, session_count, risk_score, risk_level, mitre
+| sort -risk_score

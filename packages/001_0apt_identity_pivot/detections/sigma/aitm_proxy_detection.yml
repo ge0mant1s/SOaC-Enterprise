@@ -1,0 +1,42 @@
+title: AitM Phishing Proxy Infrastructure Detection
+id: e5f6a7b8-c9d0-1234-ef01-23456789abcd
+status: stable
+level: high
+description: |
+  Detects indicators of AitM phishing proxy infrastructure (EvilProxy, Evilginx2,
+  Modlishka) by identifying authentication flows with suspicious intermediate
+  relay characteristics including mismatched User-Agent strings and unusual
+  TLS fingerprints.
+author: SOaC Community
+date: 2026/03/28
+tags:
+  - attack.credential_access
+  - attack.t1557.001
+  - attack.initial_access
+  - attack.t1566.002
+logsource:
+  product: azure
+  service: signinlogs
+detection:
+  selection_success:
+    ResultType: 0
+  filter_suspicious_ua:
+    UserAgent|contains:
+      - 'python-requests'
+      - 'Go-http-client'
+      - 'curl/'
+      - 'headless'
+  filter_impossible_travel:
+    # Two sign-ins from different countries within 5 minutes
+    LocationDetails.countryOrRegion|count: '>1'
+  condition: selection_success and (filter_suspicious_ua or filter_impossible_travel)
+falsepositives:
+  - Automated testing frameworks
+  - API integrations using service accounts
+  - Legitimate travel with fast connections
+fields:
+  - UserPrincipalName
+  - IPAddress
+  - UserAgent
+  - LocationDetails.countryOrRegion
+  - AuthenticationDetails

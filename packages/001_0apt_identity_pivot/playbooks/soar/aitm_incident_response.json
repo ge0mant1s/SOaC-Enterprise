@@ -1,0 +1,52 @@
+{
+  "playbook": {
+    "id": "soar-001-001",
+    "name": "0APT AitM Identity Pivot - Full Incident Response",
+    "version": "1.0.0",
+    "description": "Vendor-agnostic SOAR playbook for AitM phishing and session hijack response.",
+    "severity": "CRITICAL",
+    "mitre_attack": ["T1557.001", "T1078.004", "T1539"],
+    "trigger": {
+      "type": "alert",
+      "sources": ["SIEM", "IdP"],
+      "conditions": [
+        {"field": "alert.category", "operator": "contains", "value": "identity"},
+        {"field": "alert.severity", "operator": "in", "values": ["critical", "high"]}
+      ]
+    },
+    "phases": [
+      {
+        "name": "Triage",
+        "steps": [
+          {"id": 1, "action": "ENRICH_USER", "integrations": ["okta", "azure_ad"], "output": "user_context"},
+          {"id": 2, "action": "CHECK_SESSION_ANOMALY", "parameters": {"threshold_ips": 2, "window": "15m"}},
+          {"id": 3, "action": "GEO_ANALYSIS", "description": "Check for impossible travel between sign-in locations"}
+        ]
+      },
+      {
+        "name": "Containment",
+        "steps": [
+          {"id": 4, "action": "REVOKE_ALL_SESSIONS", "integrations": ["okta", "azure_ad", "google_workspace"]},
+          {"id": 5, "action": "FORCE_PASSWORD_RESET", "parameters": {"require_mfa_reset": true}},
+          {"id": 6, "action": "BLOCK_IPS", "integrations": ["firewall", "waf", "proxy"]}
+        ]
+      },
+      {
+        "name": "Investigation",
+        "steps": [
+          {"id": 7, "action": "TIMELINE_ANALYSIS", "description": "Build authentication timeline for past 72 hours"},
+          {"id": 8, "action": "APP_ACCESS_AUDIT", "description": "Check which applications were accessed during hijack window"},
+          {"id": 9, "action": "DATA_ACCESS_REVIEW", "description": "Review data accessed via compromised session"}
+        ]
+      },
+      {
+        "name": "Recovery",
+        "steps": [
+          {"id": 10, "action": "MFA_RE_ENROLLMENT", "description": "Guide user through secure MFA re-enrollment"},
+          {"id": 11, "action": "CONDITIONAL_ACCESS_UPDATE", "description": "Add stricter CA policies for affected user"},
+          {"id": 12, "action": "GENERATE_REPORT", "output": "incident_report"}
+        ]
+      }
+    ]
+  }
+}

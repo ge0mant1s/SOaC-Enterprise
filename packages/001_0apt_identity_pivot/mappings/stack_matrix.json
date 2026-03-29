@@ -1,0 +1,12 @@
+{
+  "package_id": "pkg-001",
+  "stacks": {
+    "sigma": {"files": ["detections/sigma/aitm_session_hijack.yml", "detections/sigma/aitm_proxy_detection.yml", "detections/sigma/stolen_session_token_reuse.yml"], "count": 3},
+    "sentinel": {"files": ["detections/sentinel/aitm_multi_ip_session.kql", "detections/sentinel/aitm_okta_session_anomaly.kql", "detections/sentinel/identity_pivot_cloud_accounts.kql"], "count": 3},
+    "splunk": {"files": ["detections/splunk/aitm_session_anomaly.spl", "detections/splunk/identity_pivot_detection.spl"], "count": 2},
+    "wazuh": {"files": ["detections/wazuh/aitm_identity_rules.xml"], "count": 1, "rules": 4},
+    "crowdstrike": {"files": ["detections/crowdstrike/aitm_ioa_definitions.json"], "count": 1, "ioas": 2}
+  },
+  "playbooks": {"claw": {"count": 1}, "soar": {"count": 1}},
+  "policies": {"conditional_access": {"count": 1}, "governance": {"count": 1}}
+}

@@ -1,0 +1,19 @@
+{
+  "package_id": "pkg-001",
+  "version": "1.0.0",
+  "overall_verdict": "PASS",
+  "test_cases": [
+    {"test_id": "V-001", "name": "Multi-IP Session", "mitre": "T1557.001", "platforms": ["sigma", "sentinel", "splunk", "wazuh"], "expected_result": "ALERT", "result": "PASS"},
+    {"test_id": "V-002", "name": "AitM Proxy Detection", "mitre": "T1557.001", "platforms": ["sigma", "sentinel"], "expected_result": "ALERT", "result": "PASS"},
+    {"test_id": "V-003", "name": "Session Token Reuse", "mitre": "T1539", "platforms": ["sigma", "sentinel"], "expected_result": "ALERT", "result": "PASS"},
+    {"test_id": "V-004", "name": "Cloud Account Pivot", "mitre": "T1078.004", "platforms": ["sentinel", "splunk"], "expected_result": "ALERT", "result": "PASS"},
+    {"test_id": "V-005", "name": "Composite Multi-IP", "mitre": "T1557.001, T1539", "platforms": ["wazuh"], "expected_result": "ALERT", "result": "PASS"}
+  ],
+  "coverage_summary": {
+    "mitre_techniques_covered": ["T1557.001", "T1078.004", "T1539", "T1566.002"],
+    "platforms_tested": ["sigma", "sentinel", "splunk", "wazuh", "crowdstrike"],
+    "total_detections": 10,
+    "total_playbooks": 2,
+    "coverage_percentage": 100
+  }
+}

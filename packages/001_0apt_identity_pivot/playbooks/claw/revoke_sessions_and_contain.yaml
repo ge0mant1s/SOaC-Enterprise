@@ -1,0 +1,117 @@
+name: revoke-sessions-aitm-containment
+version: "1.0.0"
+description: "Emergency session revocation and user containment for AitM phishing/session hijack"
+severity: CRITICAL
+
+mitre_attack:
+  techniques:
+    - T1557.001
+    - T1078.004
+    - T1539
+  tactics:
+    - Credential Access
+    - Defense Evasion
+
+trigger:
+  source: sentinel_alert
+  conditions:
+    - field: alert.name
+      operator: contains
+      value: "aitm_multi_ip"
+    - field: alert.severity
+      operator: in
+      value: ["Critical", "High"]
+  cooldown: 300
+
+inputs:
+  - name: compromised_user
+    type: string
+    required: true
+  - name: attacker_ips
+    type: array
+    required: true
+  - name: affected_apps
+    type: array
+    required: false
+
+steps:
+  - id: step-1
+    action: enrich_user_context
+    target: okta
+    description: "Get full user profile, active sessions, and recent auth events"
+    parameters:
+      user: "{{ inputs.compromised_user }}"
+      include_sessions: true
+      include_factors: true
+      lookback: "24h"
+    timeout: 30s
+
+  - id: step-2
+    action: revoke_all_sessions
+    target: okta
+    description: "Revoke all active Okta sessions for the compromised user"
+    parameters:
+      user_id: "{{ steps.step-1.output.user_id }}"
+      clear_sessions: true
+      clear_remember_device: true
+    timeout: 30s
+
+  - id: step-3
+    action: revoke_azure_sessions
+    target: azure_ad
+    description: "Revoke all Azure AD refresh tokens and sessions"
+    parameters:
+      user_principal_name: "{{ inputs.compromised_user }}"
+      revoke_sign_in_sessions: true
+    timeout: 30s
+
+  - id: step-4
+    action: force_mfa_reset
+    target: okta
+    description: "Reset MFA factors to force re-enrollment"
+    parameters:
+      user_id: "{{ steps.step-1.output.user_id }}"
+      reset_factors: ["sms", "totp", "push"]
+      require_re_enrollment: true
+    timeout: 30s
+
+  - id: step-5
+    action: block_attacker_ips
+    target: edge_enforcement
+    description: "Block attacker IPs at network edge"
+    parameters:
+      ips: "{{ inputs.attacker_ips }}"
+      action: block
+      enforcement_type: firewall_rule
+      ttl: 86400
+    timeout: 30s
+
+  - id: step-6
+    action: notify_user
+    target: email
+    description: "Notify the affected user about the security incident"
+    parameters:
+      to: "{{ inputs.compromised_user }}"
+      template: session_hijack_notification
+      include_instructions: true
+
+  - id: step-7
+    action: create_incident
+    target: jira
+    description: "Create incident ticket"
+    parameters:
+      project: "{{ env.JIRA_PROJECT }}"
+      type: Incident
+      priority: P1
+      title: "AitM Session Hijack: {{ inputs.compromised_user }}"
+      labels: ["aitm", "identity", "p1", "auto-response"]
+
+outputs:
+  - name: sessions_revoked
+    source: steps.step-2.output.sessions_cleared
+  - name: incident_id
+    source: steps.step-7.output.ticket_id
+
+governance:
+  requires_ai_oversight: true
+  blast_radius: single_user

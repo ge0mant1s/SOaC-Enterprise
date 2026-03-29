@@ -1,0 +1,32 @@
+// 0APT Identity Pivot - Cloud Account Pivot Detection
+// Detects lateral movement via identity pivot: a compromised user
+// authenticating to new cloud services not previously accessed.
+// MITRE ATT&CK: T1078.004
+let lookbackDays = 30;
+let baselineApps = SigninLogs
+| where TimeGenerated between (ago(lookbackDays) .. ago(1d))
+| where ResultType == 0
+| summarize BaselineApps = make_set(AppDisplayName, 100) by UserPrincipalName;
+let recentActivity = SigninLogs
+| where TimeGenerated > ago(1d)
+| where ResultType == 0
+| summarize
+    RecentApps = make_set(AppDisplayName, 100),
+    RecentIPs = make_set(IPAddress, 10),
+    SignInCount = count()
+  by UserPrincipalName;
+recentActivity
+| join kind=leftouter (baselineApps) on UserPrincipalName
+| extend NewApps = set_difference(RecentApps, BaselineApps)
+| where array_length(NewApps) > 0
+| extend NewAppCount = array_length(NewApps)
+| where NewAppCount >= 2  // Accessing 2+ new apps in 24h is suspicious
+| extend RiskScore = case(
+    NewAppCount >= 5, 95,
+    NewAppCount >= 3, 80,
+    65)
+| extend AlertSeverity = iff(RiskScore >= 80, "High", "Medium")
+| extend MitreAttack = "T1078.004"
+| project UserPrincipalName, NewApps, NewAppCount, RecentIPs,
+          SignInCount, RiskScore, AlertSeverity, MitreAttack
+| sort by RiskScore desc

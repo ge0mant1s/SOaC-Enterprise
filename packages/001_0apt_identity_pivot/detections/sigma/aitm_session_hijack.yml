@@ -1,0 +1,35 @@
+title: AitM Session Hijack - Multiple IP Authentication
+id: d4e5f6a7-b8c9-0123-def0-123456789abc
+status: stable
+level: critical
+description: |
+  Detects potential Adversary-in-the-Middle (AitM) session hijacking by
+  identifying user accounts authenticating from multiple distinct IP addresses
+  within a short timeframe. Indicates stolen session tokens being replayed
+  from attacker infrastructure.
+author: SOaC Community
+date: 2026/03/28
+tags:
+  - attack.credential_access
+  - attack.t1557.001
+  - attack.t1539
+  - attack.t1078.004
+logsource:
+  product: okta
+  service: system
+detection:
+  selection:
+    eventType: 'user.session.start'
+    outcome.result: 'SUCCESS'
+  timeframe: 15m
+  condition: selection | count(client.ipAddress) by actor.alternateId > 2
+falsepositives:
+  - Users on VPN with IP rotation
+  - Mobile users switching between WiFi and cellular
+  - Corporate proxy load balancing
+fields:
+  - actor.alternateId
+  - client.ipAddress
+  - client.geographicalContext.city
+  - client.userAgent.rawUserAgent
+  - authenticationContext.authenticationProvider

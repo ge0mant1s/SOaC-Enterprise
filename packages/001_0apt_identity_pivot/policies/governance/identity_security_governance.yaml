@@ -1,0 +1,47 @@
+apiVersion: soac.io/v1
+kind: GovernancePolicy
+metadata:
+  name: identity-security-governance-aitm
+  package_id: pkg-001
+  version: "1.0.0"
+
+spec:
+  scope:
+    environments: [production, staging]
+    identity_providers: [okta, entra_id, google_workspace]
+
+  authentication_controls:
+    mfa_policy:
+      required: always
+      allowed_methods: [fido2, webauthn, authenticator_push]
+      blocked_methods: [sms, voice_call]
+      phishing_resistant_required: true
+
+    session_management:
+      max_session_duration: 8h
+      idle_timeout: 30m
+      concurrent_sessions: 3
+      token_binding: strict
+
+    risk_based_controls:
+      impossible_travel: block_and_alert
+      new_device: step_up_mfa
+      new_location: step_up_mfa
+      tor_exit_node: block
+
+  monitoring:
+    continuous_access_evaluation: enabled
+    anomaly_detection: enabled
+    alert_destinations: [soc_channel, security_engineering]
+
+  incident_response:
+    auto_session_revocation: true
+    playbook_ref: "revoke-sessions-aitm-containment"
+    escalation_sla:
+      critical: 5m
+      high: 15m
+      medium: 1h
+
+  compliance:
+    frameworks: [NIST_CSF_2.0, SOC2_Type2, ISO_27001]
+    audit_frequency: quarterly

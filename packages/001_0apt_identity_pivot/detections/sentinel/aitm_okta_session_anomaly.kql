@@ -1,0 +1,42 @@
+// 0APT Identity Pivot - Okta Session Anomaly Detection
+// Correlates Okta system logs to detect AitM session hijacking patterns:
+// multiple geolocations, device fingerprint changes, and suspicious auth flows.
+// MITRE ATT&CK: T1557.001, T1078.004
+let OktaLogs = externaldata(
+    TimeGenerated: datetime,
+    actor_alternateId: string,
+    actor_displayName: string,
+    client_ipAddress: string,
+    client_geographicalContext_city: string,
+    client_geographicalContext_country: string,
+    client_userAgent_rawUserAgent: string,
+    eventType: string,
+    outcome_result: string,
+    authenticationContext_authenticationProvider: string,
+    debugContext_debugData_requestUri: string
+) [@"https://raw.githubusercontent.com/ge0mant1s/SOaC-Enterprise/main/packages/001_0apt_identity_pivot/replays/okta_logs.json"]
+with (format="multijson");
+// Alternative: Use native Okta data connector
+// OktaSSO
+OktaLogs
+| where eventType == "user.session.start"
+| where outcome_result == "SUCCESS"
+| summarize
+    UniqueIPs = dcount(client_ipAddress),
+    UniqueCities = dcount(client_geographicalContext_city),
+    UniqueCountries = dcount(client_geographicalContext_country),
+    UniqueUAs = dcount(client_userAgent_rawUserAgent),
+    IPList = make_set(client_ipAddress, 10),
+    CityList = make_set(client_geographicalContext_city, 10),
+    Sessions = count()
+  by actor_alternateId, bin(TimeGenerated, 15m)
+| where UniqueIPs > 2 or (UniqueCountries > 1 and UniqueCities > 2)
+| extend RiskScore = case(
+    UniqueCountries > 2, 100,
+    UniqueIPs > 3, 90,
+    UniqueIPs > 2 and UniqueUAs > 2, 85,
+    75)
+| extend AlertSeverity = iff(RiskScore >= 90, "Critical", "High")
+| extend Description = strcat("AitM session hijack indicators for ", actor_alternateId,
+         ": ", UniqueIPs, " IPs from ", UniqueCities, " cities in ", UniqueCountries, " countries")
+| sort by RiskScore desc

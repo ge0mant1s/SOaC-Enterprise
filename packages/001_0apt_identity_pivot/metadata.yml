@@ -1,0 +1,67 @@
+apiVersion: soac.io/v1
+kind: PackageMetadata
+
+package:
+  id: "pkg-001"
+  name: "Identity-led Intrusion Defense"
+  version: "1.0.0"
+  description: "Detect and contain AitM phishing, session hijacking, and identity-based attacks across Okta, Entra ID, and Azure AD."
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  updated: "2026-03-16T00:00:00Z"
+  status: "released"
+  license: "Apache-2.0"
+
+threat:
+  mitre_attack:
+    - technique_id: "T1557.001"
+      technique_name: "LLMNR/NBT-NS Poisoning and SMB Relay"
+      tactic: "Credential Access"
+    - technique_id: "T1078.004"
+      technique_name: "Cloud Accounts"
+      tactic: "Defense Evasion"
+    - technique_id: "T1539"
+      technique_name: "Steal Web Session Cookie"
+      tactic: "Credential Access"
+  threat_actors: []
+  severity: "CRITICAL"
+
+artifacts:
+  detections:
+    - path: "detection.yaml"
+      name: "aitm-session-hijack-detection"
+      platforms: ["sigma"]
+  playbooks:
+    - path: "playbook.yaml"
+      name: "revoke-compromised-sessions"
+      severity: "CRITICAL"
+  policies:
+    - path: "policy.yaml"
+      name: "identity-intrusion-lab-policy"
+      scope: "package"
+  simulations:
+    - scenario_id: "pkg-001"
+      name: "Identity-led Intrusion Defense Lab Scenario"
+
+stakeholders:
+  - role: "ciso"
+    relevance: "primary"
+  - role: "detection"
+    relevance: "primary"
+  - role: "soc"
+    relevance: "primary"
+
+signals_required:
+  - name: "Okta System Log"
+    type: "api"
+  - name: "Azure AD Sign-in Logs"
+    type: "cloud"
+  - name: "CrowdStrike Detection API"
+    type: "api"
+
+dependencies: []
+
+validation:
+  harness_level: 2
+  last_validated: "2026-03-16T00:00:00Z"
+  evidence_bundle: ""

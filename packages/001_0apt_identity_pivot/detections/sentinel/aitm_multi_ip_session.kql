@@ -1,0 +1,35 @@
+// 0APT Identity Pivot - AitM Multi-IP Session Detection
+// Detects user accounts with successful authentications from multiple IPs
+// within a 15-minute window, indicating session token theft and replay.
+// MITRE ATT&CK: T1557.001, T1539, T1078.004
+let timeWindow = 15m;
+let maxNormalIPs = 2;
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == 0  // Successful sign-ins only
+| summarize
+    UniqueIPs = dcount(IPAddress),
+    IPList = make_set(IPAddress, 10),
+    UniqueLocations = dcount(Location),
+    LocationList = make_set(Location, 10),
+    UniqueUAs = dcount(UserAgent),
+    SignInCount = count(),
+    FirstSignIn = min(TimeGenerated),
+    LastSignIn = max(TimeGenerated)
+  by UserPrincipalName, bin(TimeGenerated, timeWindow)
+| where UniqueIPs > maxNormalIPs
+| extend TimeDelta = LastSignIn - FirstSignIn
+| extend RiskScore = case(
+    UniqueIPs > 5 and UniqueLocations > 3, 100,
+    UniqueIPs > 3 and UniqueLocations > 2, 90,
+    UniqueIPs > 2, 75,
+    50)
+| extend AlertSeverity = case(
+    RiskScore >= 90, "Critical",
+    RiskScore >= 75, "High",
+    "Medium")
+| extend MitreAttack = "T1557.001, T1539, T1078.004"
+| project TimeGenerated, UserPrincipalName, UniqueIPs, IPList,
+          UniqueLocations, LocationList, SignInCount, TimeDelta,
+          RiskScore, AlertSeverity, MitreAttack
+| sort by RiskScore desc

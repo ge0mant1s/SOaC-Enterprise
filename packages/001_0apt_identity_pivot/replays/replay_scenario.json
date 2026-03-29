@@ -1,0 +1,23 @@
+{
+  "package_id": "pkg-001",
+  "title": "0APT Identity Pivot — Full Replay",
+  "duration_minutes": 30,
+  "events": [
+    {"timestamp_offset": "T+00:00", "category": "initial_access", "mitre": "T1566.002",
+     "event": {"type": "phishing_email", "target": "victim@company.com", "subject": "Urgent: MFA Verification Required", "link": "https://login.company-verify.com"}},
+    {"timestamp_offset": "T+00:02", "category": "credential_interception", "mitre": "T1557.001",
+     "event": {"type": "aitm_proxy", "victim": "victim@company.com", "proxy_domain": "login.company-verify.com", "real_domain": "login.okta.com", "captured": ["credentials", "mfa_token", "session_cookie"]}},
+    {"timestamp_offset": "T+00:03", "category": "session_hijack", "mitre": "T1539",
+     "event": {"type": "session_replay", "user": "victim@company.com", "original_ip": "192.168.1.100", "attacker_ip": "198.51.100.42", "session_id": "ses_abc123"}},
+    {"timestamp_offset": "T+00:05", "category": "identity_pivot", "mitre": "T1078.004",
+     "event": {"type": "cloud_access", "user": "victim@company.com", "apps": ["SharePoint", "Exchange Online", "Teams", "OneDrive"], "source_ip": "198.51.100.42"}},
+    {"timestamp_offset": "T+00:10", "category": "detection", "mitre": "T1557.001",
+     "event": {"type": "siem_alert", "source": "Sentinel", "alert_name": "AitM Multi-IP Session", "severity": "Critical"}},
+    {"timestamp_offset": "T+00:11", "category": "response",
+     "event": {"type": "playbook_triggered", "playbook": "revoke-sessions-aitm-containment", "actions": ["Sessions revoked", "MFA reset", "Attacker IPs blocked"]}},
+    {"timestamp_offset": "T+00:20", "category": "ciso_decision",
+     "event": {"type": "escalation", "decision": "Enable phishing-resistant MFA org-wide within 30 days"}},
+    {"timestamp_offset": "T+00:30", "category": "recovery",
+     "event": {"type": "remediation_complete", "verdict": "CONTAINED"}}
+  ]
+}
