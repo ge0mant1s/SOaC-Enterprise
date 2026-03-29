@@ -1,9 +1,0 @@
-workflow: Lazarus_Intrusion_Response
-trigger:
-  source: Brain_Lazarus_Alert
-  severity: Critical
-actions:
-  - action: CrowdStrike_Network_Isolate
-  - action: PaloAlto_Block_C2_IP
-  - action: Disable_Compromised_Service_Accounts
-  - action: Trigger_Full_Forensic_Imaging
