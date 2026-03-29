@@ -1,4 +1,0 @@
-AuditLogs
-| where OperationName == "Consent to application"
-| where AppDisplayName contains "Support" or AppDisplayName contains "Help"
-| extend AlertReason="Suspicious Helpdesk OAuth Consent"

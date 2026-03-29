@@ -1,9 +1,0 @@
-workflow: RMM_Abuse_Containment
-trigger:
-  source: Brain_Social_Eng_Alert
-  severity: High
-actions:
-  - action: CrowdStrike_Network_Isolate
-  - action: Terminate_Process_AnyDesk.exe
-  - action: Terminate_Process_ScreenConnect.exe
-  - action: Block_Sender_Domain_Email
