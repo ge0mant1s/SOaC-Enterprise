@@ -1,9 +1,0 @@
-workflow: Healthcare_Data_Protection
-trigger:
-  source: Brain_Healthcare_Alert
-  severity: High
-actions:
-  - action: EHR_System_Revoke_User_Session
-  - action: Medical_Device_Network_Isolate
-  - action: Notify_Privacy_and_Compliance_Officer
-  - action: Log_Access_for_HIPAA_Audit

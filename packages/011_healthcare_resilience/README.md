@@ -1,1 +1,0 @@
-SOaC Enterprise Package 011: Healthcare Resilience Suite.

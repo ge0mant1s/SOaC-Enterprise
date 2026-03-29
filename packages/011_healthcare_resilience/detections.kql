@@ -1,9 +1,0 @@
-
-// Detects Quick Assist/AnyDesk usage followed by AWS S3 credential access (Qilin TTP)
-DeviceProcessEvents
-| where ProcessCommandLine has_any ("quickassist.exe", "anydesk.exe")
-| join kind=inner (
-    CloudAppEvents
-    | where ActionType == "GetBucketLogging" or ActionType == "ListBuckets"
-) on DeviceId
-| extend DiscoveryType = "Healthcare_SupplyChain_Pivot"

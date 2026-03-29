@@ -1,1 +1,0 @@
-alert tcp any any -> $EHR_SERVER_IPS 443 (msg:"Massive EHR Data Access Detected"; flow:established,to_server; threshold:type both, track by_src, count 50, seconds 60; sid:1000011;)
