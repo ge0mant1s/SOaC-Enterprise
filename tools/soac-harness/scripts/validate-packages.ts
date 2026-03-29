@@ -1,3 +1,4 @@
+
 import fs from 'fs';
 import path from 'path';
 import Ajv from 'ajv';
@@ -26,26 +27,50 @@ function validateTriggerPattern(pattern: string): boolean {
   return triggerRegex.test(pattern);
 }
 
+// Define interfaces for expected YAML structure
+interface Playbook {
+  name: string;
+  triggers: { pattern: string }[];
+  steps: { action: string }[];
+}
+
+interface Policy {
+  name: string;
+  version: string;
+  rules: { id: string; description: string }[];
+}
+
 function validatePlaybookFile(filePath: string): string[] {
   const errors: string[] = [];
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
-    const data = yaml.load(content);
+    const data = yaml.load(content) as Partial<Playbook> | undefined;
+
+    if (!data) {
+      errors.push(`Empty or invalid YAML in ${filePath}`);
+      return errors;
+    }
 
     if (!validatePlaybook(data)) {
       errors.push(`Schema validation errors in ${filePath}: ${ajv.errorsText(validatePlaybook.errors)}`);
     }
 
     // Validate triggers regex
-    if (data && data.triggers) {
+    if (data.triggers) {
       for (const trigger of data.triggers) {
-        if (!validateTriggerPattern(trigger.pattern)) {
-          errors.push(`Invalid trigger pattern '${trigger.pattern}' in ${filePath}`);
+        if (typeof trigger.pattern !== 'string' || !validateTriggerPattern(trigger.pattern)) {
+          errors.push(`Invalid trigger pattern '${trigger && (trigger as any).pattern}' in ${filePath}`);
         }
       }
+    } else {
+      errors.push(`Missing 'triggers' property in ${filePath}`);
     }
-  } catch (e) {
-    errors.push(`Failed to read or parse ${filePath}: ${e.message}`);
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      errors.push(`Failed to read or parse ${filePath}: ${e.message}`);
+    } else {
+      errors.push(`Failed to read or parse ${filePath}: unknown error`);
+    }
   }
   return errors;
 }
@@ -54,18 +79,29 @@ function validatePolicyFile(filePath: string): string[] {
   const errors: string[] = [];
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
-    const data = yaml.load(content);
+    const data = yaml.load(content) as Partial<Policy> | undefined;
+
+    if (!data) {
+      errors.push(`Empty or invalid YAML in ${filePath}`);
+      return errors;
+    }
 
     if (!validatePolicy(data)) {
       errors.push(`Schema validation errors in ${filePath}: ${ajv.errorsText(validatePolicy.errors)}`);
     }
 
     // Validate version
-    if (data && data.version && !validatePackageVersion(data.version)) {
+    if (data.version && !validatePackageVersion(data.version)) {
       errors.push(`Invalid version '${data.version}' in ${filePath}`);
+    } else if (!data.version) {
+      errors.push(`Missing 'version' property in ${filePath}`);
     }
-  } catch (e) {
-    errors.push(`Failed to read or parse ${filePath}: ${e.message}`);
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      errors.push(`Failed to read or parse ${filePath}: ${e.message}`);
+    } else {
+      errors.push(`Failed to read or parse ${filePath}: unknown error`);
+    }
   }
   return errors;
 }
