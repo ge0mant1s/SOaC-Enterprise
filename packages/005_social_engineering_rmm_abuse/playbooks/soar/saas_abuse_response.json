@@ -1,0 +1,25 @@
+{
+  "name": "SaaS OAuth Abuse Incident Response",
+  "version": "1.0.0",
+  "trigger": {"type": "alert", "source": ["Microsoft Sentinel", "MCAS"], "conditions": {"alert_name_pattern": "*oauth*|*consent*|*saas*exfil*", "severity": ["critical", "high"]}},
+  "phases": [
+    {"name": "Triage", "steps": [
+      {"action": "enrich_app", "source": "Azure AD", "parameters": {"lookup": "app_id", "include": ["permissions", "consent_history", "publisher"]}},
+      {"action": "classify_severity", "rules": {"unverified_publisher_high_scope": "critical", "bulk_data_access": "critical"}}
+    ]},
+    {"name": "Containment", "steps": [{"action": "execute_playbook", "playbook": "revoke-oauth-and-contain-saas-abuse", "wait_for_completion": true}]},
+    {"name": "Investigation", "steps": [
+      {"action": "query_audit_logs", "timerange": "-30d", "focus": "malicious_app_activity"},
+      {"action": "assess_data_impact", "parameters": {"check_dlp_policies": true}}
+    ]},
+    {"name": "Remediation", "steps": [
+      {"action": "review_consent_policies", "parameters": {"restrict_user_consent": true}},
+      {"action": "enable_admin_consent_workflow", "parameters": {"require_approval": true}}
+    ]},
+    {"name": "Post-Incident", "steps": [
+      {"action": "generate_report", "template": "saas_abuse_report"},
+      {"action": "user_awareness_training", "parameters": {"topic": "consent_phishing"}}
+    ]}
+  ],
+  "sla": {"consent_revocation": "15m", "data_impact_assessment": "4h"}
+}

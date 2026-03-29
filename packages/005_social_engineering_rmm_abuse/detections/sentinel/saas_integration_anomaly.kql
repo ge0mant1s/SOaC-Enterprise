@@ -1,0 +1,29 @@
+// SaaS Integration Anomaly Detection
+// Detects suspicious new integrations, webhook registrations, and API key creation
+// MITRE: T1098.003, T1528
+let timewindow = 24h;
+let app_registrations = AuditLogs
+| where TimeGenerated > ago(timewindow)
+| where OperationName in ("Add application", "Update application",
+    "Add service principal", "Update service principal credentials")
+| extend AppName = tostring(TargetResources[0].displayName)
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend ModifiedProps = tostring(TargetResources[0].modifiedProperties)
+| where ModifiedProps has_any ("passwordCredential", "keyCredential", "requiredResourceAccess")
+| summarize
+    RegistrationActions = make_set(OperationName, 10),
+    ActionCount = count(),
+    AppsModified = make_set(AppName, 10)
+    by Actor, bin(TimeGenerated, 1h);
+let consent_events = AuditLogs
+| where TimeGenerated > ago(timewindow)
+| where OperationName == "Consent to application"
+| summarize ConsentCount = count() by tostring(InitiatedBy.user.userPrincipalName);
+app_registrations
+| join kind=leftouter consent_events on $left.Actor == $right.tostring_InitiatedBy_user_userPrincipalName
+| extend RiskScore = case(
+    ActionCount >= 5 and ConsentCount >= 2, "CRITICAL",
+    ActionCount >= 3, "HIGH",
+    "MEDIUM")
+| project TimeGenerated, Actor, ActionCount, RegistrationActions,
+    AppsModified, ConsentCount, RiskScore

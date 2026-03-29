@@ -1,0 +1,28 @@
+// SaaS Bulk Data Access - Potential Exfiltration
+// Detects anomalous API-driven data access to SharePoint, OneDrive, Exchange
+// MITRE: T1567, T1530
+let timewindow = 1h;
+let access_threshold = 100;
+OfficeActivity
+| where TimeGenerated > ago(timewindow)
+| where Operation in ("FileDownloaded", "FileSyncDownloadedFull", "FileAccessed",
+    "SearchQueryPerformed", "MailItemsAccessed")
+| where UserAgent has_any ("python-requests", "axios", "curl", "Go-http-client",
+    "PostmanRuntime", "java", "okhttp")
+| summarize
+    AccessCount = count(),
+    UniqueFiles = dcount(OfficeObjectId),
+    FileList = make_set(OfficeObjectId, 20),
+    Operations = make_set(Operation, 5),
+    SourceIPs = make_set(ClientIP, 5),
+    FirstAccess = min(TimeGenerated),
+    LastAccess = max(TimeGenerated)
+    by UserId, UserAgent
+| where AccessCount >= access_threshold
+| extend AccessRate = round(todouble(AccessCount) / datetime_diff('minute', LastAccess, FirstAccess), 2)
+| extend RiskScore = case(
+    AccessCount >= 1000, "CRITICAL",
+    AccessCount >= 500, "HIGH",
+    "MEDIUM")
+| project TimeGenerated = FirstAccess, UserId, UserAgent,
+    AccessCount, UniqueFiles, AccessRate, RiskScore, Operations, SourceIPs

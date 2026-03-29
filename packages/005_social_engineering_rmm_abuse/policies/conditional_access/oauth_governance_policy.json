@@ -1,0 +1,10 @@
+{
+  "policy_name": "SOaC SaaS OAuth Governance - Conditional Access",
+  "version": "1.0.0",
+  "rules": [
+    {"name": "Require Admin Consent for High-Risk Scopes", "conditions": {"consent_scope": ["Mail.ReadWrite", "Files.ReadWrite.All", "Directory.ReadWrite.All"]}, "actions": {"require_admin_consent": true, "user_consent": "block"}},
+    {"name": "Block Consent to Unverified Publishers", "conditions": {"publisher_verified": false, "scope_type": "delegated"}, "actions": {"grant": "block", "notify": "security_team"}},
+    {"name": "Restrict Third-Party App Access During Incident", "conditions": {"incident_active": true, "app_type": "third_party"}, "actions": {"grant": "block_new_consent", "existing_access": "monitor"}}
+  ],
+  "metadata": {"package": "pkg-005", "mitre_techniques": ["T1098.003", "T1566.002", "T1528"], "last_updated": "2025-03-28"}
+}

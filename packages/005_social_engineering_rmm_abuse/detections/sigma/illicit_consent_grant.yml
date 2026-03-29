@@ -1,0 +1,33 @@
+title: Illicit Consent Grant Attack - Consent Phishing
+id: f5a6c4d3-7e0b-5g9c-d4f8-6i1d5f0g2e03
+status: production
+level: critical
+description: |
+  Detects consent phishing attacks where users are tricked into granting
+  OAuth permissions to malicious applications. Correlates rapid consent
+  grants with unverified publishers and suspicious redirect URIs.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.initial_access
+  - attack.t1566.002
+  - attack.credential_access
+  - attack.t1528
+logsource:
+  product: azure
+  service: auditlogs
+detection:
+  selection_new_consent:
+    Operation: 'Consent to application'
+    ResultStatus: 'Success'
+  selection_unverified:
+    ModifiedProperties.NewValue|contains:
+      - 'IsVerifiedPublisher: false'
+      - 'publisherVerificationStatus: unverified'
+  selection_suspicious_redirect:
+    ModifiedProperties.NewValue|re: 'https?://(?!login\\.microsoftonline|accounts\\.google).*(?:ngrok|cloudflare|workers\\.dev|pages\\.dev)'
+  condition: selection_new_consent and (selection_unverified or selection_suspicious_redirect)
+falsepositives:
+  - Development and testing applications with localhost redirects
+  - Internal applications awaiting publisher verification

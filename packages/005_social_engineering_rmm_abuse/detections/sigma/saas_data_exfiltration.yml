@@ -1,0 +1,45 @@
+title: SaaS Data Exfiltration via API Integration
+id: f5a6c4d3-7e0b-5g9c-d4f8-6i1d5f0g2e02
+status: production
+level: critical
+description: |
+  Detects bulk data access patterns via SaaS APIs that indicate data
+  exfiltration through authorized OAuth integrations or compromised tokens.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.exfiltration
+  - attack.t1567
+  - attack.collection
+  - attack.t1530
+logsource:
+  product: m365
+  service: unified_audit
+detection:
+  selection_bulk_access:
+    Operation:
+      - 'FileDownloaded'
+      - 'FileSyncDownloadedFull'
+      - 'ListItems'
+      - 'SearchQueryPerformed'
+  selection_api_client:
+    UserAgent|contains:
+      - 'python-requests'
+      - 'axios'
+      - 'curl'
+      - 'Go-http-client'
+      - 'PostmanRuntime'
+  filter_legitimate:
+    UserId|endswith: '@contoso.com'
+    ClientIP|startswith:
+      - '10.'
+      - '172.16.'
+  condition: selection_bulk_access and selection_api_client and not filter_legitimate
+  timeframe: 1h
+  count:
+    field: ObjectId
+    gte: 100
+falsepositives:
+  - Backup solutions using API access
+  - Authorized data migration tools

@@ -1,0 +1,22 @@
+index=azure sourcetype="azure:aad:audit"
+  operationName IN ("Consent to application","Add OAuth2PermissionGrant",
+    "Add app role assignment to service principal")
+  result="success"
+| spath "targetResources{}.modifiedProperties{}.newValue" output=granted_scopes
+| spath "targetResources{}.displayName" output=app_name
+| spath "initiatedBy.user.userPrincipalName" output=consenting_user
+| where match(granted_scopes, "(?i)Mail\.ReadWrite|Files\.ReadWrite\.All|Directory\.ReadWrite\.All|full_access_as_app|Sites\.ReadWrite\.All")
+| stats count as consent_count
+  dc(consenting_user) as unique_users
+  values(consenting_user) as users
+  values(granted_scopes) as scopes
+  min(_time) as firstTime max(_time) as lastTime
+  BY app_name
+| eval risk_score=case(
+    consent_count >= 5, "CRITICAL",
+    match(scopes, "Directory.ReadWrite.All"), "CRITICAL",
+    consent_count >= 2, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1098.003,T1566.002,T1528"
+| table firstTime lastTime app_name consent_count unique_users users scopes risk_score mitre_techniques
+| sort -consent_count
