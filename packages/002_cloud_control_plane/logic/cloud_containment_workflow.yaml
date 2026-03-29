@@ -1,9 +1,0 @@
-workflow: Cloud_Protection_Containment
-trigger:
-  source: Brain_High_Risk_Cloud_Action
-  severity: Critical
-actions:
-  - action: AWS_IAM_Revoke_Tokens
-  - action: Azure_RM_Lock_Resource_Group
-  - action: GCP_Disable_Service_Account
-  - action: Notify_Cloud_Security_Team
