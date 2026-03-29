@@ -1,9 +1,0 @@
-workflow: OT_Sabotage_Containment
-trigger:
-  source: Brain_OT_Anomaly_Alert
-  severity: Critical
-actions:
-  - action: Firewall_Isolate_OT_Segment
-  - action: Disable_Remote_Access_VPN
-  - action: Trigger_Safety_System_Override
-  - action: Notify_Plant_Operations_Manager

@@ -1,5 +1,0 @@
-
-// Detects netsh portproxy used for IT-to-OT pivoting (Volt Typhoon TTP)
-DeviceProcessEvents
-| where ProcessCommandLine has_all ("interface", "portproxy", "listenport")
-| extend DiscoveryType = "IT_OT_Pivot_Attempt"
