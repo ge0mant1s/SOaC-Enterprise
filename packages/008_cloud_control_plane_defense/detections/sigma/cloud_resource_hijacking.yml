@@ -1,0 +1,48 @@
+title: Cloud Resource Hijacking - Compute and Storage Abuse
+id: h7c8e6f5-9g2d-7i1e-f6h0-8k3f7h2i4g02
+status: production
+level: high
+description: |
+  Detects cloud resource hijacking patterns including unauthorized VM creation,
+  crypto-mining indicators, and storage account exposure. Aligned with GTR-2025
+  findings on cloud resource abuse.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.impact
+  - attack.t1496
+  - attack.t1578.002
+  - attack.t1530
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection_compute_abuse:
+    eventName:
+      - 'RunInstances'
+      - 'StartInstances'
+    requestParameters.instanceType|contains:
+      - 'p3'
+      - 'p4'
+      - 'g4'
+      - 'g5'
+      - 'inf1'
+  selection_storage_exposure:
+    eventName:
+      - 'PutBucketPolicy'
+      - 'PutBucketAcl'
+    requestParameters|contains: '"Effect":"Allow","Principal":"*"'
+  selection_unusual_region:
+    eventName:
+      - 'RunInstances'
+      - 'CreateFunction'
+    awsRegion|contains:
+      - 'af-south'
+      - 'ap-east'
+      - 'me-south'
+      - 'eu-south'
+  condition: selection_compute_abuse or selection_storage_exposure or selection_unusual_region
+falsepositives:
+  - ML/AI workloads using GPU instances
+  - Multi-region deployment strategies

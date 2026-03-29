@@ -1,0 +1,26 @@
+index=aws sourcetype="aws:cloudtrail"
+  (eventName IN ("Set federation settings on domain","CreateRole","AttachRolePolicy",
+    "CreateFunction20150331","UpdateFunctionCode20150331v2","AddPermission20150331")
+   OR (eventName IN ("RunInstances","StartInstances")
+       AND (requestParameters.instanceType="*p3*" OR requestParameters.instanceType="*p4*"
+            OR requestParameters.instanceType="*g4*" OR requestParameters.instanceType="*g5*")))
+| eval category=case(
+    match(eventName, "federation"), "federation_tampering",
+    match(eventName, "Function|Permission"), "lambda_persistence",
+    match(eventName, "Role|Policy"), "iam_persistence",
+    match(eventName, "Instances"), "resource_hijacking",
+    true(), "other")
+| stats count as action_count
+  dc(category) as unique_categories
+  values(category) as categories
+  values(eventName) as actions
+  values(awsRegion) as regions
+  min(_time) as firstTime max(_time) as lastTime
+  BY userIdentity.arn sourceIPAddress
+| eval risk_score=case(
+    unique_categories >= 2, "CRITICAL",
+    action_count >= 5, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1098.001,T1484.002,T1525,T1496"
+| table firstTime lastTime userIdentity.arn sourceIPAddress action_count categories actions risk_score regions mitre_techniques
+| sort -action_count

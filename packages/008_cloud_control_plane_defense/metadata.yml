@@ -1,0 +1,65 @@
+apiVersion: soac.io/v1
+kind: PackageMetadata
+
+package:
+  id: "pkg-008"
+  name: "Lateral Movement & RDP Abuse"
+  version: "1.0.0"
+  description: "Detect RDP tunneling, pass-the-hash, and network-layer lateral movement techniques across Windows environments."
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  updated: "2026-03-16T00:00:00Z"
+  status: "released"
+  license: "Apache-2.0"
+
+threat:
+  mitre_attack:
+    - technique_id: "T1021.001"
+      technique_name: "Remote Desktop Protocol"
+      tactic: "Lateral Movement"
+    - technique_id: "T1550.002"
+      technique_name: "Pass the Hash"
+      tactic: "Defense Evasion"
+    - technique_id: "T1570"
+      technique_name: "Lateral Tool Transfer"
+      tactic: "Lateral Movement"
+  threat_actors: []
+  severity: "HIGH"
+
+artifacts:
+  detections:
+    - path: "detection.yaml"
+      name: "lateral-movement-rdp-abuse"
+      platforms: ["sigma"]
+  playbooks:
+    - path: "playbook.yaml"
+      name: "lateral-movement-containment"
+      severity: "HIGH"
+  policies:
+    - path: "policy.yaml"
+      name: "lateral-movement-lab-policy"
+      scope: "package"
+  simulations:
+    - scenario_id: "pkg-008"
+      name: "Lateral Movement & RDP Abuse Lab Scenario"
+
+stakeholders:
+  - role: "soc"
+    relevance: "primary"
+  - role: "detection"
+    relevance: "primary"
+
+signals_required:
+  - name: "Windows Security Event Log"
+    type: "log"
+  - name: "Network flow data"
+    type: "network"
+  - name: "RDP connection logs"
+    type: "log"
+
+dependencies: []
+
+validation:
+  harness_level: 2
+  last_validated: "2026-03-16T00:00:00Z"
+  evidence_bundle: ""

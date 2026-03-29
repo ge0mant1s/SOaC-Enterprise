@@ -1,0 +1,24 @@
+// Cloud Resource Abuse Detection - Crypto Mining and Hijacking
+// Detects unauthorized compute provisioning and storage exposure
+// MITRE: T1496, T1578.002
+let timewindow = 6h;
+AWSCloudTrail
+| where TimeGenerated > ago(timewindow)
+| where EventName in ("RunInstances", "StartInstances", "CreateFunction20150331")
+| extend InstanceType = tostring(parse_json(RequestParameters).instanceType)
+| extend IsGPU = InstanceType has_any ("p3", "p4", "g4", "g5", "inf1")
+| extend IsUnusualRegion = AWSRegion has_any ("af-south", "ap-east", "me-south", "eu-south")
+| where IsGPU or IsUnusualRegion
+| summarize
+    InstancesLaunched = count(),
+    InstanceTypes = make_set(InstanceType, 10),
+    Regions = make_set(AWSRegion, 5),
+    GPUInstances = countif(IsGPU),
+    UnusualRegions = countif(IsUnusualRegion)
+    by UserIdentityArn, SourceIpAddress
+| extend RiskScore = case(
+    GPUInstances >= 3, "CRITICAL",
+    UnusualRegions >= 2, "HIGH",
+    "MEDIUM")
+| project UserIdentityArn, SourceIpAddress, InstancesLaunched,
+    GPUInstances, UnusualRegions, RiskScore, InstanceTypes, Regions

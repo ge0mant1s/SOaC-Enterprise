@@ -1,0 +1,24 @@
+name: GTR-2025 Cloud Control Plane Governance
+version: "1.0.0"
+description: Hardened cloud governance aligned with CrowdStrike GTR-2025 threat intelligence.
+framework_alignment: [CrowdStrike GTR-2025, CIS Cloud Benchmarks, NIST 800-53]
+federation_controls:
+  change_approval: ciso_required
+  monitoring: continuous
+  golden_saml_prevention: signing_key_rotation_quarterly
+serverless_security:
+  code_review: required_before_deploy
+  runtime_protection: enabled
+  function_isolation: vpc_required
+resource_governance:
+  gpu_instances: approved_regions_only
+  cost_anomaly_detection: enabled
+  unused_resource_cleanup: monthly
+data_protection:
+  public_bucket_prevention: scp_enforced
+  encryption_at_rest: required
+  cross_account_data_sharing: explicit_approval
+metadata:
+  package: pkg-008
+  mitre_techniques: ["T1484.002", "T1525", "T1496", "T1098.001", "T1530"]
+  last_updated: "2025-03-28"

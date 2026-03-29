@@ -1,0 +1,29 @@
+// Advanced Cloud Persistence Detection - GTR-2025
+// Detects Lambda backdoors, IAM role chains, and API gateway abuse
+// MITRE: T1098, T1525, T1648
+let timewindow = 24h;
+let lambda_activity = AWSCloudTrail
+| where TimeGenerated > ago(timewindow)
+| where EventName in ("CreateFunction20150331", "UpdateFunctionCode20150331v2",
+    "AddPermission20150331", "CreateEventSourceMapping")
+| where SourceIpAddress != "cloudformation.amazonaws.com"
+| extend FunctionName = extract(@"functionName[\":\s]+(\w+)", 1, tostring(RequestParameters))
+| project TimeGenerated, UserIdentityArn, SourceIpAddress, EventName,
+    FunctionName, Category = "Lambda";
+let role_creation = AWSCloudTrail
+| where TimeGenerated > ago(timewindow)
+| where EventName in ("CreateRole", "AttachRolePolicy", "PutRolePolicy")
+| where RequestParameters has "Allow" and RequestParameters has "AssumeRole"
+| extend RoleName = extract(@"roleName[\":\s]+(\w+)", 1, tostring(RequestParameters))
+| project TimeGenerated, UserIdentityArn, SourceIpAddress, EventName,
+    RoleName, Category = "IAMRole";
+union lambda_activity, role_creation
+| summarize
+    PersistenceActions = make_set(EventName, 10),
+    Categories = make_set(Category),
+    ActionCount = count()
+    by UserIdentityArn, SourceIpAddress
+| extend RiskScore = case(
+    Categories has "Lambda" and Categories has "IAMRole", "CRITICAL",
+    ActionCount >= 5, "HIGH",
+    "MEDIUM")

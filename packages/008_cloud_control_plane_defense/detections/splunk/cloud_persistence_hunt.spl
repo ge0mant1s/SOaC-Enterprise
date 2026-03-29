@@ -1,0 +1,23 @@
+index=aws sourcetype="aws:cloudtrail"
+  eventName IN ("CreateFunction20150331","UpdateFunctionCode20150331v2",
+    "AddPermission20150331","CreateRole","CreateApiKey","CreateRestApi")
+  NOT sourceIPAddress="cloudformation.amazonaws.com"
+| eval persistence_type=case(
+    match(eventName, "Function|Permission"), "serverless_backdoor",
+    match(eventName, "CreateRole"), "iam_role_chain",
+    match(eventName, "Api"), "api_gateway_backdoor",
+    true(), "unknown")
+| stats count as action_count
+  values(persistence_type) as persistence_types
+  values(eventName) as actions
+  values(awsRegion) as regions
+  min(_time) as firstTime max(_time) as lastTime
+  BY userIdentity.arn sourceIPAddress
+| where action_count >= 2
+| eval risk_score=case(
+    mvcount(persistence_types) >= 2, "CRITICAL",
+    action_count >= 3, "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1098,T1525,T1648"
+| table firstTime lastTime userIdentity.arn sourceIPAddress action_count persistence_types actions risk_score mitre_techniques
+| sort -risk_score

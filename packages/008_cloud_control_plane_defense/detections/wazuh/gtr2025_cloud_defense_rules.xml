@@ -1,0 +1,54 @@
+<!-- SOaC pkg-008: Cloud Control Plane Defense GTR-2025 Rules -->
+<group name="soac,gtr2025,cloud,defense,">
+
+  <rule id="100601" level="15">
+    <if_sid>87801</if_sid>
+    <field name="azure.operationName" type="pcre2">(?:Set federation settings on domain|Set domain authentication|Add unverified domain)</field>
+    <description>SOaC GTR-2025: Federation configuration tampering detected - potential Golden SAML attack</description>
+    <mitre>
+      <id>T1484.002</id>
+      <id>T1606.002</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,cloud,federation,</group>
+  </rule>
+
+  <rule id="100602" level="13">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName" type="pcre2">(?:CreateFunction|UpdateFunctionCode|AddPermission)</field>
+    <field name="aws.sourceIPAddress" type="pcre2">(?!cloudformation\.amazonaws\.com)</field>
+    <description>SOaC GTR-2025: Serverless function modification from non-IaC source - potential Lambda backdoor</description>
+    <mitre>
+      <id>T1525</id>
+      <id>T1648</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,cloud,persistence,lambda,</group>
+  </rule>
+
+  <rule id="100603" level="14">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName" type="pcre2">(?:RunInstances|StartInstances)</field>
+    <field name="aws.requestParameters" type="pcre2">(?:p3|p4|g4|g5|inf1)</field>
+    <description>SOaC GTR-2025: GPU instance launch detected - potential crypto-mining or resource hijacking</description>
+    <mitre>
+      <id>T1496</id>
+      <id>T1578.002</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,cloud,resource_abuse,</group>
+  </rule>
+
+  <rule id="100604" level="13">
+    <if_sid>80200</if_sid>
+    <field name="aws.eventName" type="pcre2">(?:PutBucketPolicy|PutBucketAcl)</field>
+    <field name="aws.requestParameters" type="pcre2">Principal.*\*</field>
+    <description>SOaC GTR-2025: S3 bucket exposed to public - storage data exposure risk</description>
+    <mitre>
+      <id>T1530</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>gtr2025,cloud,storage,exposure,</group>
+  </rule>
+
+</group>

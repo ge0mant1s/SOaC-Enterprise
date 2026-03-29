@@ -1,0 +1,90 @@
+name: defend-cloud-control-plane-gtr2025
+version: "1.0.0"
+description: |
+  GTR-2025 aligned proactive cloud control plane defense. Detects and responds
+  to federation tampering, serverless backdoors, resource hijacking, and
+  advanced persistence techniques in cloud environments.
+severity: CRITICAL
+mitre_attack:
+  tactics: [Persistence, Impact, Defense Evasion]
+  techniques: [T1484.002, T1525, T1496, T1098.001, T1530]
+trigger:
+  source: sentinel_alert
+  conditions:
+    - alert_type: "gtr2025_cloud_identity_hunt"
+      severity: ["critical", "high"]
+    - alert_type: "cloud_persistence_detection"
+      severity: ["critical"]
+  cooldown: 300
+inputs:
+  threat_type:
+    type: enum
+    values: [federation_tampering, serverless_backdoor, resource_hijacking, storage_exposure]
+    required: true
+  affected_resources:
+    type: list
+    required: true
+  incident_id:
+    type: string
+    required: true
+steps:
+  - id: snapshot_current_state
+    action: aws.config_snapshot
+    description: "Capture current cloud configuration state for forensic baseline"
+    target: "{{ inputs.affected_resources }}"
+    parameters: {include: [iam, compute, storage, networking, serverless]}
+    timeout: 120
+    on_failure: continue
+
+  - id: contain_threat
+    action: cloud.dynamic_containment
+    description: "Apply threat-specific containment based on attack type"
+    target: "{{ inputs.affected_resources }}"
+    parameters:
+      threat_type: "{{ inputs.threat_type }}"
+      actions:
+        federation_tampering: [revert_federation_settings, rotate_signing_certificates]
+        serverless_backdoor: [disable_function, revoke_permissions, quarantine_code]
+        resource_hijacking: [terminate_instances, block_region_access]
+        storage_exposure: [revert_bucket_policy, enable_encryption]
+    timeout: 60
+    on_failure: alert
+
+  - id: hunt_for_persistence
+    action: cloud.threat_hunt
+    description: "GTR-2025 aligned persistence hunt across cloud environment"
+    target: all_accounts
+    parameters:
+      hunt_patterns: [dormant_roles, unused_keys, orphaned_functions, external_trust_policies]
+      timerange: "90d"
+    timeout: 600
+    on_failure: continue
+
+  - id: enforce_guardrails
+    action: aws.update_scp
+    description: "Deploy preventive SCPs based on detected attack pattern"
+    parameters:
+      policies:
+        - deny_federation_changes_without_approval
+        - deny_gpu_instances_outside_approved_regions
+        - deny_public_s3_buckets
+    timeout: 60
+    on_failure: alert
+
+  - id: notify_cloud_security
+    action: notification.send
+    parameters:
+      channels: [cloud_security, soc_critical, ciso_direct]
+      template: gtr2025_cloud_defense
+    timeout: 10
+    on_failure: log
+
+outputs:
+  containment_status: {value: "{{ steps.contain_threat.status }}"}
+  persistence_findings: {value: "{{ steps.hunt_for_persistence.outputs }}"}
+  guardrails_deployed: {value: "{{ steps.enforce_guardrails.status }}"}
+
+governance:
+  requires_ai_oversight: true
+  blast_radius: multi_account
+  approval_required_for: [scp_deployment, federation_revert]

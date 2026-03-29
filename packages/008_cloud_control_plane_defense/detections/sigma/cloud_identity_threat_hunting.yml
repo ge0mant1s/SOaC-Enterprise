@@ -1,0 +1,42 @@
+title: Cloud Identity Threat Hunting - GTR-2025 Aligned
+id: h7c8e6f5-9g2d-7i1e-f6h0-8k3f7h2i4g01
+status: production
+level: high
+description: |
+  Proactive threat hunting rule aligned with CrowdStrike GTR-2025 cloud
+  identity threat patterns. Detects unusual identity activities including
+  service principal abuse, managed identity misuse, and federation tampering.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.persistence
+  - attack.t1098.001
+  - attack.t1136.003
+  - attack.defense_evasion
+  - attack.t1484.002
+logsource:
+  product: azure
+  service: auditlogs
+detection:
+  selection_federation:
+    Operation:
+      - 'Set federation settings on domain'
+      - 'Set domain authentication'
+      - 'Add unverified domain'
+  selection_service_principal:
+    Operation:
+      - 'Add service principal credentials'
+      - 'Update service principal'
+    ModifiedProperties.NewValue|contains:
+      - 'keyCredential'
+      - 'passwordCredential'
+  selection_managed_identity:
+    Operation:
+      - 'Add managed identity credentials'
+      - 'Update managed identity'
+    ResultStatus: 'Success'
+  condition: selection_federation or selection_service_principal or selection_managed_identity
+falsepositives:
+  - Legitimate federation configuration by identity team
+  - Service principal rotation by DevOps

@@ -1,0 +1,43 @@
+title: Cloud Persistence Backdoor - GTR-2025 Techniques
+id: h7c8e6f5-9g2d-7i1e-f6h0-8k3f7h2i4g03
+status: production
+level: critical
+description: |
+  Detects advanced cloud persistence techniques documented in GTR-2025 including
+  Lambda/Function backdoors, IAM role chain persistence, and API gateway abuse.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.persistence
+  - attack.t1098
+  - attack.t1525
+  - attack.execution
+  - attack.t1648
+logsource:
+  product: aws
+  service: cloudtrail
+detection:
+  selection_lambda_backdoor:
+    eventName:
+      - 'CreateFunction20150331'
+      - 'UpdateFunctionCode20150331v2'
+      - 'AddPermission20150331'
+    requestParameters.runtime|contains:
+      - 'python'
+      - 'nodejs'
+  selection_role_chain:
+    eventName: 'CreateRole'
+    requestParameters.assumeRolePolicyDocument|contains: '"Effect":"Allow"'
+  selection_api_gateway:
+    eventName:
+      - 'CreateRestApi'
+      - 'CreateApiKey'
+      - 'UpdateRestApi'
+  filter_known:
+    userIdentity.principalId|contains: 'AIDA'
+    sourceIPAddress: 'cloudformation.amazonaws.com'
+  condition: (selection_lambda_backdoor or selection_role_chain or selection_api_gateway) and not filter_known
+falsepositives:
+  - Legitimate serverless deployments
+  - IaC pipeline operations

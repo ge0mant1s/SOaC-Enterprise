@@ -1,0 +1,8 @@
+{
+  "ioa_definitions": [
+    {"name": "Federation Tampering - Golden SAML Risk", "description": "Detects modification of federation settings that could enable token forging", "severity": "critical", "platform": "cloud", "tactic": "Persistence", "technique": "T1484.002", "disposition": "BLOCK_AND_ALERT", "pattern": {"type": "cloud_api_activity", "conditions": {"event_names": ["Set federation settings on domain", "Set domain authentication"]}}, "response_actions": ["block_change", "alert_soc", "snapshot_config"]},
+    {"name": "Serverless Backdoor Detection", "description": "Detects Lambda/Function creation or modification from non-IaC sources", "severity": "high", "platform": "cloud", "tactic": "Persistence", "technique": "T1525", "disposition": "DETECT_AND_ALERT", "pattern": {"type": "cloud_api_activity", "conditions": {"event_names": ["CreateFunction", "UpdateFunctionCode"], "exclude_sources": ["cloudformation.amazonaws.com", "terraform"]}}, "response_actions": ["alert_soc", "analyze_function_code"]},
+    {"name": "Cloud Resource Hijacking", "description": "Detects GPU instance launches and unusual region activity indicating crypto-mining", "severity": "high", "platform": "cloud", "tactic": "Impact", "technique": "T1496", "disposition": "DETECT_AND_ALERT", "pattern": {"type": "cloud_api_activity", "conditions": {"event_name": "RunInstances", "instance_types": ["p3.*", "p4.*", "g4.*", "g5.*"]}}, "response_actions": ["terminate_instances", "alert_soc"]}
+  ],
+  "metadata": {"package": "pkg-008", "version": "1.0.0", "last_updated": "2025-03-28"}
+}

@@ -1,0 +1,31 @@
+// GTR-2025 Cloud Identity Threat Hunt
+// Proactive hunting for federation tampering, service principal abuse, managed identity misuse
+// MITRE: T1484.002, T1098.001, T1136.003
+let timewindow = 24h;
+let federation_changes = AuditLogs
+| where TimeGenerated > ago(timewindow)
+| where OperationName in ("Set federation settings on domain", "Set domain authentication",
+    "Add unverified domain", "Update domain")
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend Details = tostring(TargetResources[0].modifiedProperties)
+| project TimeGenerated, Actor, OperationName, Details, Category = "Federation";
+let sp_changes = AuditLogs
+| where TimeGenerated > ago(timewindow)
+| where OperationName in ("Add service principal credentials", "Update service principal",
+    "Add service principal", "Add app role assignment to service principal")
+| where TargetResources[0].modifiedProperties has_any ("keyCredential", "passwordCredential")
+| extend Actor = tostring(InitiatedBy.user.userPrincipalName)
+| extend TargetApp = tostring(TargetResources[0].displayName)
+| project TimeGenerated, Actor, OperationName, TargetApp, Category = "ServicePrincipal";
+union federation_changes, sp_changes
+| summarize
+    Actions = make_set(OperationName, 10),
+    Categories = make_set(Category),
+    ActionCount = count(),
+    FirstAction = min(TimeGenerated)
+    by Actor
+| extend RiskScore = case(
+    Categories has "Federation", "CRITICAL",
+    ActionCount >= 5, "HIGH",
+    "MEDIUM")
+| project TimeGenerated = FirstAction, Actor, ActionCount, Categories, Actions, RiskScore
