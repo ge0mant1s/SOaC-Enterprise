@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - "session-"
+      - "session-*"
   workflow_dispatch:
 
 jobs:
@@ -19,54 +19,72 @@ jobs:
       - name: Checkout repository (full fetch)
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0           # full fetch to avoid missing files
+          fetch-depth: 0
           persist-credentials: true
-          submodules: recursive   # enable if repo uses submodules; remove if not needed
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
-          check-latest: false
 
-      - name: Show repo root + packages debug
-        run: |
-          echo "WORKSPACE: $GITHUB_WORKSPACE"
-          echo "PWD:" && pwd
-          echo "Repo root listing:"
-          ls -la "${GITHUB_WORKSPACE}" || true
-          echo "packages/ listing (if present):"
-          ls -la "${GITHUB_WORKSPACE}/packages" || true
-          echo "tools/ listing:"
-          ls -la "${GITHUB_WORKSPACE}/tools" || true
-          echo "tools/soac-harness listing:"
-          ls -la "${GITHUB_WORKSPACE}/tools/soac-harness" || true
-
-      - name: Cache npm & node_modules
-        uses: actions/cache@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          path: |
-            ~/.npm
-            tools/soac-harness/node_modules
-          key: ${{ runner.os }}-soac-harness-${{ hashFiles('tools/soac-harness/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-soac-harness-
+          python-version: '3.11'
 
-      - name: Install dependencies (use CI if lockfile exists)
+      - name: Auto-Fix GovernancePolicy Kind
+        run: |
+          echo "Normalizing GovernancePolicy -> Policy..."
+          # Find all YAML files and replace the kind string
+          find packages -type f \( -name "*.yaml" -o -name "*.yml" \) -exec sed -i 's/kind: GovernancePolicy/kind: Policy/g' {} +
+          
+          # Commit changes if any were made
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/
+          if ! git diff --cached --quiet; then
+            git commit -m "fix: normalize GovernancePolicy to Policy kind"
+            git push
+          else
+            echo "No kind changes needed."
+          fi
+
+      - name: Install YAML Validator
+        run: pip install ruamel.yaml
+
+      - name: Strict YAML Duplicate Key Check
+        run: |
+          python3 -c "
+          import glob, sys
+          from ruamel.yaml import YAML
+          yaml = YAML()
+          errors = 0
+          files = glob.glob('packages/**/*.yml', recursive=True) + glob.glob('packages/**/*.yaml', recursive=True)
+          for f in files:
+              try:
+                  with open(f, 'r') as stream:
+                      yaml.load(stream)
+              except Exception as e:
+                  print(f'❌ YAML Error in {f}: {e}')
+                  errors += 1
+          if errors > 0:
+              print(f'\nTotal Errors: {errors}')
+              sys.exit(1)
+          print('✅ All YAML files are syntactically valid.')
+          "
+
+      - name: Install Harness Dependencies
         working-directory: tools/soac-harness
         run: |
           if [ -f package-lock.json ]; then
-            echo "package-lock.json found — using npm ci"
             npm ci
           else
-            echo "package-lock.json NOT found — using npm install"
             npm install
           fi
 
-      - name: Run unit tests
+      - name: Run SOaC Harness Validation
         working-directory: tools/soac-harness
         run: |
-          # validate path now points to repo-root/packages from tools/soac-harness
           npx ts-node src/index.ts validate --path ../../packages --level 2
 
       - name: Harness v3.0 validation (schema + package checks)
@@ -74,4 +92,4 @@ jobs:
         env:
           NODE_OPTIONS: '--max-old-space-size=4096'
         run: |
-          npx -y ts-node --
+          npx -y ts-node --transpile-only scripts/validate-packages.ts
