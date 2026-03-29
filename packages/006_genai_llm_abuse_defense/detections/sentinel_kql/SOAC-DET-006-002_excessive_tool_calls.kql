@@ -1,5 +1,0 @@
-// Detect excessive tool/API calls from an LLM agent session (possible loop/resource abuse)
-LLMGatewayLogs
-| summarize ToolCalls=count() by SessionId, AgentId, bin(TimeGenerated, 5m)
-| where ToolCalls > 50
-| extend AlertReason="Excessive LLM tool calls (possible autonomous loop/tool abuse)"

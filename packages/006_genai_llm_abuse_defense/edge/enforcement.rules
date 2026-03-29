@@ -1,1 +1,0 @@
-alert tcp any any -> $LLM_API_ENDPOINTS 443 (msg:"Potential LLM Jailbreak Pattern Detected"; content:"ignore all previous instructions"; nocase; sid:1000006;)

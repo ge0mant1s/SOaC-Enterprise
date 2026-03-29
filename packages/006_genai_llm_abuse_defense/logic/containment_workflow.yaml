@@ -1,9 +1,0 @@
-workflow: GenAI_Abuse_Response
-trigger:
-  source: Brain_LLM_Abuse_Alert
-  severity: High
-actions:
-  - action: Azure_OpenAI_Filter_Update
-  - action: CASB_Block_LLM_Session
-  - action: Notify_AI_Governance_Team
-  - action: Log_Prompt_for_Forensics

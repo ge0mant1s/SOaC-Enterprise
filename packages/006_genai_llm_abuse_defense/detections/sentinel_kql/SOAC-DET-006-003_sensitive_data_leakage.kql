@@ -1,5 +1,0 @@
-// Detect potential secrets/credentials in LLM outputs (best-effort patterns)
-LLMGatewayLogs
-| where EventType == "response"
-| where ResponseText matches regex @"(?i)(BEGIN PRIVATE KEY|AKIA[0-9A-Z]{16}|api[_-]?key|password\s*[:=])"
-| extend AlertReason="Potential sensitive data leakage in LLM response"
