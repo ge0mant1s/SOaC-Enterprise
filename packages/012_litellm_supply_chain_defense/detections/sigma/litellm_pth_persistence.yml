@@ -1,0 +1,46 @@
+title: LiteLLM .pth File Persistence Detection
+id: a1b2c3d4-e5f6-7890-abcd-ef0123456789
+status: stable
+level: critical
+description: |
+  Detects creation or modification of Python .pth files in site-packages
+  directories, a technique used by the trojanized LiteLLM package to
+  establish persistence and auto-execute malicious code on Python startup.
+author: SOaC Community
+date: 2026/03/28
+modified: 2026/03/28
+tags:
+  - attack.persistence
+  - attack.t1546.016
+  - attack.supply_chain
+  - cve.2024.litellm
+logsource:
+  category: file_event
+  product: windows
+detection:
+  selection_path:
+    TargetFilename|contains:
+      - '\site-packages\'
+      - '/site-packages/'
+    TargetFilename|endswith:
+      - '.pth'
+  selection_action:
+    EventType:
+      - 'FileCreate'
+      - 'FileModified'
+  filter_legitimate:
+    TargetFilename|contains:
+      - 'easy-install.pth'
+      - 'setuptools.pth'
+      - 'distutils-precedence.pth'
+  condition: selection_path and selection_action and not filter_legitimate
+falsepositives:
+  - Legitimate Python package installations that create .pth files
+  - Virtual environment creation
+  - Package manager operations (pip, conda)
+fields:
+  - TargetFilename
+  - User
+  - Image
+  - ProcessId
+  - Computer

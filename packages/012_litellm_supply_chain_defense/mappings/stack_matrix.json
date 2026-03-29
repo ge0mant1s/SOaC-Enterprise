@@ -1,0 +1,74 @@
+{
+  "package_id": "pkg-012",
+  "version": "1.0.0",
+  "stacks": {
+    "sigma": {
+      "files": [
+        "detections/sigma/litellm_pth_persistence.yml",
+        "detections/sigma/litellm_credential_env_access.yml",
+        "detections/sigma/litellm_supply_chain_indicators.yml"
+      ],
+      "count": 3,
+      "coverage": ["T1546.016", "T1552.001", "T1071.001", "T1567"]
+    },
+    "sentinel": {
+      "files": [
+        "detections/sentinel/litellm_credential_exfil.kql",
+        "detections/sentinel/litellm_pth_file_creation.kql",
+        "detections/sentinel/litellm_oauth_token_theft.kql"
+      ],
+      "count": 3,
+      "coverage": ["T1552.001", "T1567", "T1546.016", "T1528", "T1078.004"]
+    },
+    "splunk": {
+      "files": [
+        "detections/splunk/litellm_supply_chain_hunt.spl",
+        "detections/splunk/litellm_pip_package_anomaly.spl"
+      ],
+      "count": 2,
+      "coverage": ["T1195.002", "T1552.001", "T1071.001"]
+    },
+    "wazuh": {
+      "files": [
+        "detections/wazuh/litellm_supply_chain_rules.xml"
+      ],
+      "count": 1,
+      "rules": 5,
+      "rule_ids": [100801, 100802, 100803, 100804, 100805],
+      "coverage": ["T1546.016", "T1552.001", "T1071.001", "T1195.002"]
+    },
+    "crowdstrike": {
+      "files": [
+        "detections/crowdstrike/litellm_ioa_definitions.json"
+      ],
+      "count": 1,
+      "ioas": 3,
+      "coverage": ["T1546.016", "T1552.001", "T1528", "T1071.001"]
+    }
+  },
+  "playbooks": {
+    "claw": {
+      "files": [
+        "playbooks/claw/isolate_and_rotate_credentials.yaml",
+        "playbooks/claw/collect_forensic_evidence.yaml"
+      ],
+      "count": 2
+    },
+    "soar": {
+      "files": [
+        "playbooks/soar/litellm_incident_response.json"
+      ],
+      "count": 1
+    }
+  },
+  "policies": {
+    "conditional_access": {
+      "files": ["policies/conditional_access/ai_service_access_policy.json"],
+      "count": 1
+    },
+    "governance": {
+      "files": ["policies/governance/supply_chain_security_policy.yaml"],
+      "count": 1
+    }
+  }
+}

@@ -1,0 +1,112 @@
+# SOaC CLAW Playbook — LiteLLM Supply Chain: Forensic Evidence Collection
+# Collects memory dumps, process trees, network captures, and file artifacts
+# from a compromised host for incident response.
+
+name: collect-litellm-forensic-evidence
+version: "1.0.0"
+description: "Automated forensic evidence collection for LiteLLM supply chain compromise"
+severity: HIGH
+
+mitre_attack:
+  techniques:
+    - T1195.002
+    - T1552.001
+  tactics:
+    - Collection
+    - Initial Access
+
+trigger:
+  source: claw_playbook
+  conditions:
+    - field: parent_playbook
+      operator: equals
+      value: "isolate-and-rotate-litellm-credentials"
+
+inputs:
+  - name: affected_host
+    type: string
+    required: true
+  - name: incident_id
+    type: string
+    required: true
+
+steps:
+  - id: forensic-1
+    action: capture_memory
+    target: crowdstrike
+    description: "Capture volatile memory from Python processes"
+    parameters:
+      host: "{{ inputs.affected_host }}"
+      process_filter: "python*"
+      output_path: "/forensics/{{ inputs.incident_id }}/memory/"
+    timeout: 300s
+
+  - id: forensic-2
+    action: capture_process_tree
+    target: crowdstrike
+    description: "Export full process tree with command lines"
+    parameters:
+      host: "{{ inputs.affected_host }}"
+      include_network: true
+      include_file_ops: true
+      time_range: "24h"
+    timeout: 120s
+
+  - id: forensic-3
+    action: collect_artifacts
+    target: local
+    description: "Collect .pth files, pip logs, and modified packages"
+    parameters:
+      host: "{{ inputs.affected_host }}"
+      paths:
+        - "/usr/lib/python*/site-packages/*.pth"
+        - "/usr/local/lib/python*/site-packages/*.pth"
+        - "$HOME/.local/lib/python*/site-packages/*.pth"
+        - "/var/log/pip*.log"
+        - "/tmp/pip-*"
+      hash_algorithm: "sha256"
+      preserve_timestamps: true
+    timeout: 120s
+
+  - id: forensic-4
+    action: network_capture
+    target: network_tap
+    description: "Extract PCAP for outbound connections to C2 domains"
+    parameters:
+      host: "{{ inputs.affected_host }}"
+      filter: "host litellm-telemetry.io or host ai-proxy-cdn.com or host ml-analytics-pipe.net"
+      duration: "retrospective_24h"
+    timeout: 180s
+
+  - id: forensic-5
+    action: package_integrity_check
+    target: local
+    description: "Verify integrity of installed Python packages against PyPI hashes"
+    parameters:
+      host: "{{ inputs.affected_host }}"
+      packages: ["litellm", "openai", "anthropic", "httpx", "pydantic"]
+      verify_against: "pypi_hash_registry"
+    timeout: 120s
+
+  - id: forensic-6
+    action: archive_evidence
+    target: s3
+    description: "Package and upload all evidence to secure storage"
+    parameters:
+      bucket: "{{ env.FORENSICS_BUCKET }}"
+      prefix: "incidents/{{ inputs.incident_id }}/pkg-012/"
+      encrypt: true
+      retention: "365d"
+
+outputs:
+  - name: evidence_archive_url
+    source: steps.forensic-6.output.archive_url
+  - name: integrity_results
+    source: steps.forensic-5.output.verification_results
+  - name: suspicious_files
+    source: steps.forensic-3.output.collected_files
+
+governance:
+  requires_ai_oversight: true
+  chain_of_custody: strict
+  data_classification: "CONFIDENTIAL"
