@@ -1,1 +1,0 @@
-alert tcp any any -> $BANKING_API_IPS 443 (msg:"Unauthorized Access to Core Banking API"; content:"/api/v1/transfer"; nocase; sid:1000009;)

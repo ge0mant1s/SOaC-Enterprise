@@ -1,9 +1,0 @@
-workflow: Financial_Fraud_Containment
-trigger:
-  source: Brain_Financial_Fraud_Alert
-  severity: Critical
-actions:
-  - action: Core_Banking_API_Freeze_User
-  - action: SWIFT_Gateway_Hold_Transaction
-  - action: Entra_ID_Block_User
-  - action: Notify_Fraud_and_Compliance_Team
