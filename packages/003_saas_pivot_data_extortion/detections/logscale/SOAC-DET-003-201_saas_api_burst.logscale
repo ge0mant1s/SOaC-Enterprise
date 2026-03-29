@@ -1,6 +1,0 @@
-# id: SOAC-DET-003-201
-# name: SaaS API Enumeration Burst
-
-EventType=/API|Report|Export/
-| groupBy([UserId, IP], function=[count(as=api_calls)])
-| where api_calls >= 100
