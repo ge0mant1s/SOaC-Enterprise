@@ -23,14 +23,13 @@ logsource:
 detection:
   selection_download:
     CommandLine|contains:
-      - 'huggingface.co'
-      - 'civitai.com'
-      - 'modelscope.cn'
-    CommandLine|contains:
-      - 'wget'
-      - 'curl'
-      - 'git clone'
-      - 'git lfs'
+  - 'huggingface.co'
+  - 'civitai.com'
+  - 'modelscope.cn'
+  - 'wget'
+  - 'curl'
+  - 'git clone'
+  - 'git lfs'
   filter_trusted:
     CommandLine|contains:
       - '--revision main'
