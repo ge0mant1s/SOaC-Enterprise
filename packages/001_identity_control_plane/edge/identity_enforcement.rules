@@ -1,1 +1,0 @@
-alert tcp any any -> $HOME_NET 443 (msg:"Suspicious Identity Access Pattern Detected"; content:"/admin"; nocase; sid:1000001;)

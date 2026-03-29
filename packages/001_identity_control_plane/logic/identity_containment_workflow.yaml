@@ -1,9 +1,0 @@
-workflow: Identity_Protection_Containment
-trigger:
-  source: Brain_High_Risk_Identity_Access
-  severity: Critical
-actions:
-  - action: Entra_ID_Block_SignIn
-  - action: AWS_IAM_Deactivate_AccessKeys
-  - action: M365_Disable_Account
-  - action: Notify_CISO_and_Manager
