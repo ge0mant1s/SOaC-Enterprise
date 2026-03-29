@@ -3,7 +3,7 @@
 # for Python AI/ML libraries including LiteLLM.
 
 apiVersion: soac.io/v1
-kind: GovernancePolicy
+kind: Policy
 metadata:
   name: ai-ml-supply-chain-security
   package_id: pkg-012

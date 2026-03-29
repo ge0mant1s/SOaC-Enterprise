@@ -1,5 +1,5 @@
 apiVersion: soac.io/v1
-kind: GovernancePolicy
+kind: Policy
 metadata:
   name: identity-security-governance-aitm
   package_id: pkg-001
