@@ -1,30 +1,67 @@
 name: SOaC Gatekeeper (Harness v3.0)
 
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ main ]
+  push:
+    branches:
+      - main
+      - "session-*"
+  workflow_dispatch:
 
 jobs:
   validate-and-test:
+    name: Validate & Test (tools/soac-harness)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # Removed 'cache: npm' to avoid the "lock file not found" error 
-          # until you commit your package-lock.json
-          
-      - name: Install Dependencies
-        run: npm install # Use 'install' instead of 'ci' if lockfile is missing
-        
-      - name: 🛡️ Harness v3.0 Validation
-        run: npx ts-node scripts/validate-packages.ts
-        continue-on-error: false # Fail the build if a package is invalid
+          check-latest: false
 
-      - name: 🧪 Unit Tests
+      - name: Cache npm & node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            tools/soac-harness/node_modules
+          key: ${{ runner.os }}-soac-harness-${{ hashFiles('tools/soac-harness/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-soac-harness-
+
+      - name: Install dependencies (use CI if lockfile exists)
+        working-directory: tools/soac-harness
+        run: |
+          if [ -f package-lock.json ]; then
+            echo "package-lock.json found — using npm ci"
+            npm ci
+          else
+            echo "package-lock.json NOT found — using npm install"
+            npm install
+          fi
+
+      - name: Lint
+        working-directory: tools/soac-harness
+        run: npm run lint
+
+      - name: Run unit tests
+        working-directory: tools/soac-harness
         run: npm test
+
+      - name: Harness v3.0 validation (schema + package checks)
+        working-directory: tools/soac-harness
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+        run: |
+          # Exit non-zero on any validation failures (validator should do this)
+          npx -y ts-node --transpile-only scripts/validate-packages.ts
+
+      - name: Build
+        working-directory: tools/soac-harness
+        run: npm run build
