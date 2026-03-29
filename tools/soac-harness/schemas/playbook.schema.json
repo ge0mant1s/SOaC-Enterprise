@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Playbook",
+  "type": "object",
+  "properties": {
+    "name": { "type": "string" },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern": { "type": "string" }
+        },
+        "required": ["pattern"]
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": { "type": "string" }
+        },
+        "required": ["action"]
+      }
+    }
+  },
+  "required": ["name", "triggers", "steps"]
+}
