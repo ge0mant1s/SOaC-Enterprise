@@ -1,0 +1,43 @@
+title: Emergency Patch Bypass - Exploitation After Patch Window
+id: e4f5b3c2-6d9a-4f8b-c3e7-5h0c4e9f1d02
+status: production
+level: high
+description: |
+  Detects exploitation attempts targeting known vulnerabilities after patch
+  release but before deployment, indicating adversary awareness of patch gaps.
+  Correlates with CISA KEV catalog entries.
+author: SOaC Framework
+date: 2025/03/15
+modified: 2025/03/28
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - attack.t1210
+logsource:
+  category: webserver
+  product: any
+detection:
+  selection_exploit_patterns:
+    cs-uri-query|contains:
+      - '../../'
+      - '%00'
+      - 'JNDI:LDAP'
+      - 'cmd.exe'
+      - '/etc/passwd'
+      - 'union+select'
+  selection_cve_specific:
+    cs-uri-stem|contains:
+      - '/global-protect/portal'
+      - '/api/v1/totp/user-backup-code'
+      - '/dana-na/'
+      - '/_layouts/'
+      - '/ecp/'
+  selection_response:
+    sc-status:
+      - 200
+      - 301
+      - 302
+  condition: (selection_exploit_patterns or selection_cve_specific) and selection_response
+falsepositives:
+  - Vulnerability scanners
+  - Authorized security assessments

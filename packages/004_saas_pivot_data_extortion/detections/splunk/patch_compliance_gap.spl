@@ -1,0 +1,27 @@
+| inputlookup vulnerability_scan_results.csv
+| where severity IN ("Critical","High")
+  AND patch_available="true"
+  AND patch_applied="false"
+| eval days_unpatched=round((now() - strptime(first_detected, "%Y-%m-%dT%H:%M:%S")) / 86400, 0)
+| eval cisa_kev=if(match(cve_id, "CVE-2024-3400|CVE-2023-46805|CVE-2024-21887|CVE-2024-47575"), "YES", "NO")
+| stats count as vuln_count
+  dc(cve_id) as unique_cves
+  values(cve_id) as cve_list
+  max(days_unpatched) as max_days_unpatched
+  sum(eval(if(cisa_kev="YES",1,0))) as kev_count
+  BY host asset_criticality
+| join type=left host [
+  | search index=ids sourcetype="snort" OR sourcetype="suricata"
+    alert.signature="*exploit*" OR alert.signature="*CVE-*"
+    earliest=-24h
+  | stats count as exploit_attempts BY dest_ip
+  | rename dest_ip as host
+  ]
+| eval patch_risk=case(
+    kev_count > 0 AND exploit_attempts > 0, "CRITICAL",
+    kev_count > 0, "HIGH",
+    unique_cves >= 5 AND asset_criticality="critical", "HIGH",
+    true(), "MEDIUM")
+| eval mitre_techniques="T1190,T1210"
+| table host asset_criticality vuln_count unique_cves kev_count max_days_unpatched exploit_attempts patch_risk cve_list mitre_techniques
+| sort -patch_risk -kev_count
