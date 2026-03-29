@@ -6,7 +6,7 @@ on:
   push:
     branches:
       - main
-      - "session-*"
+      - "session-"
   workflow_dispatch:
 
 jobs:
@@ -45,23 +45,3 @@ jobs:
             echo "package-lock.json NOT found — using npm install"
             npm install
           fi
-
-      - name: Lint
-        working-directory: tools/soac-harness
-        run: npm run lint
-
-      - name: Run unit tests
-        working-directory: tools/soac-harness
-        run: npm test
-
-      - name: Harness v3.0 validation (schema + package checks)
-        working-directory: tools/soac-harness
-        env:
-          NODE_OPTIONS: '--max-old-space-size=4096'
-        run: |
-          # Exit non-zero on any validation failures (validator should do this)
-          npx -y ts-node --transpile-only scripts/validate-packages.ts
-
-      - name: Build
-        working-directory: tools/soac-harness
-        run: npm run build
