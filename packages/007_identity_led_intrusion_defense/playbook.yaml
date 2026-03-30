@@ -1,0 +1,194 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "identity-intrusion-containment"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  tags: ["pkg-007", "automated-response", "identity", "gtr-2025"]
+  mitre_attack: ["T1190", "T1505.003", "T1068", "T1021", "T1078", "T1557", "T1539", "T1550"]
+  severity: "CRITICAL"
+  package_id: "pkg-007"
+
+spec:
+  description: "Automated containment and remediation for identity-led intrusion chains. Revokes compromised sessions, forces MFA re-registration, disables account, rotates credentials, audits privileged actions, and contains lateral movement across M365, Entra ID, and AWS."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "in"
+        value: ["identity_intrusion_chain", "mfa_fatigue_confirmed", "token_replay_detected", "cross_cloud_pivot"]
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_identity"
+      type: "string"
+      required: true
+      description: "The compromised user principal name"
+    - name: "affected_cloud_accounts"
+      type: "array"
+      required: false
+      description: "List of cloud accounts (AWS, Azure, GCP) associated with the compromised identity"
+
+  steps:
+    - id: "step-1"
+      name: "revoke_all_active_sessions"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/users/{userId}/sessions/revoke-all"
+        method: "POST"
+        providers: ["entra_id", "microsoft_365", "aws_sso"]
+      timeout: "60s"
+      retry:
+        max_attempts: 3
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "force_mfa_reregistration"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/users/{userId}/mfa/reset"
+        method: "POST"
+        provider: "entra_id"
+        require_phishing_resistant: true
+        clear_existing_methods: true
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-3"
+      name: "disable_compromised_account"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/users/{userId}/disable"
+        method: "POST"
+        provider: "entra_id"
+        reason: "identity_intrusion_investigation"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-4"
+      name: "rotate_credentials_and_tokens"
+      action: "remediation"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/credentials/rotate-identity"
+        method: "POST"
+        user_id: "{target_identity}"
+        include_service_principals: true
+        include_app_passwords: true
+        include_api_keys: true
+      timeout: "120s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "rollback"
+    - id: "step-5"
+      name: "audit_privileged_actions"
+      action: "enrichment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/audit/privileged-actions"
+        method: "POST"
+        user_id: "{target_identity}"
+        timeframe: "72h"
+        include_entra_id: true
+        include_aws_cloudtrail: true
+        include_m365_uam: true
+      timeout: "120s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-6"
+      name: "contain_lateral_movement"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+        endpoint: "/enforce"
+        method: "POST"
+        action_type: "block_identity"
+        identity: "{target_identity}"
+        scope: ["rdp", "smb", "winrm", "ssh"]
+        ttl: "24h"
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-7"
+      name: "revoke_aws_federated_sessions"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/aws/sts/revoke-federated"
+        method: "POST"
+        identity: "{target_identity}"
+        revoke_assume_role: true
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-8"
+      name: "create_p1_incident"
+      action: "notification"
+      target: "INTERNAL"
+      parameters:
+        channel: "#soc-critical"
+        template: "identity_intrusion_incident"
+        ticket_system: "jira"
+        severity: "P1"
+        title: "Identity-Led Intrusion Chain — {target_identity}"
+        attach_audit_report: true
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "containment_status"
+      type: "string"
+      description: "Overall status of identity containment and credential rotation"
+    - name: "privileged_action_audit"
+      type: "object"
+      description: "Audit report of all privileged actions by the compromised identity"
+    - name: "lateral_movement_scope"
+      type: "array"
+      description: "List of hosts and services accessed via lateral movement"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "re_enable_account"
+        action: "api_call"
+        target: "BODY"
+        parameters:
+          action: "enable_user"
+          user_id: "{target_identity}"
+      - id: "rollback-2"
+        name: "lift_lateral_movement_block"
+        action: "api_call"
+        target: "EDGE"
+        parameters:
+          action: "unblock_identity"
+          identity: "{target_identity}"
+
+  governance:
+    requires_brain_oversight: true
+    max_blast_radius: "org"
+    audit_level: "verbose"
+    human_approval_required: true

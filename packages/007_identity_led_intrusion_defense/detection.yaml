@@ -1,0 +1,188 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+
+metadata:
+  name: "identity-led-intrusion-detection"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  package_id: "pkg-007"
+  mitre_attack:
+    - technique: "T1190"
+      tactic: "Initial Access"
+    - technique: "T1505.003"
+      tactic: "Persistence"
+    - technique: "T1068"
+      tactic: "Privilege Escalation"
+    - technique: "T1021"
+      tactic: "Lateral Movement"
+    - technique: "T1078"
+      tactic: "Defense Evasion"
+    - technique: "T1557"
+      tactic: "Credential Access"
+    - technique: "T1539"
+      tactic: "Credential Access"
+    - technique: "T1550"
+      tactic: "Lateral Movement"
+  severity: "CRITICAL"
+  confidence: "HIGH"
+  tags: ["pkg-007", "identity", "gtr-2025", "lateral-movement", "privilege-escalation"]
+
+spec:
+  description: "Detects identity-led intrusion chains aligned with CrowdStrike GTR-2025 findings: perimeter exploitation, web shell persistence, kernel privilege escalation, RDP/SMB lateral movement, and identity pivot from on-premises to cloud via federated identity abuse."
+
+  data_sources:
+    - name: "Azure AD Sign-In Logs"
+      type: "api"
+      fields: ["userPrincipalName", "ipAddress", "location", "riskState", "authenticationRequirement"]
+    - name: "Endpoint Process Logs"
+      type: "edr"
+      fields: ["process.name", "process.command_line", "process.parent", "user.name"]
+    - name: "Windows Security Event Log"
+      type: "siem"
+      fields: ["EventID", "TargetUserName", "LogonType", "IpAddress"]
+
+  logic:
+    type: "correlation"
+    timewindow: "15m"
+    implementations:
+      sentinel:
+        kql: |
+          // Stage 1: Detect impossible travel or anomalous sign-in
+          let anomalous_signin = SigninLogs
+          | where ResultType == 0
+          | where RiskLevelDuringSignIn in ("high", "medium")
+              or ConditionalAccessStatus == "failure"
+          | summarize SignInCount=count(), DistinctIPs=dcount(IPAddress),
+              Locations=make_set(LocationDetails.city, 5) by UserPrincipalName, bin(TimeGenerated, 15m)
+          | where DistinctIPs > 2 or SignInCount > 10;
+          // Stage 2: Detect MFA fatigue / push bombing
+          let mfa_fatigue = AADNonInteractiveUserSignInLogs
+          | where ResultType == 50074  // MFA required
+          | summarize MFAAttempts=count() by UserPrincipalName, bin(TimeGenerated, 5m)
+          | where MFAAttempts > 5;
+          // Stage 3: Detect token theft indicators (PRT/OAuth replay from new device)
+          let token_replay = SigninLogs
+          | where AuthenticationRequirement == "singleFactorAuthentication"
+          | where TokenIssuerType == "AzureAD"
+          | where DeviceDetail.isCompliant == false or isempty(DeviceDetail.deviceId)
+          | where RiskState has_any ("atRisk", "confirmedCompromised")
+          | project TokenTime=TimeGenerated, UserPrincipalName, IPAddress, DeviceDetail;
+          // Stage 4: Detect cross-cloud pivot (Entra ID to AWS)
+          let aws_pivot = AWSCloudTrail
+          | where EventName in ("AssumeRoleWithSAML", "AssumeRoleWithWebIdentity")
+          | where SourceIPAddress !in ("internal_range")
+          | project AWSTime=TimeGenerated, UserIdentityArn=UserIdentity.Arn, EventName, SourceIPAddress;
+          // Correlate anomalous sign-in with token replay or AWS pivot
+          anomalous_signin
+          | join kind=inner (token_replay) on UserPrincipalName
+          | union (
+              anomalous_signin
+              | join kind=leftouter (aws_pivot) on $left.UserPrincipalName == $right.UserIdentityArn
+          )
+      sigma:
+        rule: |
+          title: MFA Fatigue Attack - Excessive Push Notifications
+          status: experimental
+          logsource:
+            product: azure
+            service: signinlogs
+          detection:
+            selection:
+              ResultType: 50074
+            timeframe: 5m
+            condition: selection | count() by UserPrincipalName > 5
+          level: high
+          tags:
+            - attack.credential_access
+            - attack.t1621
+            - attack.t1078
+      splunk:
+        spl: |
+          index=azure sourcetype="azure:signinlogs" ResultType=0
+          | iplocation IPAddress
+          | stats dc(IPAddress) as unique_ips dc(City) as unique_locations count by UserPrincipalName _time span=15m
+          | where unique_ips > 2 OR unique_locations > 2
+          | eval risk_score=case(
+              unique_locations > 3, 95,
+              unique_ips > 4, 90,
+              unique_ips > 2, 80,
+              true(), 70)
+          | sort -risk_score
+          | table UserPrincipalName unique_ips unique_locations count risk_score _time
+      crowdstrike:
+        hunt: |
+          // CrowdStrike Falcon Identity: Lateral movement via RDP following privilege escalation
+          event_simpleName=UserLogon
+          | LogonType=10  // RemoteInteractive (RDP)
+          | join event_simpleName=ProcessRollup2 [search FileName IN ("whoami.exe", "net.exe", "nltest.exe", "dsquery.exe") earliest=-15m]
+          | stats count values(FileName) as recon_tools by aid UserName RemoteIP
+          | where count >= 2
+      wazuh:
+        rule: |
+          <group name="identity,intrusion,gtr-2025,">
+            <rule id="100901" level="14">
+              <if_sid>60122</if_sid>
+              <field name="win.system.eventID">4625</field>
+              <frequency>10</frequency>
+              <timeframe>300</timeframe>
+              <description>Brute force or MFA fatigue attack — excessive failed logons [GTR-2025]</description>
+              <mitre>
+                <id>T1078</id>
+                <id>T1557</id>
+              </mitre>
+            </rule>
+            <rule id="100902" level="13">
+              <if_sid>60106</if_sid>
+              <field name="win.system.eventID">4624</field>
+              <field name="win.eventdata.logonType">10</field>
+              <description>RDP lateral movement to new host [Identity-Led Intrusion]</description>
+              <mitre>
+                <id>T1021</id>
+                <id>T1550</id>
+              </mitre>
+            </rule>
+            <rule id="100903" level="14">
+              <if_sid>61603</if_sid>
+              <field name="win.eventdata.image" type="pcre2">nltest|dsquery|adfind|bloodhound</field>
+              <description>Active Directory reconnaissance tool execution [Privilege Escalation Chain]</description>
+              <mitre>
+                <id>T1068</id>
+                <id>T1078</id>
+              </mitre>
+            </rule>
+          </group>
+
+  tuning:
+    threshold: 1
+    whitelist: ["break-glass-admin@corp.example.com", "service-account-sync@corp.example.com"]
+    noise_reduction: "dedup_by_user_and_timewindow"
+
+  response:
+    playbook: "identity-intrusion-containment"
+    escalation: "auto"
+    notify: ["soc-team", "identity-team", "cloud-security-team"]
+
+  test_cases:
+    - name: "positive-impossible-travel"
+      description: "Sign-ins from 3+ countries within 15 minutes should trigger alert"
+      input:
+        event_type: "sign_in"
+        unique_locations: 4
+        timeframe_minutes: 10
+        severity: "CRITICAL"
+      expected_result: "alert"
+    - name: "positive-mfa-fatigue"
+      description: "More than 5 MFA push attempts in 5 minutes should trigger alert"
+      input:
+        event_type: "mfa_challenge"
+        attempt_count: 8
+        timeframe_minutes: 5
+      expected_result: "alert"
+    - name: "negative-legitimate-travel"
+      description: "Known break-glass admin account should not trigger alert"
+      input:
+        event_type: "sign_in"
+        user: "break-glass-admin@corp.example.com"
+        unique_locations: 3
+      expected_result: "no_alert"
