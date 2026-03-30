@@ -1,0 +1,107 @@
+apiVersion: soac.io/v1
+kind: Policy
+
+metadata:
+  name: "litellm-supply-chain-defense-policy"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  package_id: "pkg-012"
+  scope: "package"
+  tags: ["pkg-012", "supply-chain", "governance", "ai-infrastructure"]
+
+spec:
+  description: "Governs supply chain security controls for AI/ML infrastructure including package integrity verification, LiteLLM proxy network segmentation, credential management, and model endpoint access policies."
+
+  environments:
+    - name: "lab"
+      mode: "simulate"
+      data_handling: "synthetic"
+      network_access: "isolated"
+      persistence: "ephemeral"
+      package_policy:
+        registries: ["pypi.org"]
+        hash_verification: true
+        allow_prerelease: true
+    - name: "staging"
+      mode: "audit"
+      data_handling: "anonymized"
+      network_access: "restricted"
+      persistence: "persistent"
+      package_policy:
+        registries: ["pypi.org"]
+        hash_verification: true
+        allow_prerelease: false
+        pin_versions: true
+    - name: "production"
+      mode: "enforce"
+      data_handling: "live"
+      network_access: "segmented"
+      persistence: "persistent"
+      package_policy:
+        registries: ["internal-pypi.corp.example.com"]
+        hash_verification: true
+        allow_prerelease: false
+        pin_versions: true
+        require_sbom: true
+
+  actions:
+    allowed:
+      - "detect"
+      - "alert"
+      - "enrich"
+      - "contain_host"
+      - "rotate_credentials"
+      - "revoke_tokens"
+      - "block_domain"
+      - "audit_packages"
+      - "verify_hashes"
+      - "notify"
+    blocked:
+      - "delete_data"
+      - "exfiltrate"
+      - "disable_logging"
+      - "modify_package_registry"
+      - "bypass_hash_verification"
+    requires_approval:
+      - "rotate_credentials"
+      - "contain_host"
+      - "org_wide_rotation"
+
+  access_control:
+    roles:
+      - name: "soc_analyst"
+        permissions: ["read", "execute", "contain_host"]
+      - name: "ml_platform_engineer"
+        permissions: ["read", "write", "audit_packages", "verify_hashes"]
+      - name: "detection_engineer"
+        permissions: ["read", "write", "execute"]
+      - name: "admin"
+        permissions: ["read", "write", "execute", "admin", "org_wide_rotation"]
+    authentication:
+      required: true
+      methods: ["sso", "mfa"]
+    conditional_access:
+      ai_service_endpoints:
+        require_managed_identity: true
+        block_interactive_login: true
+        allowed_locations: ["corporate_network", "vpn"]
+
+  compliance:
+    frameworks: ["NIST CSF", "MITRE ATT&CK", "NIST SP 800-218", "SLSA Level 3"]
+    controls: ["DE.CM-1", "RS.RP-1", "PR.DS-6", "PR.IP-1"]
+    review_frequency: "quarterly"
+    supply_chain_controls:
+      sbom_required: true
+      provenance_verification: true
+      dependency_scanning: "continuous"
+      vulnerability_threshold: "critical"
+
+  audit:
+    log_level: "verbose"
+    retention: "365d"
+    immutable: true
+    package_audit:
+      track_installations: true
+      track_hash_changes: true
+      alert_on_unsigned: true

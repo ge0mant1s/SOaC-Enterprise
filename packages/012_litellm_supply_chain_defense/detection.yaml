@@ -1,0 +1,152 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+
+metadata:
+  name: "litellm-supply-chain-compromise-detection"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  package_id: "pkg-012"
+  mitre_attack:
+    - technique: "T1195.002"
+      tactic: "Initial Access"
+    - technique: "T1546.016"
+      tactic: "Persistence"
+    - technique: "T1552.001"
+      tactic: "Credential Access"
+    - technique: "T1528"
+      tactic: "Credential Access"
+    - technique: "T1567"
+      tactic: "Exfiltration"
+    - technique: "T1071.001"
+      tactic: "Command and Control"
+  severity: "CRITICAL"
+  confidence: "HIGH"
+  tags: ["pkg-012", "supply-chain", "litellm", "credential-access"]
+
+spec:
+  description: "Detects LiteLLM supply chain compromise via trojanized package installation, .pth persistence deployment, credential harvesting from environment variables, OAuth token theft, and exfiltration to C2 infrastructure."
+
+  data_sources:
+    - name: "Endpoint Process Logs"
+      type: "edr"
+      fields: ["process.name", "process.command_line", "file.path", "file.hash"]
+    - name: "Network Traffic"
+      type: "ndr"
+      fields: ["dns.query", "http.host", "http.user_agent", "destination.ip"]
+    - name: "Azure AD Sign-In Logs"
+      type: "api"
+      fields: ["servicePrincipalId", "ipAddress", "location", "appDisplayName"]
+
+  logic:
+    type: "correlation"
+    timewindow: "5m"
+    implementations:
+      sentinel:
+        kql: |
+          // Detect .pth file creation in Python site-packages
+          let pth_creation = DeviceFileEvents
+          | where FileName endswith ".pth"
+          | where FolderPath has "site-packages"
+          | where FileName != "distutils-precedence.pth"
+          | project PthTime=Timestamp, DeviceId, FileName, FolderPath, InitiatingProcessFileName;
+          // Detect credential environment variable access
+          let cred_access = DeviceProcessEvents
+          | where ProcessCommandLine has_any ("AWS_SECRET_ACCESS_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "LITELLM_MASTER_KEY", "AZURE_CLIENT_SECRET")
+          | where InitiatingProcessFileName in ("python", "python3", "python3.11")
+          | project CredTime=Timestamp, DeviceId, ProcessCommandLine, InitiatingProcessFileName;
+          // Detect outbound HTTPS to non-approved domains from Python
+          let exfil = DeviceNetworkEvents
+          | where InitiatingProcessFileName in ("python", "python3", "python3.11")
+          | where RemoteUrl has_any ("litellm-telemetry.io", "telemetry-api.io")
+          | project ExfilTime=Timestamp, DeviceId, RemoteUrl, RemoteIP;
+          // Correlate all three signals on same device within 5 minutes
+          pth_creation
+          | join kind=inner (cred_access) on DeviceId
+          | where abs(datetime_diff('minute', PthTime, CredTime)) <= 5
+          | join kind=inner (exfil) on DeviceId
+          | where abs(datetime_diff('minute', PthTime, ExfilTime)) <= 5
+          | project-reorder PthTime, DeviceId, FileName, ProcessCommandLine, RemoteUrl
+      sigma:
+        rule: |
+          title: LiteLLM Supply Chain - Suspicious .pth File in site-packages
+          status: experimental
+          logsource:
+            category: file_event
+            product: windows
+          detection:
+            selection:
+              TargetFilename|endswith: '.pth'
+              TargetFilename|contains: 'site-packages'
+            filter:
+              TargetFilename|contains: 'distutils-precedence'
+            condition: selection and not filter
+          level: critical
+          tags:
+            - attack.persistence
+            - attack.t1546.016
+      splunk:
+        spl: |
+          index=endpoint sourcetype=sysmon EventCode=11
+          | where match(TargetFilename, "site-packages.*\.pth$")
+          | where NOT match(TargetFilename, "distutils-precedence")
+          | eval risk_score=case(
+              match(Image, "pip|pip3"), 80,
+              match(Image, "python|python3"), 90,
+              true(), 70)
+          | stats count min(_time) as first_seen max(_time) as last_seen values(Image) as processes by ComputerName TargetFilename
+          | where count > 0
+          | sort -risk_score
+      crowdstrike:
+        hunt: |
+          // CrowdStrike Falcon Long-Term Search: Python package anomaly
+          event_simpleName=PeFileWritten
+          | FileName="*.pth" FilePath="*site-packages*"
+          | NOT FileName="distutils-precedence.pth"
+          | stats count earliest(timestamp) latest(timestamp) values(ParentBaseFileName) by aid FileName FilePath
+      wazuh:
+        rule: |
+          <group name="litellm,supply-chain,">
+            <rule id="100601" level="14">
+              <if_sid>550</if_sid>
+              <field name="file">.pth</field>
+              <field name="file">site-packages</field>
+              <description>LiteLLM Supply Chain: Suspicious .pth file created in site-packages</description>
+              <mitre>
+                <id>T1546.016</id>
+                <id>T1195.002</id>
+              </mitre>
+            </rule>
+          </group>
+
+  tuning:
+    threshold: 1
+    whitelist: ["distutils-precedence.pth", "README.pth"]
+    noise_reduction: "dedup_by_device"
+
+  response:
+    playbook: "isolate-and-rotate-litellm-credentials"
+    escalation: "auto"
+    notify: ["soc-team", "ml-platform-team"]
+
+  test_cases:
+    - name: "positive-pth-creation"
+      description: "Simulated .pth file creation in site-packages that should trigger alert"
+      input:
+        event_type: "file_creation"
+        file_path: "/opt/venv/lib/python3.11/site-packages/litellm_telemetry.pth"
+        severity: "CRITICAL"
+      expected_result: "alert"
+    - name: "positive-credential-harvest"
+      description: "Python process accessing multiple credential environment variables"
+      input:
+        event_type: "process_execution"
+        command_line: "python3 -c 'import os; os.environ["AWS_SECRET_ACCESS_KEY"]'"
+        severity: "CRITICAL"
+      expected_result: "alert"
+    - name: "negative-standard-pth"
+      description: "Standard distutils-precedence.pth should not trigger"
+      input:
+        event_type: "file_creation"
+        file_path: "/opt/venv/lib/python3.11/site-packages/distutils-precedence.pth"
+      expected_result: "no_alert"
