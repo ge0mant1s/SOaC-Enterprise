@@ -1,0 +1,294 @@
+name: SOaC Drift Detection
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Weekly Monday 08:00 UTC
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  drift-detect:
+    name: Detect Package Drift
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Run drift detection
+        id: drift
+        run: |
+          node << 'SCRIPT'
+          const fs = require('fs');
+          const path = require('path');
+
+          const PACKAGES_DIR = 'packages';
+          const MANIFEST_REQUIRED = [
+            'package_id', 'title', 'description', 'difficulty', 'tier',
+            'roles', 'mitre', 'stacks', 'schema_version', 'mitre_version',
+            'platform_targets', 'simulation_steps'
+          ];
+          const EXPECTED_FILES = ['manifest.json', 'metadata.yml'];
+          const OPTIONAL_FILES = ['detection.yaml', 'playbook.yaml', 'policy.yaml', 'scenario.json'];
+          const CANONICAL_PREFIX = /^\d{3}_/;
+
+          const report = { packages: [], orphans: [], duplicates: [], issues: [] };
+
+          // Discover all package dirs
+          const dirs = fs.readdirSync(PACKAGES_DIR)
+            .filter(d => fs.statSync(path.join(PACKAGES_DIR, d)).isDirectory())
+            .sort();
+
+          // Detect duplicates (same numeric prefix)
+          const prefixMap = {};
+          for (const d of dirs) {
+            const prefix = d.substring(0, 3);
+            if (!prefixMap[prefix]) prefixMap[prefix] = [];
+            prefixMap[prefix].push(d);
+          }
+          for (const [prefix, folders] of Object.entries(prefixMap)) {
+            if (folders.length > 1) {
+              report.duplicates.push({ prefix, folders });
+              report.issues.push({
+                type: 'duplicate',
+                severity: 'high',
+                message: `Duplicate prefix ${prefix}: ${folders.join(', ')}`,
+                auto_fixable: false
+              });
+            }
+          }
+
+          // Check each package
+          for (const pkg of dirs) {
+            const pkgDir = path.join(PACKAGES_DIR, pkg);
+            const pkgReport = { name: pkg, manifest: null, missing_fields: [], missing_files: [], warnings: [] };
+
+            // Check if it's a canonical package
+            if (!CANONICAL_PREFIX.test(pkg)) {
+              if (pkg !== 'vendor_packs') {
+                report.orphans.push(pkg);
+                report.issues.push({
+                  type: 'orphan',
+                  severity: 'medium',
+                  message: `Non-canonical directory: ${pkg}`,
+                  auto_fixable: false
+                });
+              }
+              continue;
+            }
+
+            // Check manifest.json
+            const manifestPath = path.join(pkgDir, 'manifest.json');
+            if (!fs.existsSync(manifestPath)) {
+              pkgReport.manifest = 'MISSING';
+              report.issues.push({
+                type: 'missing_manifest',
+                severity: 'critical',
+                message: `${pkg}: manifest.json missing`,
+                auto_fixable: false
+              });
+            } else {
+              try {
+                const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+                pkgReport.manifest = 'present';
+
+                // Check required fields
+                for (const field of MANIFEST_REQUIRED) {
+                  if (!(field in manifest) || manifest[field] === null || manifest[field] === undefined) {
+                    pkgReport.missing_fields.push(field);
+                    report.issues.push({
+                      type: 'missing_field',
+                      severity: 'high',
+                      message: `${pkg}: manifest.json missing required field "${field}"`,
+                      auto_fixable: false
+                    });
+                  }
+                }
+
+                // Check schema_version
+                if (manifest.schema_version && manifest.schema_version !== '3.0') {
+                  report.issues.push({
+                    type: 'wrong_version',
+                    severity: 'medium',
+                    message: `${pkg}: schema_version is "${manifest.schema_version}", expected "3.0"`,
+                    auto_fixable: false
+                  });
+                }
+
+                // Check tier value
+                const validTiers = ['Foundations', 'Intermediate', 'Advanced', 'Elite'];
+                if (manifest.tier && !validTiers.includes(manifest.tier)) {
+                  report.issues.push({
+                    type: 'invalid_tier',
+                    severity: 'medium',
+                    message: `${pkg}: tier "${manifest.tier}" not in canonical taxonomy`,
+                    auto_fixable: false
+                  });
+                }
+              } catch (e) {
+                pkgReport.manifest = 'INVALID';
+                report.issues.push({
+                  type: 'parse_error',
+                  severity: 'critical',
+                  message: `${pkg}: manifest.json parse error: ${e.message}`,
+                  auto_fixable: false
+                });
+              }
+            }
+
+            // Check expected files
+            for (const f of EXPECTED_FILES) {
+              if (!fs.existsSync(path.join(pkgDir, f))) {
+                pkgReport.missing_files.push(f);
+              }
+            }
+
+            // Check optional files
+            for (const f of OPTIONAL_FILES) {
+              if (!fs.existsSync(path.join(pkgDir, f))) {
+                pkgReport.warnings.push(`Optional file missing: ${f}`);
+              }
+            }
+
+            report.packages.push(pkgReport);
+          }
+
+          // Generate summary
+          const criticalCount = report.issues.filter(i => i.severity === 'critical').length;
+          const highCount = report.issues.filter(i => i.severity === 'high').length;
+          const mediumCount = report.issues.filter(i => i.severity === 'medium').length;
+
+          console.log('\n' + '='.repeat(70));
+          console.log('SOaC DRIFT DETECTION REPORT');
+          console.log('='.repeat(70));
+          console.log(`Packages scanned: ${report.packages.length}`);
+          console.log(`Duplicates found: ${report.duplicates.length}`);
+          console.log(`Orphan directories: ${report.orphans.length}`);
+          console.log(`Issues: ${criticalCount} critical, ${highCount} high, ${mediumCount} medium`);
+          console.log('='.repeat(70));
+
+          if (report.issues.length > 0) {
+            console.log('\nISSUES:\n');
+            for (const issue of report.issues) {
+              const icon = issue.severity === 'critical' ? '🔴' : issue.severity === 'high' ? '🟠' : '🟡';
+              console.log(`  ${icon} [${issue.severity.toUpperCase()}] ${issue.message}`);
+            }
+          }
+
+          // Per-package status
+          console.log('\nPER-PACKAGE STATUS:\n');
+          for (const pkg of report.packages) {
+            const status = pkg.missing_fields.length === 0 && pkg.manifest !== 'MISSING' && pkg.manifest !== 'INVALID' ? '✓' : '✗';
+            const warnings = pkg.warnings.length > 0 ? ` (${pkg.warnings.length} warnings)` : '';
+            console.log(`  ${status} ${pkg.name}${warnings}`);
+            if (pkg.missing_fields.length > 0) {
+              console.log(`      Missing fields: ${pkg.missing_fields.join(', ')}`);
+            }
+          }
+
+          // Write report as artifact
+          fs.writeFileSync('drift-report.json', JSON.stringify(report, null, 2));
+
+          // Set outputs for subsequent steps
+          const fs2 = require('fs');
+          const outputFile = process.env.GITHUB_OUTPUT || '/dev/null';
+          fs2.appendFileSync(outputFile, `has_issues=${report.issues.length > 0}\n`);
+          fs2.appendFileSync(outputFile, `critical_count=${criticalCount}\n`);
+          fs2.appendFileSync(outputFile, `high_count=${highCount}\n`);
+          fs2.appendFileSync(outputFile, `total_issues=${report.issues.length}\n`);
+          fs2.appendFileSync(outputFile, `duplicate_count=${report.duplicates.length}\n`);
+
+          if (report.issues.length > 0) {
+            console.log('\n⚠️  Drift detected — see details above');
+          } else {
+            console.log('\n✓ No drift detected — all packages aligned');
+          }
+          SCRIPT
+
+      - name: Upload drift report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-report
+          path: drift-report.json
+          retention-days: 30
+
+      - name: Create issue for critical/high drift
+        if: steps.drift.outputs.has_issues == 'true' && (steps.drift.outputs.critical_count != '0' || steps.drift.outputs.high_count != '0')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('drift-report.json', 'utf-8'));
+            const issues = report.issues.filter(i => i.severity === 'critical' || i.severity === 'high');
+
+            if (issues.length === 0) return;
+
+            const body = [
+              '## SOaC Drift Detection Report',
+              '',
+              `**Run:** ${context.runId} | **Date:** ${new Date().toISOString().split('T')[0]}`,
+              '',
+              '### Issues Found',
+              '',
+              ...issues.map(i => {
+                const icon = i.severity === 'critical' ? '🔴' : '🟠';
+                return `- ${icon} **[${i.severity.toUpperCase()}]** ${i.message}`;
+              }),
+              '',
+              '### Duplicates',
+              '',
+              ...(report.duplicates.length > 0
+                ? report.duplicates.map(d => `- Prefix \`${d.prefix}\`: ${d.folders.join(', ')}`)
+                : ['None detected']),
+              '',
+              '### Recommended Actions',
+              '',
+              '- Review and resolve each issue above',
+              '- For duplicate folders: keep the canonical name, remove the stale one via PR',
+              '- For missing manifest fields: add them following `core/templates/manifest_v3.0.json`',
+              '',
+              '---',
+              '*Auto-generated by SOaC Drift Detection workflow*'
+            ].join('\n');
+
+            // Check for existing open drift issues
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'soac-drift'
+            });
+
+            if (existing.data.length > 0) {
+              // Update existing issue
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.data[0].number,
+                body: body
+              });
+              console.log(`Updated existing drift issue #${existing.data[0].number}`);
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[SOaC Drift] ${issues.length} issue(s) detected`,
+                body: body,
+                labels: ['soac-drift']
+              });
+              console.log('Created new drift issue');
+            }
