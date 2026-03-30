@@ -1,0 +1,169 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "isolate-and-rotate-litellm-credentials"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  tags: ["pkg-012", "automated-response", "supply-chain"]
+  mitre_attack: ["T1195.002", "T1552.001", "T1528", "T1546.016", "T1567"]
+  severity: "CRITICAL"
+  package_id: "pkg-012"
+
+spec:
+  description: "Automated response to LiteLLM supply chain compromise: isolate affected host, enumerate and rotate stolen credentials, revoke OAuth tokens, block C2 domains, and create incident ticket."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "in"
+        value: ["litellm_supply_chain_compromise", "pth_persistence_detected", "credential_exfiltration"]
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_host"
+      type: "string"
+      required: true
+      description: "The compromised host identifier"
+    - name: "affected_credentials"
+      type: "array"
+      required: false
+      description: "List of credential names known to be exposed"
+
+  steps:
+    - id: "step-1"
+      name: "network_contain_host"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+        endpoint: "/api/v1/hosts/{hostId}/contain"
+        method: "POST"
+        provider: "crowdstrike"
+      timeout: "60s"
+      retry:
+        max_attempts: 3
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "enumerate_exposed_credentials"
+      action: "enrichment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/hosts/{hostId}/environment"
+        method: "GET"
+        filter_keys: ["AWS_SECRET_ACCESS_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "LITELLM_MASTER_KEY", "AZURE_CLIENT_SECRET", "DATABASE_URL"]
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-3"
+      name: "rotate_credentials_via_keyvault"
+      action: "remediation"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/keyvault/rotate-batch"
+        method: "POST"
+        credential_list: "{step-2.output.exposed_keys}"
+      timeout: "120s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "rollback"
+    - id: "step-4"
+      name: "revoke_oauth_tokens"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/oauth/revoke-by-host"
+        method: "POST"
+        providers: ["azure_ad", "openai", "anthropic"]
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-5"
+      name: "block_c2_domains"
+      action: "containment"
+      target: "EDGE"
+      parameters:
+        endpoint: "/enforce"
+        method: "POST"
+        action_type: "block_domain"
+        domains: ["litellm-telemetry.io", "telemetry-api.io"]
+        ttl: "7d"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+    - id: "step-6"
+      name: "remove_pth_persistence"
+      action: "remediation"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/hosts/{hostId}/files/remove"
+        method: "POST"
+        pattern: "site-packages/*.pth"
+        exclude: ["distutils-precedence.pth"]
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-7"
+      name: "create_p1_incident"
+      action: "notification"
+      target: "INTERNAL"
+      parameters:
+        channel: "#soc-critical"
+        template: "supply_chain_compromise"
+        ticket_system: "jira"
+        severity: "P1"
+        title: "LiteLLM Supply Chain Compromise — {target_host}"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "containment_status"
+      type: "string"
+      description: "Final status of host containment and credential rotation"
+    - name: "rotated_credentials"
+      type: "array"
+      description: "List of credentials that were successfully rotated"
+    - name: "revoked_tokens"
+      type: "array"
+      description: "List of OAuth tokens that were revoked"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "lift_network_containment"
+        action: "api_call"
+        target: "EDGE"
+        parameters:
+          action: "lift_containment"
+          host: "{target_host}"
+      - id: "rollback-2"
+        name: "restore_credentials_from_backup"
+        action: "api_call"
+        target: "BODY"
+        parameters:
+          action: "restore_credentials_from_backup"
+          credential_list: "{step-2.output.exposed_keys}"
+
+  governance:
+    requires_brain_oversight: true
+    max_blast_radius: "org"
+    audit_level: "verbose"
+    human_approval_required: true
