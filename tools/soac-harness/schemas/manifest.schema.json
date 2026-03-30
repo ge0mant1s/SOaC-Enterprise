@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://soacframe.io/schemas/manifest.schema.json",
+  "title": "SOaC Package Manifest v3.0",
+  "description": "JSON Schema for SOaC package manifest.json files — Harness v3.0 compliant",
+  "type": "object",
+  "required": [
+    "package_id",
+    "title",
+    "description",
+    "difficulty",
+    "tier",
+    "roles",
+    "mitre",
+    "stacks",
+    "schema_version",
+    "mitre_version",
+    "platform_targets",
+    "simulation_steps"
+  ],
+  "properties": {
+    "package_id": {
+      "type": "string",
+      "pattern": "^pkg-\\d{3}$",
+      "description": "Canonical package ID (e.g., pkg-001)"
+    },
+    "version": {
+      "type": "string",
+      "description": "Package version (semver)"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["3.0"],
+      "description": "Harness schema version"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Human-readable package title"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 10,
+      "description": "Package description"
+    },
+    "difficulty": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4,
+      "description": "1=Foundations, 2=Intermediate, 3=Advanced, 4=Elite"
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["Foundations", "Intermediate", "Advanced", "Elite"],
+      "description": "Canonical tier label"
+    },
+    "category": {
+      "type": "string",
+      "description": "Threat category"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Searchable tags"
+    },
+    "threat_actor": {
+      "type": "string",
+      "description": "Associated threat actor name"
+    },
+    "github_path": {
+      "type": "string",
+      "pattern": "^packages/\\d{3}_",
+      "description": "Relative path in GitHub repo"
+    },
+    "roles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Required roles (e.g., Red Team, Blue Team, SOC, CISO)"
+    },
+    "mitre": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^T\\d{4}(\\.\\d{3})?$"
+      },
+      "minItems": 1,
+      "description": "MITRE ATT&CK technique IDs"
+    },
+    "mitre_version": {
+      "type": "string",
+      "pattern": "^v\\d+\\.\\d+$",
+      "description": "MITRE ATT&CK version (e.g., v15.1)"
+    },
+    "stacks": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Detection stacks (e.g., sigma, sentinel, splunk, wazuh, crowdstrike)"
+    },
+    "platform_targets": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Target platforms (e.g., azure_ad, okta, entra_id, aws)"
+    },
+    "saas_targets": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "SaaS targets (optional)"
+    },
+    "simulation_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step_index", "role", "title", "technique"],
+        "properties": {
+          "step_index": { "type": "integer" },
+          "role": { "type": "string" },
+          "title": { "type": "string" },
+          "technique": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "description": "High-level simulation steps (public-safe)"
+    },
+    "lab_scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "type": { "type": "string" },
+          "estimated_minutes": { "type": "integer" }
+        }
+      },
+      "description": "Lab scenario references"
+    },
+    "created": { "type": "string" },
+    "updated": { "type": "string" },
+    "license": { "type": "string" },
+    "author": { "type": "string" }
+  },
+  "additionalProperties": false
+}

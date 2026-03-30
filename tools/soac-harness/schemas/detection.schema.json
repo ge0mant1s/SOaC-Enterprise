@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://soacframe.io/schemas/detection.schema.json",
+  "title": "SOaC Detection Rule v1",
+  "description": "JSON Schema for detection.yaml files — SOaC apiVersion soac.io/v1",
+  "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "properties": {
+    "apiVersion": {
+      "type": "string",
+      "const": "soac.io/v1",
+      "description": "Must be soac.io/v1"
+    },
+    "kind": {
+      "type": "string",
+      "const": "Detection",
+      "description": "Must be Detection"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "namespace": { "type": "string" },
+        "labels": { "type": "object" },
+        "annotations": { "type": "object" }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["rules"],
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+        },
+        "mitre": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "platforms": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "data_sources": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "query": { "type": "string" },
+              "platform": { "type": "string" },
+              "severity": { "type": "string" }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

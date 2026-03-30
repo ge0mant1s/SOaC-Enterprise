@@ -1,21 +1,49 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Policy",
+  "$id": "https://soacframe.io/schemas/policy.schema.json",
+  "title": "SOaC Policy v1",
+  "description": "JSON Schema for policy.yaml files — SOaC apiVersion soac.io/v1",
   "type": "object",
+  "required": ["apiVersion", "kind", "metadata", "spec"],
   "properties": {
-    "name": { "type": "string" },
-    "version": { "type": "string" },
-    "rules": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "description": { "type": "string" }
+    "apiVersion": {
+      "type": "string",
+      "const": "soac.io/v1",
+      "description": "Must be soac.io/v1"
+    },
+    "kind": {
+      "type": "string",
+      "const": "Policy",
+      "description": "Must be Policy"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "namespace": { "type": "string" },
+        "labels": { "type": "object" },
+        "annotations": { "type": "object" }
+      }
+    },
+    "spec": {
+      "type": "object",
+      "required": ["environments"],
+      "properties": {
+        "severity": { "type": "string" },
+        "scope": { "type": "string" },
+        "environments": {
+          "type": "object",
+          "description": "Environment-specific policy rules (lab, staging, production)",
+          "additionalProperties": {
+            "type": "object"
+          }
         },
-        "required": ["id", "description"]
+        "access_control": { "type": "object" },
+        "governance": { "type": "object" },
+        "audit": { "type": "object" }
       }
     }
   },
-  "required": ["name", "version", "rules"]
+  "additionalProperties": false
 }
