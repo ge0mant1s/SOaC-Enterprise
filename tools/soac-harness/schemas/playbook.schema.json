@@ -24,33 +24,6 @@
       "required": [
         "name"
       ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "version": {
-          "type": "string"
-        },
-        "author": {
-          "type": "string"
-        },
-        "created": {
-          "type": "string"
-        },
-        "tags": {
-          "type": "array"
-        },
-        "mitre_attack": {
-          "type": "array"
-        },
-        "severity": {
-          "type": "string"
-        },
-        "package_id": {
-          "type": "string"
-        }
-      },
       "additionalProperties": true
     },
     "spec": {
@@ -68,17 +41,6 @@
           "required": [
             "source"
           ],
-          "properties": {
-            "source": {
-              "type": "string"
-            },
-            "conditions": {
-              "type": "array"
-            },
-            "cooldown": {
-              "type": "string"
-            }
-          },
           "additionalProperties": true
         },
         "inputs": {
@@ -96,10 +58,16 @@
           "minItems": 1
         },
         "outputs": {
-          "type": "object"
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "Playbook output definitions (array of output objects)"
         },
         "rollback": {
-          "type": "array"
+          "type": "object",
+          "description": "Rollback configuration with steps",
+          "additionalProperties": true
         },
         "governance": {
           "type": "object"
