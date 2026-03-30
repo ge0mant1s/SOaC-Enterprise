@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://soacframe.io/schemas/manifest.schema.json",
   "title": "SOaC Package Manifest v3.0",
-  "description": "JSON Schema for SOaC package manifest.json files — Harness v3.0 compliant",
+  "description": "JSON Schema for SOaC package manifest.json files \u2014 Harness v3.0 compliant",
   "type": "object",
   "required": [
     "package_id",
@@ -30,7 +30,9 @@
     },
     "schema_version": {
       "type": "string",
-      "enum": ["3.0"],
+      "enum": [
+        "3.0"
+      ],
       "description": "Harness schema version"
     },
     "title": {
@@ -51,7 +53,12 @@
     },
     "tier": {
       "type": "string",
-      "enum": ["Foundations", "Intermediate", "Advanced", "Elite"],
+      "enum": [
+        "Foundations",
+        "Intermediate",
+        "Advanced",
+        "Elite"
+      ],
       "description": "Canonical tier label"
     },
     "category": {
@@ -60,12 +67,17 @@
     },
     "tags": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Searchable tags"
     },
     "threat_actor": {
-      "type": "string",
-      "description": "Associated threat actor name"
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Associated threat actor name (nullable for packages without a specific actor)"
     },
     "github_path": {
       "type": "string",
@@ -74,73 +86,65 @@
     },
     "roles": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {},
       "minItems": 1,
-      "description": "Required roles (e.g., Red Team, Blue Team, SOC, CISO)"
+      "description": "Required roles (string or object format)"
     },
     "mitre": {
       "type": "array",
-      "items": {
-        "type": "string",
-        "pattern": "^T\\d{4}(\\.\\d{3})?$"
-      },
+      "items": {},
       "minItems": 1,
-      "description": "MITRE ATT&CK technique IDs"
+      "description": "MITRE ATT&CK technique references (string IDs or objects)"
     },
     "mitre_version": {
       "type": "string",
-      "pattern": "^v\\d+\\.\\d+$",
-      "description": "MITRE ATT&CK version (e.g., v15.1)"
+      "description": "MITRE ATT&CK version (e.g., v15.1 or 16.1)"
     },
     "stacks": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Detection stacks (e.g., sigma, sentinel, splunk, wazuh, crowdstrike)"
+      "items": {},
+      "description": "Detection stacks (string or object format)"
     },
     "platform_targets": {
       "type": "array",
-      "items": { "type": "string" },
-      "description": "Target platforms (e.g., azure_ad, okta, entra_id, aws)"
+      "items": {
+        "type": "string"
+      },
+      "description": "Target platforms"
     },
     "saas_targets": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "SaaS targets (optional)"
     },
     "simulation_steps": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": ["step_index", "role", "title", "technique"],
-        "properties": {
-          "step_index": { "type": "integer" },
-          "role": { "type": "string" },
-          "title": { "type": "string" },
-          "technique": {
-            "type": "array",
-            "items": { "type": "string" }
-          }
-        }
+        "type": "object"
       },
-      "description": "High-level simulation steps (public-safe)"
+      "description": "High-level simulation steps"
     },
     "lab_scenarios": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "string" },
-          "title": { "type": "string" },
-          "type": { "type": "string" },
-          "estimated_minutes": { "type": "integer" }
-        }
+        "type": "object"
       },
       "description": "Lab scenario references"
     },
-    "created": { "type": "string" },
-    "updated": { "type": "string" },
-    "license": { "type": "string" },
-    "author": { "type": "string" }
+    "created": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string"
+    },
+    "author": {
+      "type": "string"
+    }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
