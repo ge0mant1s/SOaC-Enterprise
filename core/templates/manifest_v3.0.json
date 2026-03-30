@@ -1,0 +1,52 @@
+{
+  "$comment": "SOaC Harness v3.0 Manifest Template — copy this into packages/<NNN>_<slug>/manifest.json",
+  "package_id": "pkg-NNN",
+  "version": "1.0.0",
+  "title": "Package Title",
+  "description": "One-line description of the package.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "category": "threat-defense",
+  "tags": ["example-tag"],
+  "threat_actor": "Named threat actor or campaign",
+  "github_path": "packages/NNN_slug",
+  "roles": [
+    { "role": "soc_analyst", "label": "SOC Analyst" },
+    { "role": "threat_hunter", "label": "Threat Hunter" },
+    { "role": "incident_responder", "label": "Incident Responder" }
+  ],
+  "mitre": [
+    {
+      "technique_id": "T1234",
+      "technique_name": "Technique Name",
+      "tactic": "Tactic Name"
+    }
+  ],
+  "stacks": [
+    { "stack": "siem", "label": "SIEM" },
+    { "stack": "edr", "label": "EDR" }
+  ],
+  "created": "2026-01-01T00:00:00Z",
+  "updated": "2026-01-01T00:00:00Z",
+  "license": "Apache-2.0",
+  "author": "SOaC Community",
+
+  "schema_version": "3.0",
+  "mitre_version": "16.1",
+  "platform_targets": ["multi_platform"],
+  "simulation_steps": [
+    {
+      "step": 1,
+      "action": "Describe the simulation step",
+      "expected_detection": "Which detection rule should fire"
+    }
+  ],
+  "saas_targets": [],
+  "lab_scenarios": [
+    {
+      "id": "lab-NNN-01",
+      "title": "Lab scenario title",
+      "environment": "Description of lab environment"
+    }
+  ]
+}
