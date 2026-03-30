@@ -1,152 +1,161 @@
-
-import fs from 'fs';
-import path from 'path';
 import Ajv from 'ajv';
-import yaml from 'js-yaml';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as yaml from 'js-yaml';
 
-const ajv = new Ajv({ allErrors: true });
+const PACKAGES_DIR = path.resolve(__dirname, '../../../packages');
+const SCHEMAS_DIR = path.resolve(__dirname, '../schemas');
 
-// Load JSON schemas
-const playbookSchema = JSON.parse(fs.readFileSync(path.join(__dirname, '../schemas/playbook.schema.json'), 'utf-8'));
-const policySchema = JSON.parse(fs.readFileSync(path.join(__dirname, '../schemas/policy.schema.json'), 'utf-8'));
-
-const validatePlaybook = ajv.compile(playbookSchema);
-const validatePolicy = ajv.compile(policySchema);
-
-// Regex for semantic versioning
-const semverRegex = /^\d+\.\d+\.\d+(-[\w\.]+)?$/;
-
-// Regex for trigger pattern validation
-const triggerRegex = /^([\w\s]+)(\s*\|\|\s*[\w\s]+)*$/;
-
-function validatePackageVersion(version: string): boolean {
-  return semverRegex.test(version);
+interface ValidationResult {
+  package: string;
+  file: string;
+  valid: boolean;
+  errors?: string[];
 }
 
-function validateTriggerPattern(pattern: string): boolean {
-  return triggerRegex.test(pattern);
+function loadSchema(name: string): object {
+  const schemaPath = path.join(SCHEMAS_DIR, name);
+  if (!fs.existsSync(schemaPath)) {
+    throw new Error(`Schema not found: ${schemaPath}`);
+  }
+  return JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
 }
 
-// Define interfaces for expected YAML structure
-interface Playbook {
-  name: string;
-  triggers: { pattern: string }[];
-  steps: { action: string }[];
-}
-
-interface Policy {
-  name: string;
-  version: string;
-  rules: { id: string; description: string }[];
-}
-
-function validatePlaybookFile(filePath: string): string[] {
-  const errors: string[] = [];
+function validateFile(
+  filePath: string,
+  schema: object,
+  ajv: Ajv,
+  isYaml: boolean
+): { valid: boolean; errors: string[] } {
   try {
     const content = fs.readFileSync(filePath, 'utf-8');
-    const data = yaml.load(content) as Partial<Playbook> | undefined;
+    const data = isYaml ? yaml.load(content) : JSON.parse(content);
+    const validate = ajv.compile(schema);
+    const valid = validate(data);
+    if (!valid && validate.errors) {
+      return {
+        valid: false,
+        errors: validate.errors.map(
+          (e) => `${e.instancePath || '/'} ${e.message}`
+        ),
+      };
+    }
+    return { valid: true, errors: [] };
+  } catch (err: any) {
+    return { valid: false, errors: [`Parse error: ${err.message}`] };
+  }
+}
 
-    if (!data) {
-      errors.push(`Empty or invalid YAML in ${filePath}`);
-      return errors;
+function main() {
+  const ajv = new Ajv({ allErrors: true, strict: false });
+  const results: ValidationResult[] = [];
+
+  // Load schemas
+  const manifestSchema = loadSchema('manifest.schema.json');
+  const detectionSchema = loadSchema('detection.schema.json');
+  const playbookSchema = loadSchema('playbook.schema.json');
+  const policySchema = loadSchema('policy.schema.json');
+
+  // Discover packages
+  const packages = fs
+    .readdirSync(PACKAGES_DIR)
+    .filter((d) => fs.statSync(path.join(PACKAGES_DIR, d)).isDirectory())
+    .sort();
+
+  console.log(`\nValidating ${packages.length} packages...\n`);
+
+  for (const pkg of packages) {
+    const pkgDir = path.join(PACKAGES_DIR, pkg);
+
+    // 1. Validate manifest.json
+    const manifestPath = path.join(pkgDir, 'manifest.json');
+    if (fs.existsSync(manifestPath)) {
+      const r = validateFile(manifestPath, manifestSchema, ajv, false);
+      results.push({ package: pkg, file: 'manifest.json', ...r });
+    } else {
+      results.push({
+        package: pkg,
+        file: 'manifest.json',
+        valid: false,
+        errors: ['File not found'],
+      });
     }
 
-    if (!validatePlaybook(data)) {
-      errors.push(`Schema validation errors in ${filePath}: ${ajv.errorsText(validatePlaybook.errors)}`);
-    }
-
-    // Validate triggers regex
-    if (data.triggers) {
-      for (const trigger of data.triggers) {
-        if (typeof trigger.pattern !== 'string' || !validateTriggerPattern(trigger.pattern)) {
-          errors.push(`Invalid trigger pattern '${trigger && (trigger as any).pattern}' in ${filePath}`);
-        }
+    // 2. Validate detection*.yaml files
+    const detectionsDir = path.join(pkgDir, 'detections');
+    if (fs.existsSync(detectionsDir)) {
+      const detFiles = fs
+        .readdirSync(detectionsDir)
+        .filter((f) => f.startsWith('detection') && f.endsWith('.yaml'));
+      for (const df of detFiles) {
+        const r = validateFile(
+          path.join(detectionsDir, df),
+          detectionSchema,
+          ajv,
+          true
+        );
+        results.push({ package: pkg, file: `detections/${df}`, ...r });
       }
-    } else {
-      errors.push(`Missing 'triggers' property in ${filePath}`);
-    }
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      errors.push(`Failed to read or parse ${filePath}: ${e.message}`);
-    } else {
-      errors.push(`Failed to read or parse ${filePath}: unknown error`);
-    }
-  }
-  return errors;
-}
-
-function validatePolicyFile(filePath: string): string[] {
-  const errors: string[] = [];
-  try {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const data = yaml.load(content) as Partial<Policy> | undefined;
-
-    if (!data) {
-      errors.push(`Empty or invalid YAML in ${filePath}`);
-      return errors;
     }
 
-    if (!validatePolicy(data)) {
-      errors.push(`Schema validation errors in ${filePath}: ${ajv.errorsText(validatePolicy.errors)}`);
+    // 3. Validate playbook*.yaml files
+    const playbooksDir = path.join(pkgDir, 'playbooks');
+    if (fs.existsSync(playbooksDir)) {
+      const pbFiles = fs
+        .readdirSync(playbooksDir)
+        .filter((f) => f.startsWith('playbook') && f.endsWith('.yaml'));
+      for (const pf of pbFiles) {
+        const r = validateFile(
+          path.join(playbooksDir, pf),
+          playbookSchema,
+          ajv,
+          true
+        );
+        results.push({ package: pkg, file: `playbooks/${pf}`, ...r });
+      }
     }
 
-    // Validate version
-    if (data.version && !validatePackageVersion(data.version)) {
-      errors.push(`Invalid version '${data.version}' in ${filePath}`);
-    } else if (!data.version) {
-      errors.push(`Missing 'version' property in ${filePath}`);
-    }
-  } catch (e: unknown) {
-    if (e instanceof Error) {
-      errors.push(`Failed to read or parse ${filePath}: ${e.message}`);
-    } else {
-      errors.push(`Failed to read or parse ${filePath}: unknown error`);
+    // 4. Validate policy*.yaml files
+    const policiesDir = path.join(pkgDir, 'policies');
+    if (fs.existsSync(policiesDir)) {
+      const polFiles = fs
+        .readdirSync(policiesDir)
+        .filter((f) => f.startsWith('policy') && f.endsWith('.yaml'));
+      for (const pf of polFiles) {
+        const r = validateFile(
+          path.join(policiesDir, pf),
+          policySchema,
+          ajv,
+          true
+        );
+        results.push({ package: pkg, file: `policies/${pf}`, ...r });
+      }
     }
   }
-  return errors;
-}
 
-function findFiles(dir: string, fileName: string): string[] {
-  let results: string[] = [];
-  const list = fs.readdirSync(dir);
-  list.forEach(file => {
-    const filePath = path.join(dir, file);
-    const stat = fs.statSync(filePath);
-    if (stat && stat.isDirectory()) {
-      results = results.concat(findFiles(filePath, fileName));
-    } else if (file === fileName) {
-      results.push(filePath);
+  // Summary
+  const passed = results.filter((r) => r.valid).length;
+  const failed = results.filter((r) => !r.valid).length;
+
+  console.log('='.repeat(60));
+  console.log(`Results: ${passed} passed, ${failed} failed, ${results.length} total`);
+  console.log('='.repeat(60));
+
+  // Print failures
+  const failures = results.filter((r) => !r.valid);
+  if (failures.length > 0) {
+    console.log('\nFailures:\n');
+    for (const f of failures) {
+      console.log(`  ✗ ${f.package}/${f.file}`);
+      for (const e of f.errors || []) {
+        console.log(`      ${e}`);
+      }
     }
-  });
-  return results;
-}
-
-function validateAllPackages(rootDir: string): string[] {
-  const errors: string[] = [];
-
-  // Find all playbook.yaml and policy.yaml files
-  const playbookFiles = findFiles(rootDir, 'playbook.yaml');
-  const policyFiles = findFiles(rootDir, 'policy.yaml');
-
-  for (const file of playbookFiles) {
-    errors.push(...validatePlaybookFile(file));
-  }
-
-  for (const file of policyFiles) {
-    errors.push(...validatePolicyFile(file));
-  }
-
-  return errors;
-}
-
-if (require.main === module) {
-  const rootDir = process.argv[2] || '.';
-  const errors = validateAllPackages(rootDir);
-  if (errors.length > 0) {
-    console.error('Validation errors found:');
-    errors.forEach(e => console.error(`- ${e}`));
     process.exit(1);
   } else {
-    console.log('All SOaC packages validated successfully.');
+    console.log('\n✓ All validations passed\n');
+    process.exit(0);
   }
 }
+
+main();
