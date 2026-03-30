@@ -6,11 +6,14 @@ import * as yaml from 'js-yaml';
 const PACKAGES_DIR = path.resolve(__dirname, '../../../packages');
 const SCHEMAS_DIR = path.resolve(__dirname, '../schemas');
 
-interface ValidationResult {
+interface PackageResult {
   package: string;
-  file: string;
-  valid: boolean;
-  errors?: string[];
+  manifest: 'pass' | 'fail' | 'skip';
+  detection: 'pass' | 'fail' | 'warn';
+  playbook: 'pass' | 'fail' | 'warn';
+  policy: 'pass' | 'fail' | 'warn';
+  errors: string[];
+  warnings: string[];
 }
 
 function loadSchema(name: string): object {
@@ -48,7 +51,8 @@ function validateFile(
 
 function main() {
   const ajv = new Ajv({ allErrors: true, strict: false });
-  const results: ValidationResult[] = [];
+  const results: PackageResult[] = [];
+  let hardFailures = 0;
 
   // Load schemas
   const manifestSchema = loadSchema('manifest.schema.json');
@@ -62,95 +66,142 @@ function main() {
     .filter((d) => fs.statSync(path.join(PACKAGES_DIR, d)).isDirectory())
     .sort();
 
-  console.log(`\nValidating ${packages.length} packages...\n`);
+  console.log(`\nValidating ${packages.length} directories...\n`);
 
   for (const pkg of packages) {
     const pkgDir = path.join(PACKAGES_DIR, pkg);
+    const result: PackageResult = {
+      package: pkg,
+      manifest: 'skip',
+      detection: 'warn',
+      playbook: 'warn',
+      policy: 'warn',
+      errors: [],
+      warnings: [],
+    };
 
-    // 1. Validate manifest.json
+    // 1. manifest.json — required; if missing, skip entire package with warning
     const manifestPath = path.join(pkgDir, 'manifest.json');
-    if (fs.existsSync(manifestPath)) {
-      const r = validateFile(manifestPath, manifestSchema, ajv, false);
-      results.push({ package: pkg, file: 'manifest.json', ...r });
+    if (!fs.existsSync(manifestPath)) {
+      result.manifest = 'skip';
+      result.warnings.push('No manifest.json — skipping package');
+      results.push(result);
+      continue;
+    }
+
+    const mResult = validateFile(manifestPath, manifestSchema, ajv, false);
+    if (mResult.valid) {
+      result.manifest = 'pass';
     } else {
-      results.push({
-        package: pkg,
-        file: 'manifest.json',
-        valid: false,
-        errors: ['File not found'],
-      });
+      result.manifest = 'fail';
+      result.errors.push(...mResult.errors.map((e) => `manifest.json: ${e}`));
+      hardFailures++;
     }
 
-    // 2. Validate detection*.yaml files
-    const detectionsDir = path.join(pkgDir, 'detections');
-    if (fs.existsSync(detectionsDir)) {
-      const detFiles = fs
-        .readdirSync(detectionsDir)
-        .filter((f) => f.startsWith('detection') && f.endsWith('.yaml'));
-      for (const df of detFiles) {
-        const r = validateFile(
-          path.join(detectionsDir, df),
-          detectionSchema,
-          ajv,
-          true
-        );
-        results.push({ package: pkg, file: `detections/${df}`, ...r });
+    // 2. detection.yaml — root level; warn if missing, fail if invalid
+    const detPath = path.join(pkgDir, 'detection.yaml');
+    if (fs.existsSync(detPath)) {
+      const dResult = validateFile(detPath, detectionSchema, ajv, true);
+      if (dResult.valid) {
+        result.detection = 'pass';
+      } else {
+        result.detection = 'fail';
+        result.errors.push(...dResult.errors.map((e) => `detection.yaml: ${e}`));
+        hardFailures++;
       }
+    } else {
+      result.detection = 'warn';
+      result.warnings.push('detection.yaml not found');
     }
 
-    // 3. Validate playbook*.yaml files
-    const playbooksDir = path.join(pkgDir, 'playbooks');
-    if (fs.existsSync(playbooksDir)) {
-      const pbFiles = fs
-        .readdirSync(playbooksDir)
-        .filter((f) => f.startsWith('playbook') && f.endsWith('.yaml'));
-      for (const pf of pbFiles) {
-        const r = validateFile(
-          path.join(playbooksDir, pf),
-          playbookSchema,
-          ajv,
-          true
-        );
-        results.push({ package: pkg, file: `playbooks/${pf}`, ...r });
+    // 3. playbook.yaml — root level; warn if missing, fail if invalid
+    const pbPath = path.join(pkgDir, 'playbook.yaml');
+    if (fs.existsSync(pbPath)) {
+      const pResult = validateFile(pbPath, playbookSchema, ajv, true);
+      if (pResult.valid) {
+        result.playbook = 'pass';
+      } else {
+        result.playbook = 'fail';
+        result.errors.push(...pResult.errors.map((e) => `playbook.yaml: ${e}`));
+        hardFailures++;
       }
+    } else {
+      result.playbook = 'warn';
+      result.warnings.push('playbook.yaml not found');
     }
 
-    // 4. Validate policy*.yaml files
-    const policiesDir = path.join(pkgDir, 'policies');
-    if (fs.existsSync(policiesDir)) {
-      const polFiles = fs
-        .readdirSync(policiesDir)
-        .filter((f) => f.startsWith('policy') && f.endsWith('.yaml'));
-      for (const pf of polFiles) {
-        const r = validateFile(
-          path.join(policiesDir, pf),
-          policySchema,
-          ajv,
-          true
-        );
-        results.push({ package: pkg, file: `policies/${pf}`, ...r });
+    // 4. policy.yaml — root level; warn if missing, fail if invalid
+    const polPath = path.join(pkgDir, 'policy.yaml');
+    if (fs.existsSync(polPath)) {
+      const polResult = validateFile(polPath, policySchema, ajv, true);
+      if (polResult.valid) {
+        result.policy = 'pass';
+      } else {
+        result.policy = 'fail';
+        result.errors.push(...polResult.errors.map((e) => `policy.yaml: ${e}`));
+        hardFailures++;
+      }
+    } else {
+      result.policy = 'warn';
+      result.warnings.push('policy.yaml not found');
+    }
+
+    results.push(result);
+  }
+
+  // Print summary table
+  console.log('='.repeat(90));
+  console.log(
+    'Package'.padEnd(50) +
+    'Manifest'.padEnd(10) +
+    'Detection'.padEnd(11) +
+    'Playbook'.padEnd(10) +
+    'Policy'.padEnd(8)
+  );
+  console.log('-'.repeat(90));
+
+  for (const r of results) {
+    const icon = (s: string) =>
+      s === 'pass' ? '✓' : s === 'fail' ? '✗' : s === 'warn' ? '⚠' : '⊘';
+    console.log(
+      r.package.padEnd(50) +
+      icon(r.manifest).padEnd(10) +
+      icon(r.detection).padEnd(11) +
+      icon(r.playbook).padEnd(10) +
+      icon(r.policy).padEnd(8)
+    );
+  }
+
+  console.log('='.repeat(90));
+
+  // Print errors
+  const withErrors = results.filter((r) => r.errors.length > 0);
+  if (withErrors.length > 0) {
+    console.log('\nErrors (cause CI failure):\n');
+    for (const r of withErrors) {
+      for (const e of r.errors) {
+        console.log(`  ✗ ${r.package}: ${e}`);
       }
     }
   }
 
-  // Summary
-  const passed = results.filter((r) => r.valid).length;
-  const failed = results.filter((r) => !r.valid).length;
-
-  console.log('='.repeat(60));
-  console.log(`Results: ${passed} passed, ${failed} failed, ${results.length} total`);
-  console.log('='.repeat(60));
-
-  // Print failures
-  const failures = results.filter((r) => !r.valid);
-  if (failures.length > 0) {
-    console.log('\nFailures:\n');
-    for (const f of failures) {
-      console.log(`  ✗ ${f.package}/${f.file}`);
-      for (const e of f.errors || []) {
-        console.log(`      ${e}`);
+  // Print warnings
+  const withWarnings = results.filter((r) => r.warnings.length > 0);
+  if (withWarnings.length > 0) {
+    console.log('\nWarnings (informational only):\n');
+    for (const r of withWarnings) {
+      for (const w of r.warnings) {
+        console.log(`  ⚠ ${r.package}: ${w}`);
       }
     }
+  }
+
+  const passed = results.filter((r) => r.errors.length === 0).length;
+  const failed = results.filter((r) => r.errors.length > 0).length;
+  console.log(`\nSummary: ${passed} packages clean, ${failed} packages with errors, ${hardFailures} total validation failures`);
+
+  if (hardFailures > 0) {
+    console.log('\n✗ Validation FAILED\n');
     process.exit(1);
   } else {
     console.log('\n✓ All validations passed\n');
