@@ -1,0 +1,61 @@
+{
+  "package_id": "pkg-012",
+  "framework": "MITRE ATT&CK v15",
+  "techniques": [
+    {
+      "id": "T1195.002",
+      "name": "Supply Chain Compromise: Compromise Software Supply Chain",
+      "tactic": "Initial Access",
+      "detections": ["litellm_supply_chain_indicators.yml", "litellm_pip_package_anomaly.spl", "wazuh_rule_100804"],
+      "playbook_ref": "isolate-and-rotate-litellm-credentials"
+    },
+    {
+      "id": "T1552.001",
+      "name": "Unsecured Credentials: Credentials In Files",
+      "tactic": "Credential Access",
+      "detections": ["litellm_credential_env_access.yml", "litellm_credential_exfil.kql", "litellm_supply_chain_hunt.spl", "wazuh_rule_100802"],
+      "playbook_ref": "isolate-and-rotate-litellm-credentials"
+    },
+    {
+      "id": "T1528",
+      "name": "Steal Application Access Token",
+      "tactic": "Credential Access",
+      "detections": ["litellm_oauth_token_theft.kql", "ioa-012-002"],
+      "playbook_ref": "isolate-and-rotate-litellm-credentials"
+    },
+    {
+      "id": "T1078.004",
+      "name": "Valid Accounts: Cloud Accounts",
+      "tactic": "Defense Evasion",
+      "detections": ["litellm_oauth_token_theft.kql"],
+      "policy_ref": "ai_service_access_policy.json"
+    },
+    {
+      "id": "T1546.016",
+      "name": "Event Triggered Execution: Installer Packages",
+      "tactic": "Persistence",
+      "detections": ["litellm_pth_persistence.yml", "litellm_pth_file_creation.kql", "wazuh_rule_100801", "ioa-012-001"],
+      "playbook_ref": "collect-litellm-forensic-evidence"
+    },
+    {
+      "id": "T1071.001",
+      "name": "Application Layer Protocol: Web Protocols",
+      "tactic": "Command and Control",
+      "detections": ["litellm_supply_chain_indicators.yml", "wazuh_rule_100803", "ioa-012-003"],
+      "playbook_ref": "isolate-and-rotate-litellm-credentials"
+    },
+    {
+      "id": "T1567",
+      "name": "Exfiltration Over Web Service",
+      "tactic": "Exfiltration",
+      "detections": ["litellm_credential_exfil.kql", "litellm_supply_chain_hunt.spl"],
+      "playbook_ref": "isolate-and-rotate-litellm-credentials"
+    }
+  ],
+  "navigator_layer": {
+    "name": "pkg-012 LiteLLM Supply Chain Coverage",
+    "versions": {"layer": "4.5", "attack": "15"},
+    "domain": "enterprise-attack",
+    "description": "Detection coverage for LiteLLM supply chain attack defense package"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "package_id": "pkg-012",
+  "version": "1.0.0",
+  "title": "LiteLLM Supply Chain Attack Defense",
+  "description": "Full supply chain attack defense against AI/ML infrastructure compromise via LiteLLM proxy exploitation. Includes real detections across 5 SIEM platforms, automated response playbooks, governance policies, and complete validation evidence.",
+  "difficulty": 4,
+  "tier": "Elite",
+  "category": "Supply Chain",
+  "tags": ["supply-chain", "litellm", "ai", "credential-theft", "defense", "python", "ci-cd"],
+  "threat_actor": "Shai-Hulud",
+  "github_path": "packages/012_litellm_supply_chain_defense",
+  "roles": ["Red Team", "Blue Team", "SOC", "CISO"],
+  "mitre": ["T1195.002", "T1552.001", "T1528", "T1078.004", "T1546.016", "T1071.001", "T1567"],
+  "stacks": ["sentinel", "sigma", "splunk", "wazuh", "crowdstrike"],
+  "created": "2026-03-28",
+  "updated": "2026-03-28",
+  "license": "Apache-2.0",
+  "author": "SOaC Community"
+}

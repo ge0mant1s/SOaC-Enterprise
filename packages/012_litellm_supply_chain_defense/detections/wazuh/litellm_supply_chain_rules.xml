@@ -1,0 +1,71 @@
+<!--
+  SOaC Package: pkg-012 — LiteLLM Supply Chain Attack Defense
+  Wazuh Detection Rules
+  MITRE ATT&CK: T1195.002, T1552.001, T1546.016
+-->
+<group name="soac,supply_chain,litellm,">
+
+  <!-- Rule: Suspicious .pth file creation in Python site-packages -->
+  <rule id="100801" level="14">
+    <if_sid>550</if_sid>
+    <field name="file" type="pcre2">site-packages.*\.pth$</field>
+    <description>SOaC: Suspicious .pth file created in Python site-packages - possible supply chain persistence (T1546.016)</description>
+    <mitre>
+      <id>T1546.016</id>
+      <id>T1195.002</id>
+    </mitre>
+    <options>no_full_log</options>
+    <group>supply_chain,persistence,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Rule: Python process accessing credential environment variables -->
+  <rule id="100802" level="12">
+    <if_sid>530</if_sid>
+    <field name="process.name" type="pcre2">python[23]?</field>
+    <field name="process.args" type="pcre2">AWS_SECRET_ACCESS_KEY|AZURE_CLIENT_SECRET|OPENAI_API_KEY|LITELLM_MASTER_KEY</field>
+    <description>SOaC: Python process accessing cloud credential environment variables - possible credential harvesting (T1552.001)</description>
+    <mitre>
+      <id>T1552.001</id>
+    </mitre>
+    <group>supply_chain,credential_access,pci_dss_8.2.1,</group>
+  </rule>
+
+  <!-- Rule: Outbound connection to suspicious AI/ML domains -->
+  <rule id="100803" level="13">
+    <if_sid>87700</if_sid>
+    <field name="dns.question.name" type="pcre2">litellm-telemetry\.io|ai-proxy-cdn\.com|ml-analytics-pipe\.net</field>
+    <description>SOaC: DNS query to known supply chain C2 domain detected (T1071.001)</description>
+    <mitre>
+      <id>T1071.001</id>
+      <id>T1567</id>
+    </mitre>
+    <group>supply_chain,c2,pci_dss_10.6.1,</group>
+  </rule>
+
+  <!-- Rule: pip install from non-PyPI source -->
+  <rule id="100804" level="10">
+    <if_sid>530</if_sid>
+    <field name="process.name" type="pcre2">pip[23]?</field>
+    <field name="process.args" type="pcre2">install.*(-e|--editable|git\+|http://|https://.*\.whl)</field>
+    <description>SOaC: pip install from non-standard source detected - verify package integrity (T1195.002)</description>
+    <mitre>
+      <id>T1195.002</id>
+    </mitre>
+    <group>supply_chain,initial_access,</group>
+  </rule>
+
+  <!-- Composite: .pth creation + credential access within 10 minutes -->
+  <rule id="100805" level="15" frequency="2" timeframe="600">
+    <if_matched_sid>100801</if_matched_sid>
+    <same_field>agent.id</same_field>
+    <if_sid>100802</if_sid>
+    <description>SOaC: CRITICAL - .pth persistence followed by credential harvesting on same host - active supply chain compromise</description>
+    <mitre>
+      <id>T1195.002</id>
+      <id>T1552.001</id>
+      <id>T1546.016</id>
+    </mitre>
+    <group>supply_chain,critical,pci_dss_11.4,</group>
+  </rule>
+
+</group>

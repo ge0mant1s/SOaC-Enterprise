@@ -1,0 +1,65 @@
+{
+  "policy_id": "ca-012-001",
+  "display_name": "SOaC: AI Service Conditional Access - LiteLLM Defense",
+  "description": "Restricts access to AI/ML services (OpenAI, Anthropic, LiteLLM proxy) to approved devices from compliant locations with MFA enforcement. Part of supply chain defense posture.",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "applications": {
+      "includeApplications": ["All AI/ML Service Principals"],
+      "includeUserActions": ["urn:user:registerdevice"]
+    },
+    "users": {
+      "includeGroups": ["AI-ML-Engineers", "Data-Scientists", "Platform-Engineers"],
+      "excludeGroups": ["Emergency-Break-Glass"]
+    },
+    "platforms": {
+      "includePlatforms": ["all"],
+      "excludePlatforms": []
+    },
+    "locations": {
+      "includeLocations": ["AllTrusted"],
+      "excludeLocations": ["AllUntrusted"]
+    },
+    "clientAppTypes": ["browser", "mobileAppsAndDesktopClients"],
+    "signInRiskLevels": ["high", "medium"],
+    "deviceStates": {
+      "includeStates": ["compliant", "domainJoined"]
+    }
+  },
+  "grantControls": {
+    "operator": "AND",
+    "builtInControls": [
+      "mfa",
+      "compliantDevice"
+    ],
+    "authenticationStrength": {
+      "requirementsSatisfied": "mfa",
+      "combinationConfigurations": [
+        "fido2",
+        "microsoftAuthenticatorPush"
+      ]
+    },
+    "termsOfUse": ["AI-Acceptable-Use-Policy"]
+  },
+  "sessionControls": {
+    "signInFrequency": {
+      "value": 4,
+      "type": "hours",
+      "isEnabled": true
+    },
+    "persistentBrowser": {
+      "mode": "never",
+      "isEnabled": true
+    },
+    "cloudAppSecurity": {
+      "cloudAppSecurityType": "monitorOnly",
+      "isEnabled": true
+    }
+  },
+  "metadata": {
+    "package_id": "pkg-012",
+    "mitre_defense": ["T1078.004", "T1528"],
+    "version": "1.0.0",
+    "entra_compatible": true
+  }
+}
