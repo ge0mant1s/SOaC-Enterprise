@@ -2,48 +2,93 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://soacframe.io/schemas/policy.schema.json",
   "title": "SOaC Policy v1",
-  "description": "JSON Schema for policy.yaml files — SOaC apiVersion soac.io/v1",
+  "description": "JSON Schema for policy.yaml \u2014 soac.io/v1 Policy",
   "type": "object",
-  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
   "properties": {
     "apiVersion": {
       "type": "string",
-      "const": "soac.io/v1",
-      "description": "Must be soac.io/v1"
+      "const": "soac.io/v1"
     },
     "kind": {
       "type": "string",
-      "const": "Policy",
-      "description": "Must be Policy"
+      "const": "Policy"
     },
     "metadata": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "namespace": { "type": "string" },
-        "labels": { "type": "object" },
-        "annotations": { "type": "object" }
-      }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        },
+        "package_id": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": true
     },
     "spec": {
       "type": "object",
-      "required": ["environments"],
+      "required": [
+        "environments"
+      ],
       "properties": {
-        "severity": { "type": "string" },
-        "scope": { "type": "string" },
-        "environments": {
-          "type": "object",
-          "description": "Environment-specific policy rules (lab, staging, production)",
-          "additionalProperties": {
-            "type": "object"
-          }
+        "description": {
+          "type": "string"
         },
-        "access_control": { "type": "object" },
-        "governance": { "type": "object" },
-        "audit": { "type": "object" }
-      }
+        "environments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "name"
+            ],
+            "additionalProperties": true
+          },
+          "minItems": 1,
+          "description": "Environment-specific policy rules (array of environment objects)"
+        },
+        "actions": {
+          "type": "object"
+        },
+        "access_control": {
+          "type": "object"
+        },
+        "compliance": {
+          "type": "object"
+        },
+        "audit": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }

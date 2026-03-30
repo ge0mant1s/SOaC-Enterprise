@@ -2,78 +2,111 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://soacframe.io/schemas/playbook.schema.json",
   "title": "CLAW Playbook v1",
-  "description": "JSON Schema for playbook.yaml files — CLAW apiVersion claw.soac.io/v1",
+  "description": "JSON Schema for playbook.yaml \u2014 claw.soac.io/v1 Playbook",
   "type": "object",
-  "required": ["apiVersion", "kind", "metadata", "spec"],
+  "required": [
+    "apiVersion",
+    "kind",
+    "metadata",
+    "spec"
+  ],
   "properties": {
     "apiVersion": {
       "type": "string",
-      "const": "claw.soac.io/v1",
-      "description": "Must be claw.soac.io/v1"
+      "const": "claw.soac.io/v1"
     },
     "kind": {
       "type": "string",
-      "const": "Playbook",
-      "description": "Must be Playbook"
+      "const": "Playbook"
     },
     "metadata": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "namespace": { "type": "string" },
-        "labels": { "type": "object" },
-        "annotations": { "type": "object" }
-      }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "created": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array"
+        },
+        "mitre_attack": {
+          "type": "array"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "package_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
     },
     "spec": {
       "type": "object",
-      "required": ["trigger", "steps"],
+      "required": [
+        "trigger",
+        "steps"
+      ],
       "properties": {
-        "severity": {
-          "type": "string",
-          "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
-        },
-        "mitre": {
-          "type": "array",
-          "items": { "type": "string" }
+        "description": {
+          "type": "string"
         },
         "trigger": {
           "type": "object",
-          "required": ["source"],
+          "required": [
+            "source"
+          ],
           "properties": {
-            "source": { "type": "string" },
-            "conditions": {
-              "type": "array",
-              "items": { "type": "object" }
+            "source": {
+              "type": "string"
             },
-            "cooldown": { "type": "string" }
-          }
+            "conditions": {
+              "type": "array"
+            },
+            "cooldown": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        "inputs": {
+          "type": "array"
         },
         "steps": {
           "type": "array",
           "items": {
             "type": "object",
-            "required": ["action"],
-            "properties": {
-              "action": { "type": "string" },
-              "target": { "type": "string" },
-              "params": { "type": "object" },
-              "description": { "type": "string" },
-              "timeout": { "type": "string" },
-              "retry": { "type": "object" },
-              "on_failure": { "type": "string" }
-            }
+            "required": [
+              "action"
+            ],
+            "additionalProperties": true
           },
           "minItems": 1
         },
-        "rollback": {
-          "type": "array",
-          "items": { "type": "object" }
+        "outputs": {
+          "type": "object"
         },
-        "governance": { "type": "object" }
-      }
+        "rollback": {
+          "type": "array"
+        },
+        "governance": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
     }
   },
-  "additionalProperties": false
+  "additionalProperties": true
 }
