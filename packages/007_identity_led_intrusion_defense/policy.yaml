@@ -1,0 +1,117 @@
+apiVersion: soac.io/v1
+kind: Policy
+
+metadata:
+  name: "identity-led-intrusion-defense-policy"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  package_id: "pkg-007"
+  scope: "package"
+  tags: ["pkg-007", "identity", "gtr-2025", "governance", "mfa", "federation"]
+
+spec:
+  description: "Governs identity security controls for defense against identity-led intrusion chains including phishing-resistant MFA enforcement, privileged identity governance, cross-cloud federation security, and session/token binding policies."
+
+  environments:
+    - name: "lab"
+      mode: "simulate"
+      data_handling: "synthetic"
+      network_access: "isolated"
+      persistence: "ephemeral"
+      identity_policy:
+        mfa_enforcement: "optional"
+        session_lifetime_hours: 24
+        allow_legacy_auth: true
+    - name: "staging"
+      mode: "audit"
+      data_handling: "anonymized"
+      network_access: "restricted"
+      persistence: "persistent"
+      identity_policy:
+        mfa_enforcement: "required"
+        phishing_resistant_mfa: false
+        session_lifetime_hours: 12
+        allow_legacy_auth: false
+    - name: "production"
+      mode: "enforce"
+      data_handling: "live"
+      network_access: "full"
+      persistence: "persistent"
+      identity_policy:
+        mfa_enforcement: "required"
+        phishing_resistant_mfa: true
+        accepted_mfa_methods: ["fido2", "windows_hello", "certificate"]
+        blocked_mfa_methods: ["sms", "voice_call"]
+        session_lifetime_hours: 8
+        token_binding: "device_compliant"
+        allow_legacy_auth: false
+        pim_required_for_privileged_roles: true
+        jit_access_max_duration_hours: 4
+
+  actions:
+    allowed:
+      - "detect"
+      - "alert"
+      - "enrich"
+      - "revoke_sessions"
+      - "reset_mfa"
+      - "disable_account"
+      - "rotate_credentials"
+      - "block_lateral_movement"
+      - "revoke_federated_sessions"
+      - "audit_privileged_actions"
+      - "notify"
+    blocked:
+      - "delete_data"
+      - "exfiltrate"
+      - "disable_logging"
+      - "disable_conditional_access"
+      - "grant_permanent_admin"
+    requires_approval:
+      - "disable_account"
+      - "org_wide_session_revocation"
+      - "modify_federation_trust"
+
+  access_control:
+    roles:
+      - name: "soc_analyst"
+        permissions: ["read", "execute", "revoke_sessions", "audit_privileged_actions"]
+      - name: "identity_engineer"
+        permissions: ["read", "write", "reset_mfa", "disable_account", "rotate_credentials"]
+      - name: "cloud_security_engineer"
+        permissions: ["read", "write", "revoke_federated_sessions", "block_lateral_movement"]
+      - name: "admin"
+        permissions: ["read", "write", "execute", "admin", "modify_federation_trust"]
+    authentication:
+      required: true
+      methods: ["fido2", "certificate"]
+    conditional_access:
+      privileged_operations:
+        require_pim_activation: true
+        require_compliant_device: true
+        require_phishing_resistant_mfa: true
+        allowed_locations: ["corporate_network"]
+
+  compliance:
+    frameworks: ["NIST CSF", "MITRE ATT&CK", "CIS Controls v8", "ISO 27001", "CrowdStrike GTR-2025"]
+    controls: ["PR.AC-1", "PR.AC-7", "DE.CM-1", "RS.RP-1", "PR.IP-1"]
+    review_frequency: "quarterly"
+    identity_governance:
+      access_review_cadence: "quarterly"
+      privileged_role_review_cadence: "monthly"
+      federation_trust_review_cadence: "quarterly"
+      stale_account_threshold_days: 90
+      mfa_compliance_target_percent: 100
+
+  audit:
+    log_level: "verbose"
+    retention: "365d"
+    immutable: true
+    identity_audit:
+      track_sign_ins: true
+      track_mfa_events: true
+      track_privilege_escalation: true
+      track_federation_events: true
+      alert_on_impossible_travel: true
+      alert_on_mfa_fatigue: true
