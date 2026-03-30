@@ -1,81 +1,12 @@
 {
-  "id": "pkg-011",
-  "title": "GenAI & LLM Abuse Defense GTR-2025",
-  "version": "1.0.0",
-  "classification": "TLP:AMBER",
-  "category": "GTR-2025 Defense",
-  "difficulty": 3,
-  "description": "Comprehensive detection and response package for GenAI and LLM security threats including prompt injection, data exfiltration via AI responses, model supply chain compromise, and resource abuse. Based on CrowdStrike GTR-2025 findings and OWASP LLM Top 10.",
-  "mitre": [
-    "T1190",
-    "T1041",
-    "T1195.002",
-    "T1496"
-  ],
-  "stacks": [
-    "sentinel",
-    "sigma",
-    "splunk",
-    "wazuh",
-    "crowdstrike"
-  ],
-  "author": "SOaC Framework",
-  "created": "2025-03-15",
-  "updated": "2025-03-28",
-  "contents": {
-    "detections": {
-      "sigma": [
-        "detections/sigma/genai_prompt_injection_attempt.yml",
-        "detections/sigma/genai_data_exfiltration_via_llm.yml",
-        "detections/sigma/genai_model_poisoning_supply_chain.yml"
-      ],
-      "kql": [
-        "detections/kql/genai_prompt_injection_sentinel.kql",
-        "detections/kql/genai_data_leak_sentinel.kql",
-        "detections/kql/genai_model_abuse_sentinel.kql"
-      ],
-      "splunk": [
-        "detections/splunk/genai_prompt_injection.spl",
-        "detections/splunk/genai_sensitive_data_exposure.spl"
-      ],
-      "wazuh": [
-        "detections/wazuh/genai_abuse_rules.xml"
-      ],
-      "crowdstrike": [
-        "detections/crowdstrike/genai_abuse_ioa.json"
-      ]
-    },
-    "playbooks": [
-      "playbooks/claw_genai_prompt_injection_response.yaml",
-      "playbooks/claw_genai_data_exfil_response.yaml",
-      "playbooks/soar_genai_incident.json"
-    ],
-    "policies": [
-      "policies/ca_genai_security_policy.json",
-      "policies/governance_genai_usage.yaml"
-    ],
-    "docs": [
-      "docs/threat_context.md",
-      "docs/deployment_guide.md",
-      "docs/validation_guide.md"
-    ],
-    "validation": [
-      "validation/evidence_bundle.json",
-      "validation/replay_report.md"
-    ],
-    "support": [
-      "support/mitre_attack.json",
-      "support/stack_matrix.json"
-    ]
-  },
   "package_id": "pkg-011",
-  "roles": [
-    "soc_analyst",
-    "ai_security_engineer",
-    "threat_hunter",
-    "mlops_engineer"
-  ],
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "GenAI & LLM Abuse Defense GTR-2025",
+  "description": "Comprehensive detection and response package for GenAI and LLM security threats including prompt injection, data exfiltration via AI responses, model supply chain compromise, and resource abuse. Based on CrowdStrike GTR-2025 findings and OWASP LLM Top 10.",
+  "difficulty": 3,
   "tier": "Advanced",
+  "category": "GTR-2025 Defense",
   "tags": [
     "genai",
     "llm",
@@ -86,6 +17,91 @@
     "gtr-2025"
   ],
   "threat_actor": "Multiple (SCATTERED SPIDER, FAMOUS CHOLLIMA)",
-  "github_path": "packages/011",
-  "license": "MIT"
+  "github_path": "packages/011_genai_llm_abuse_defense",
+  "roles": [
+    "soc_analyst",
+    "ai_security_engineer",
+    "threat_hunter",
+    "mlops_engineer"
+  ],
+  "mitre": [
+    "T1190",
+    "T1041",
+    "T1195.002",
+    "T1496"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "sentinel",
+    "sigma",
+    "splunk",
+    "wazuh",
+    "crowdstrike"
+  ],
+  "platform_targets": [
+    "multi_platform"
+  ],
+  "saas_targets": [],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "title": "Enumerate AI Endpoints",
+      "technique": [
+        "T1595.002"
+      ]
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "title": "DAN Jailbreak Prompt Injection",
+      "technique": [
+        "T1190"
+      ]
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "title": "Extract Credentials via Crafted Queries",
+      "technique": [
+        "T1041"
+      ]
+    },
+    {
+      "step_index": 6,
+      "role": "Red Team",
+      "title": "Distribute Backdoored Model on Hugging Face",
+      "technique": [
+        "T1195.002"
+      ]
+    },
+    {
+      "step_index": 7,
+      "role": "Victim",
+      "title": "Data Scientist Downloads Poisoned Model",
+      "technique": [
+        "T1195.002"
+      ]
+    },
+    {
+      "step_index": 9,
+      "role": "Red Team",
+      "title": "LLMjacking - Massive Unauthorized Inference",
+      "technique": [
+        "T1496"
+      ]
+    }
+  ],
+  "lab_scenarios": [
+    {
+      "id": "lab-011-full",
+      "title": "GenAI & LLM Abuse Defense GTR-2025 \u2014 Full Simulation",
+      "type": "full",
+      "estimated_minutes": 45
+    }
+  ],
+  "created": "2025-03-15",
+  "updated": "2025-03-28",
+  "license": "MIT",
+  "author": "SOaC Framework"
 }

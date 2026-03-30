@@ -1,1 +1,86 @@
-{"package_id":"pkg-008","version":"1.0.0","title":"Cloud Control Plane Defense","description":"Hardened cloud control plane defense aligned with GTR-2025 threat intelligence.","difficulty":4,"tier":"Elite","category":"GTR-2025 Defense","tags":["gtr-2025","cloud","iam","control-plane","defense","federation","serverless","cryptojacking"],"threat_actor":null,"github_path":"packages/008_cloud_control_plane_defense","roles":["Red Team","Blue Team","SOC","CISO"],"mitre":["T1484.002","T1525","T1496","T1098.001","T1530","T1648"],"stacks":["sentinel","sigma","splunk","wazuh","crowdstrike"],"mitre_techniques":["T1484.002","T1525","T1496","T1098.001","T1530","T1648"],"detections":{"sigma":3,"sentinel":3,"splunk":2,"wazuh":1,"crowdstrike":1,"total":10},"playbooks":{"claw":1,"soar":1,"total":2},"policies":{"conditional_access":1,"governance":1,"total":2},"docs":["threat_context.md","deployment_guide.md","validation_guide.md"],"created":"2025-03-28","last_updated":"2025-03-28"}
+{
+  "package_id": "pkg-008",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "Cloud Control Plane Defense",
+  "description": "Hardened cloud control plane defense aligned with GTR-2025 threat intelligence.",
+  "difficulty": 4,
+  "tier": "Elite",
+  "category": "GTR-2025 Defense",
+  "tags": [
+    "gtr-2025",
+    "cloud",
+    "iam",
+    "control-plane",
+    "defense",
+    "federation",
+    "serverless",
+    "cryptojacking"
+  ],
+  "threat_actor": null,
+  "github_path": "packages/008_cloud_control_plane_defense",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1484.002",
+    "T1525",
+    "T1496",
+    "T1098.001",
+    "T1530",
+    "T1648"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "sentinel",
+    "sigma",
+    "splunk",
+    "wazuh",
+    "crowdstrike"
+  ],
+  "platform_targets": [
+    "multi_platform"
+  ],
+  "saas_targets": [],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "title": "Service Principal Abuse",
+      "technique": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "title": "Federation Tampering",
+      "technique": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "title": "Lambda Backdoor",
+      "technique": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "title": "GPU Instance Launch",
+      "technique": []
+    }
+  ],
+  "lab_scenarios": [
+    {
+      "id": "lab-008-full",
+      "title": "Cloud Control Plane Defense \u2014 Full Simulation",
+      "type": "full",
+      "estimated_minutes": 45
+    }
+  ],
+  "created": "2025-03-28",
+  "updated": "",
+  "license": "MIT",
+  "author": "SOaC Framework"
+}

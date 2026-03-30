@@ -1,6 +1,7 @@
 {
   "package_id": "pkg-003",
   "version": "1.0.0",
+  "schema_version": "3.0",
   "title": "Cloud Control Plane Hijack",
   "description": "Detect IAM privilege escalation, control plane hijack, and policy tampering in cloud environments.",
   "difficulty": 3,
@@ -22,38 +23,6 @@
     "SOC",
     "CISO"
   ],
-  "mitre_techniques": [
-    "T1098.001",
-    "T1078.004",
-    "T1562.008",
-    "T1550.001",
-    "T1578"
-  ],
-  "detections": {
-    "sigma": 3,
-    "sentinel": 3,
-    "splunk": 2,
-    "wazuh": 1,
-    "crowdstrike": 1,
-    "total": 10
-  },
-  "playbooks": {
-    "claw": 1,
-    "soar": 1,
-    "total": 2
-  },
-  "policies": {
-    "conditional_access": 1,
-    "governance": 1,
-    "total": 2
-  },
-  "docs": [
-    "threat_context.md",
-    "deployment_guide.md",
-    "validation_guide.md"
-  ],
-  "created": "2025-03-28",
-  "last_updated": "2025-03-28",
   "mitre": [
     "T1098.001",
     "T1078.004",
@@ -61,11 +30,68 @@
     "T1550.001",
     "T1578"
   ],
+  "mitre_version": "v15.1",
   "stacks": [
     "sentinel",
     "sigma",
     "splunk",
     "wazuh",
     "crowdstrike"
-  ]
+  ],
+  "platform_targets": [
+    "aws",
+    "azure",
+    "gcp"
+  ],
+  "saas_targets": [],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "title": "Compromised IAM Credentials",
+      "technique": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "title": "Cloud Environment Mapping",
+      "technique": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "title": "Admin Policy Attachment",
+      "technique": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "title": "Disable Logging",
+      "technique": []
+    },
+    {
+      "step_index": 7,
+      "role": "Red Team",
+      "title": "Cross-Account Pivot",
+      "technique": []
+    },
+    {
+      "step_index": 8,
+      "role": "Red Team",
+      "title": "Network Exposure",
+      "technique": []
+    }
+  ],
+  "lab_scenarios": [
+    {
+      "id": "lab-003-full",
+      "title": "Cloud Control Plane Hijack \u2014 Full Simulation",
+      "type": "full",
+      "estimated_minutes": 45
+    }
+  ],
+  "created": "2025-03-28",
+  "updated": "",
+  "license": "MIT",
+  "author": "SOaC Framework"
 }

@@ -1,17 +1,98 @@
 {
   "package_id": "pkg-001",
   "version": "1.0.0",
+  "schema_version": "3.0",
   "title": "0APT Identity Pivot",
   "description": "Detect and contain AitM phishing, session hijacking, and identity-based attacks across Okta, Entra ID, and Azure AD. Simulates the 0APT threat actor TTPs targeting enterprise identity infrastructure.",
   "difficulty": 3,
   "tier": "Advanced",
   "category": "Identity & Access",
-  "tags": ["identity", "aitm", "phishing", "session-hijack", "okta", "entra-id"],
+  "tags": [
+    "identity",
+    "aitm",
+    "phishing",
+    "session-hijack",
+    "okta",
+    "entra-id"
+  ],
   "threat_actor": "0APT",
   "github_path": "packages/001_0apt_identity_pivot",
-  "roles": ["Red Team", "Blue Team", "SOC", "CISO"],
-  "mitre": ["T1557.001", "T1078.004", "T1539"],
-  "stacks": ["sentinel", "sigma", "splunk", "wazuh", "crowdstrike"],
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1557.001",
+    "T1078.004",
+    "T1539"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "sentinel",
+    "sigma",
+    "splunk",
+    "wazuh",
+    "crowdstrike"
+  ],
+  "platform_targets": [
+    "azure_ad",
+    "okta",
+    "entra_id"
+  ],
+  "saas_targets": [],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "title": "Send AitM Phishing Email",
+      "technique": [
+        "T1566.002"
+      ]
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "title": "Intercept Credentials via AitM Proxy",
+      "technique": [
+        "T1557.001"
+      ]
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "title": "Steal Session Token",
+      "technique": [
+        "T1539"
+      ]
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "title": "Replay Session from Attacker Infrastructure",
+      "technique": [
+        "T1539",
+        "T1078.004"
+      ]
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "title": "Pivot to Cloud Applications",
+      "technique": [
+        "T1078.004"
+      ]
+    }
+  ],
+  "lab_scenarios": [
+    {
+      "id": "lab-001-full",
+      "title": "0APT Identity Pivot \u2014 Full Simulation",
+      "type": "full",
+      "estimated_minutes": 45
+    }
+  ],
   "created": "2026-03-28",
   "updated": "2026-03-28",
   "license": "Apache-2.0",

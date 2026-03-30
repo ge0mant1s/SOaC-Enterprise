@@ -1,0 +1,104 @@
+{
+  "package_id": "pkg-007",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "Identity-Led Intrusion Defense (GTR-2025)",
+  "description": "CrowdStrike GTR-2025 aligned defense package covering identity-led intrusion chains: perimeter exploitation, web shell persistence, privilege escalation, lateral movement via RDP/SMB, and identity pivot. Multi-stage detection across 5 SIEM platforms.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "category": "GTR-2025 Defense",
+  "tags": [
+    "gtr-2025",
+    "identity",
+    "perimeter",
+    "exploit-chaining",
+    "defense",
+    "web-shell",
+    "lateral-movement"
+  ],
+  "threat_actor": "",
+  "github_path": "packages/007_identity_led_intrusion_defense",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1190",
+    "T1505.003",
+    "T1068",
+    "T1021",
+    "T1078",
+    "T1557",
+    "T1539",
+    "T1550"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "sentinel",
+    "sigma",
+    "splunk",
+    "wazuh",
+    "crowdstrike"
+  ],
+  "platform_targets": [
+    "multi_platform"
+  ],
+  "saas_targets": [],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "title": "Exploit Perimeter Vulnerability",
+      "technique": [
+        "T1190"
+      ]
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "title": "Deploy Web Shell",
+      "technique": [
+        "T1505.003"
+      ]
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "title": "Escalate to SYSTEM via Kernel Exploit",
+      "technique": [
+        "T1068"
+      ]
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "title": "Move Laterally via RDP/SMB",
+      "technique": [
+        "T1021"
+      ]
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "title": "Pivot to Cloud Identity",
+      "technique": [
+        "T1078",
+        "T1550"
+      ]
+    }
+  ],
+  "lab_scenarios": [
+    {
+      "id": "lab-007-full",
+      "title": "Identity-Led Intrusion Defense (GTR-2025) \u2014 Full Simulation",
+      "type": "full",
+      "estimated_minutes": 45
+    }
+  ],
+  "created": "2026-03-28",
+  "updated": "2026-03-28",
+  "license": "Apache-2.0",
+  "author": "SOaC Community"
+}
