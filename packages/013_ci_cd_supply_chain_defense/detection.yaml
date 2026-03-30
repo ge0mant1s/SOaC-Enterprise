@@ -1,0 +1,133 @@
+apiVersion: soac.io/v1
+kind: Detection
+
+metadata:
+  name: "ci-cd-supply-chain-detection"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-30T00:00:00Z"
+  package_id: "pkg-013"
+  mitre_attack: ["T1195.002", "T1059.004", "T1552.001", "T1496", "T1588.001", "T1105", "T1071.001"]
+  severity: "CRITICAL"
+  data_sources: ["github_audit_logs", "github_actions_logs", "endpoint_file_creation", "endpoint_process_creation", "container_registry_logs"]
+
+spec:
+  description: "Detect CI/CD supply chain compromise indicators including forced tag mutations in upstream repos, secret harvesting from build runners, data exfiltration via curl, and unauthorized container image publication."
+
+  platforms:
+    - "linux"
+    - "cloud_ci_cd"
+    - "github_actions"
+    - "container_runtime"
+
+  detection_formats:
+    sigma:
+      path: "detections/sigma/"
+      count: 3
+    sentinel:
+      path: "detections/sentinel/"
+      count: 3
+    splunk:
+      path: "detections/splunk/"
+      count: 2
+    wazuh:
+      path: "detections/wazuh/"
+      count: 1
+    crowdstrike:
+      path: "detections/crowdstrike/"
+      count: 1
+
+  inline_rules:
+    - id: "KQL-001"
+      name: "Forced Tag Push — Upstream Repository Tampering"
+      format: "kql"
+      platform: "sentinel"
+      mitre: ["T1195.002"]
+      severity: "CRITICAL"
+      query: |
+        GitHubAuditLog
+        | where EventName == "git.push"
+        | where Data_forced == true
+        | where Data_ref startswith "refs/tags/"
+        | project TimeGenerated, Data_actor, Data_repository, Data_ref, Data_before, Data_after
+        | extend AlertTitle = strcat("Forced tag push detected on ", Data_repository, " ref ", Data_ref)
+      fields_matched:
+        - "ref"
+        - "forced"
+        - "actor"
+        - "repository"
+
+    - id: "Sigma-002"
+      name: "SSH Private Key Creation on CI Runner"
+      format: "sigma"
+      platform: "sigma"
+      mitre: ["T1552.001"]
+      severity: "HIGH"
+      query: |
+        title: SSH Private Key Dropped on CI Build Runner
+        status: experimental
+        logsource:
+          category: file_event
+          product: windows  # MDE normalises Linux file events here
+        detection:
+          selection:
+            FileName|endswith: 'id_rsa'
+            FolderPath|contains: '.ssh'
+          condition: selection
+      fields_matched:
+        - "FileName"
+        - "FolderPath"
+
+    - id: "Splunk-003"
+      name: "Curl-Based Secret Exfiltration from Build Environment"
+      format: "spl"
+      platform: "splunk"
+      mitre: ["T1071.001", "T1105"]
+      severity: "CRITICAL"
+      query: |
+        index=edr sourcetype="endpoint:process"
+        | search ProcessName="curl"
+        | search CommandLine="*--data-binary*"
+        | search CommandLine="*@/home/runner/.ssh/id_rsa*"
+        | eval exfil_target=mvindex(split(CommandLine, " "), -1)
+        | table _time, DeviceName, ProcessName, CommandLine, exfil_target
+      fields_matched:
+        - "ProcessName"
+        - "CommandLine"
+
+    - id: "CrowdStrike-004"
+      name: "Unauthorized Container Image Push Post-Build"
+      format: "crowdstrike_query"
+      platform: "crowdstrike"
+      mitre: ["T1496", "T1588.001"]
+      severity: "HIGH"
+      query: |
+        event_simpleName=ContainerImagePush
+        | ImageTag=v0.69.3-compromised
+        | Pusher!=release-bot
+        | Registry=ghcr.io
+      fields_matched:
+        - "ImageTag"
+        - "Pusher"
+        - "Registry"
+
+    - id: "Wazuh-005"
+      name: "Build Runner SSH Key Theft via File Integrity"
+      format: "wazuh_rule"
+      platform: "wazuh"
+      mitre: ["T1552.001"]
+      severity: "HIGH"
+      rule_id: 101301
+      query: |
+        <group name="ci_cd_supply_chain,file_integrity,">
+          <rule id="101301" level="12">
+            <if_group>syscheck</if_group>
+            <field name="file">.ssh/id_rsa</field>
+            <description>SSH private key created or modified on CI runner — potential secret harvesting (pkg-013)</description>
+            <mitre>
+              <id>T1552.001</id>
+            </mitre>
+          </rule>
+        </group>
+      fields_matched:
+        - "file"

