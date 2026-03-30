@@ -1,1 +1,55 @@
-{"id":"pkg-008","title":"Cloud Control Plane Defense","subtitle":"GTR-2025 aligned proactive cloud defense against federation, persistence, and resource abuse","difficulty":4,"category":"GTR-2025 Defense","steps":[{"phase":"Initial Compromise","title":"Service Principal Abuse","description":"Attacker uses compromised service principal for cloud control plane access.","role":"Red Team"},{"phase":"Federation Attack","title":"Federation Tampering","description":"Modify SAML federation settings for Golden SAML token forging capability.","role":"Red Team"},{"phase":"Detection","title":"Federation Change Alert","description":"GTR-2025 hunting rules detect unauthorized federation modification.","role":"Blue Team"},{"phase":"Persistence","title":"Lambda Backdoor","description":"Deploy serverless function backdoor with external invoke permissions.","role":"Red Team"},{"phase":"Resource Abuse","title":"GPU Instance Launch","description":"Launch GPU compute instances in unusual regions for crypto-mining.","role":"Red Team"},{"phase":"Detection","title":"Resource Abuse Alert","description":"Cloud resource abuse and persistence detection rules fire.","role":"Blue Team"},{"phase":"Containment","title":"Automated Defense","description":"CLAW reverts federation, disables Lambda, terminates instances.","role":"Blue Team"},{"phase":"Hardening","title":"SCP Deployment","description":"Deploy Service Control Policies preventing future attack patterns.","role":"Blue Team"},{"phase":"Hunt","title":"Persistence Hunt","description":"Organization-wide hunt for dormant roles, unused keys, orphaned functions.","role":"Blue Team"},{"phase":"Recovery","title":"Baseline Update","description":"Update cloud configuration baseline and monitoring thresholds.","role":"Blue Team"}]}
+{
+  "title": "Cloud Control Plane Defense",
+  "steps": [
+    {
+      "phase": "Initial Compromise",
+      "title": "Service Principal Abuse",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Federation Attack",
+      "title": "Federation Tampering",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "Federation Change Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Persistence",
+      "title": "Lambda Backdoor",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Resource Abuse",
+      "title": "GPU Instance Launch",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "Resource Abuse Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Containment",
+      "title": "Automated Defense",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Hardening",
+      "title": "SCP Deployment",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Hunt",
+      "title": "Persistence Hunt",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Recovery",
+      "title": "Baseline Update",
+      "role": "Blue Team"
+    }
+  ]
+}

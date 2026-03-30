@@ -1,0 +1,55 @@
+{
+  "title": "SaaS OAuth & Integration Risk Defense",
+  "steps": [
+    {
+      "phase": "Social Engineering",
+      "title": "Consent Phishing Campaign",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Initial Access",
+      "title": "Illicit Consent Grant",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Collection",
+      "title": "Mailbox Enumeration",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "Consent Abuse Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Exfiltration",
+      "title": "Bulk File Download",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "Data Exfiltration Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Containment",
+      "title": "OAuth Revocation",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Investigation",
+      "title": "Data Impact Assessment",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Remediation",
+      "title": "Consent Policy Hardening",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Recovery",
+      "title": "User Awareness Training",
+      "role": "Blue Team"
+    }
+  ]
+}

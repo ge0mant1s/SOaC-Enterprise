@@ -1,19 +1,55 @@
 {
-  "id": "pkg-003",
   "title": "Cloud Control Plane Hijack",
-  "subtitle": "Detect and contain cloud IAM abuse, logging disruption, and cross-account pivoting",
-  "difficulty": 3,
-  "category": "Cloud Security",
   "steps": [
-    {"phase": "Initial Access", "title": "Compromised IAM Credentials", "description": "Attacker obtains IAM access key from exposed repository or phishing.", "role": "Red Team"},
-    {"phase": "Reconnaissance", "title": "Cloud Environment Mapping", "description": "Enumerate IAM users, roles, policies, and logging configuration.", "role": "Red Team"},
-    {"phase": "Privilege Escalation", "title": "Admin Policy Attachment", "description": "Attach AdministratorAccess policy and remove permission boundaries.", "role": "Red Team"},
-    {"phase": "Detection", "title": "IAM Escalation Alert", "description": "Sentinel and Sigma detect admin policy attachment from unknown source.", "role": "Blue Team"},
-    {"phase": "Defense Evasion", "title": "Disable Logging", "description": "Stop CloudTrail, delete VPC flow logs, disable GuardDuty.", "role": "Red Team"},
-    {"phase": "Detection", "title": "Logging Disruption Alert", "description": "Critical alert fires on CloudTrail StopLogging event.", "role": "Blue Team"},
-    {"phase": "Lateral Movement", "title": "Cross-Account Pivot", "description": "Assume roles in 3 additional accounts using organization trust.", "role": "Red Team"},
-    {"phase": "Impact", "title": "Network Exposure", "description": "Open security groups to 0.0.0.0/0 for persistent backdoor access.", "role": "Red Team"},
-    {"phase": "Containment", "title": "Automated Cloud Containment", "description": "CLAW revokes sessions, attaches deny-all, restores logging.", "role": "Blue Team"},
-    {"phase": "Recovery", "title": "IAM Audit & Remediation", "description": "Audit all changes, rollback unauthorized modifications, rotate credentials.", "role": "Blue Team"}
+    {
+      "phase": "Initial Access",
+      "title": "Compromised IAM Credentials",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Reconnaissance",
+      "title": "Cloud Environment Mapping",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Privilege Escalation",
+      "title": "Admin Policy Attachment",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "IAM Escalation Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Defense Evasion",
+      "title": "Disable Logging",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "Logging Disruption Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Lateral Movement",
+      "title": "Cross-Account Pivot",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Impact",
+      "title": "Network Exposure",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Containment",
+      "title": "Automated Cloud Containment",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Recovery",
+      "title": "IAM Audit & Remediation",
+      "role": "Blue Team"
+    }
   ]
 }

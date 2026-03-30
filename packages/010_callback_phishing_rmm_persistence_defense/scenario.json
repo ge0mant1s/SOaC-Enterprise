@@ -1,1 +1,55 @@
-{"id":"pkg-010","title":"Callback Phishing & RMM Persistence Defense","subtitle":"GTR-2025 callback phishing detection and unauthorized RMM tool containment","difficulty":3,"category":"GTR-2025 Defense","steps":[{"phase":"Social Engineering","title":"Callback Phishing Email","description":"Fake invoice/subscription email with callback phone number delivered.","role":"Red Team"},{"phase":"Initial Access","title":"Phone Social Engineering","description":"Victim calls fake support and is guided to install RMM tool.","role":"Red Team"},{"phase":"Execution","title":"RMM Tool Installation","description":"AnyDesk/ScreenConnect downloaded via browser and executed.","role":"Red Team"},{"phase":"Detection","title":"RMM Execution Alert","description":"Unauthorized RMM tool detected by endpoint monitoring.","role":"Blue Team"},{"phase":"Persistence","title":"Service Installation","description":"RMM tool creates Windows service for persistent access.","role":"Red Team"},{"phase":"C2","title":"Remote Access Channel","description":"C2 channel established through legitimate RMM infrastructure.","role":"Red Team"},{"phase":"Containment","title":"RMM Removal","description":"CLAW kills processes, removes persistence, blocks RMM domains.","role":"Blue Team"},{"phase":"Investigation","title":"Session Analysis","description":"Analyze RMM session logs for data accessed and commands executed.","role":"Blue Team"},{"phase":"Remediation","title":"Application Control","description":"Deploy app whitelisting to block unapproved RMM tools.","role":"Blue Team"},{"phase":"Prevention","title":"User Awareness","description":"Targeted training on callback phishing recognition.","role":"Blue Team"}]}
+{
+  "title": "Callback Phishing & RMM Persistence Defense",
+  "steps": [
+    {
+      "phase": "Social Engineering",
+      "title": "Callback Phishing Email",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Initial Access",
+      "title": "Phone Social Engineering",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Execution",
+      "title": "RMM Tool Installation",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Detection",
+      "title": "RMM Execution Alert",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Persistence",
+      "title": "Service Installation",
+      "role": "Red Team"
+    },
+    {
+      "phase": "C2",
+      "title": "Remote Access Channel",
+      "role": "Red Team"
+    },
+    {
+      "phase": "Containment",
+      "title": "RMM Removal",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Investigation",
+      "title": "Session Analysis",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Remediation",
+      "title": "Application Control",
+      "role": "Blue Team"
+    },
+    {
+      "phase": "Prevention",
+      "title": "User Awareness",
+      "role": "Blue Team"
+    }
+  ]
+}

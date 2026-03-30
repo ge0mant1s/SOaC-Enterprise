@@ -1,0 +1,117 @@
+{
+  "package_id": "pkg-007",
+  "title": "Identity-Led Intrusion Defense (GTR-2025)",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Exploit Perimeter Vulnerability",
+      "text": "Attacker exploits CVE in public-facing web application to achieve remote code execution.",
+      "mitre": [
+        "T1190"
+      ],
+      "artifact": "detections/sentinel/perimeter_exploit_chain.kql"
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "title": "Deploy Web Shell",
+      "text": "Attacker writes ASPX web shell to web directory for persistent access.",
+      "mitre": [
+        "T1505.003"
+      ],
+      "artifact": "detections/sigma/web_shell_persistence.yml"
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "title": "Escalate to SYSTEM via Kernel Exploit",
+      "text": "From IIS AppPool service account, attacker uses PrintSpoofer to escalate to SYSTEM.",
+      "mitre": [
+        "T1068"
+      ],
+      "artifact": "detections/sigma/privilege_escalation_exploit.yml"
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Lateral Movement",
+      "pillar": "Offense",
+      "title": "Move Laterally via RDP/SMB",
+      "text": "Using SYSTEM credentials, attacker moves to domain controller and file servers.",
+      "mitre": [
+        "T1021"
+      ],
+      "artifact": "detections/sigma/lateral_movement_rdp_smb.yml"
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Credential Access",
+      "pillar": "Offense",
+      "title": "Pivot to Cloud Identity",
+      "text": "Stolen AD credentials used to authenticate to Azure AD and access cloud services.",
+      "mitre": [
+        "T1078",
+        "T1550"
+      ],
+      "artifact": "detections/sentinel/identity_pivot_post_exploit.kql"
+    },
+    {
+      "step_index": 6,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Defense",
+      "title": "Exploit Chain Correlation Alert",
+      "text": "Sentinel correlates web shell creation + lateral movement + identity pivot into Critical alert.",
+      "mitre": [
+        "T1190",
+        "T1505.003"
+      ],
+      "artifact": "detections/sentinel/perimeter_exploit_chain.kql"
+    },
+    {
+      "step_index": 7,
+      "role": "Blue Team",
+      "phase": "Containment",
+      "pillar": "Defense",
+      "title": "CLAW: Contain Exploit Chain",
+      "text": "Automated playbook isolates host, removes web shells, blocks lateral ports, and blocks attacker IP.",
+      "artifact": "playbooks/claw/contain_exploit_chain.yaml"
+    },
+    {
+      "step_index": 8,
+      "role": "SOC",
+      "phase": "Investigation",
+      "pillar": "Defense",
+      "title": "Full Chain Investigation",
+      "text": "SOC maps the complete attack chain: entry point, persistence, privilege escalation, lateral movement, and cloud pivot.",
+      "artifact": "playbooks/soar/exploit_chain_response.json"
+    },
+    {
+      "step_index": 9,
+      "role": "CISO",
+      "phase": "Decision",
+      "pillar": "Governance",
+      "title": "Emergency Patching & Resegmentation",
+      "text": "CISO authorizes emergency patching of perimeter systems and DMZ network resegmentation.",
+      "artifact": "policies/governance/exploit_chain_defense_governance.yaml"
+    },
+    {
+      "step_index": 10,
+      "role": "Blue Team",
+      "phase": "Hardening",
+      "pillar": "Defense",
+      "title": "Deploy GTR-2025 Defense Controls",
+      "text": "Apply WAF rules, FIM on web directories, network segmentation, and identity monitoring enhancements.",
+      "artifact": "policies/conditional_access/perimeter_defense_policy.json"
+    }
+  ]
+}
