@@ -141,7 +141,7 @@ spec:
       description: "Python process accessing multiple credential environment variables"
       input:
         event_type: "process_execution"
-        command_line: "python3 -c 'import os; os.environ["AWS_SECRET_ACCESS_KEY"]'"
+        command_line: 'python3 -c os.getenv(AWS_SECRET_ACCESS_KEY)'
         severity: "CRITICAL"
       expected_result: "alert"
     - name: "negative-standard-pth"
