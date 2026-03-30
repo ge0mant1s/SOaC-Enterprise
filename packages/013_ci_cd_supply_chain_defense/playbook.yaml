@@ -1,0 +1,138 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "ci-cd-supply-chain-containment"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-30T00:00:00Z"
+  tags: ["pkg-013", "supply-chain", "ci-cd", "automated-response"]
+  mitre_attack: ["T1195.002", "T1059.004", "T1552.001", "T1496"]
+  severity: "CRITICAL"
+  package_id: "pkg-013"
+
+spec:
+  description: "Contain CI/CD supply chain compromise by freezing pipelines, revoking runner tokens, rotating secrets, quarantining tampered artifacts, auditing provenance chain, and escalating to P1 incident."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "eq"
+        value: "ci_cd_supply_chain_compromise"
+      - field: "severity"
+        operator: "gte"
+        value: "HIGH"
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "Detection event payload from The Body"
+    - name: "affected_repository"
+      type: "string"
+      required: true
+      description: "Full repo slug of the compromised upstream dependency"
+    - name: "affected_tag"
+      type: "string"
+      required: true
+      description: "Git tag that was force-pushed or tampered with"
+
+  steps:
+    - name: "freeze_pipelines"
+      action: "disable_workflows"
+      target: "github_api"
+      parameters:
+        repository: "{{ affected_repository }}"
+        workflows: ["release.yml", "build.yml", "deploy.yml"]
+        reason: "Supply chain compromise — forced tag push detected on {{ affected_tag }}"
+      timeout: "30s"
+      on_failure: "alert_soc"
+
+    - name: "revoke_runner_tokens"
+      action: "revoke_tokens"
+      target: "github_api"
+      parameters:
+        scope: "self_hosted_runners"
+        repository: "{{ affected_repository }}"
+        include_org_runners: true
+      timeout: "60s"
+      on_failure: "continue"
+
+    - name: "rotate_compromised_secrets"
+      action: "rotate_secrets"
+      target: "vault_api"
+      parameters:
+        scope: "ci_cd_runner_secrets"
+        include:
+          - "DEPLOY_KEY"
+          - "NPM_TOKEN"
+          - "GHCR_PAT"
+          - "AWS_ACCESS_KEY_ID"
+        create_audit_trail: true
+      timeout: "120s"
+      on_failure: "alert_soc"
+
+    - name: "quarantine_artifacts"
+      action: "quarantine_images"
+      target: "container_registry_api"
+      parameters:
+        registry: "ghcr.io"
+        image_filter: "*{{ affected_tag }}*"
+        action: "mark_quarantined"
+        block_pulls: true
+      timeout: "60s"
+      on_failure: "continue"
+
+    - name: "audit_provenance_chain"
+      action: "provenance_audit"
+      target: "sigstore_api"
+      parameters:
+        artifact_tag: "{{ affected_tag }}"
+        verify_signatures: true
+        check_slsa_provenance: true
+        output_format: "sarif"
+      timeout: "90s"
+      on_failure: "continue"
+
+    - name: "investigate_exfiltration"
+      action: "log_query"
+      target: "siem_api"
+      parameters:
+        query: "ProcessName='curl' AND CommandLine='*--data-binary*' AND CommandLine='*id_rsa*'"
+        time_window: "24h"
+        output: "exfil_evidence"
+      timeout: "60s"
+      on_failure: "continue"
+
+    - name: "escalate_p1_incident"
+      action: "create_incident"
+      target: "incident_management"
+      parameters:
+        severity: "P1"
+        title: "CI/CD Supply Chain Compromise — {{ affected_repository }}:{{ affected_tag }}"
+        description: "Forced tag push detected. Runner secrets potentially exfiltrated. Tampered container images published. All pipelines frozen. Immediate CISO review required."
+        assign_to: "supply_chain_security_team"
+        attach:
+          - "{{ steps.audit_provenance_chain.output }}"
+          - "{{ steps.investigate_exfiltration.output }}"
+      timeout: "30s"
+      on_failure: "alert_soc"
+
+  outputs:
+    - name: "containment_report"
+      type: "object"
+      description: "Summary of all containment actions, revoked tokens, quarantined images, and provenance audit results"
+    - name: "exfil_evidence"
+      type: "object"
+      description: "SIEM query results showing potential exfiltration activity"
+
+  rollback:
+    steps:
+      - action: "enable_workflows"
+        description: "Re-enable CI/CD workflows after root cause confirmed and remediated"
+      - action: "restore_runner_tokens"
+        description: "Issue new runner tokens after runner environment is re-imaged"
+      - action: "unquarantine_artifacts"
+        description: "Release verified-clean artifacts from quarantine"
