@@ -1,0 +1,174 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+
+metadata:
+  name: "saas-oauth-abuse-containment"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  tags: ["pkg-005", "automated-response", "oauth", "saas"]
+  mitre_attack: ["T1098.003", "T1566.002", "T1567", "T1528", "T1530"]
+  severity: "HIGH"
+  package_id: "pkg-005"
+
+spec:
+  description: "Automated response to OAuth consent abuse and SaaS integration compromise. Revokes malicious app consents, enumerates affected permissions, isolates compromised accounts, rotates tokens, assesses data impact, and hardens consent policies."
+
+  trigger:
+    source: "BODY"
+    conditions:
+      - field: "detection_type"
+        operator: "in"
+        value: ["illicit_consent_grant", "oauth_abuse_detected", "saas_bulk_exfiltration"]
+    cooldown: "5m"
+
+  inputs:
+    - name: "detection_event"
+      type: "object"
+      required: true
+      description: "The detection event payload from The Body"
+    - name: "target_user"
+      type: "string"
+      required: true
+      description: "The affected user principal name"
+    - name: "malicious_app_id"
+      type: "string"
+      required: false
+      description: "The OAuth application ID to revoke"
+
+  steps:
+    - id: "step-1"
+      name: "revoke_malicious_app_consent"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/oauth/apps/{appId}/revoke"
+        method: "POST"
+        provider: "entra_id"
+        revoke_type: "app_and_delegated"
+      timeout: "60s"
+      retry:
+        max_attempts: 3
+        backoff: "exponential"
+      on_failure: "halt"
+    - id: "step-2"
+      name: "enumerate_all_app_permissions"
+      action: "enrichment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/users/{userId}/app-permissions"
+        method: "GET"
+        include_delegated: true
+        include_application: true
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-3"
+      name: "disable_affected_account"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/users/{userId}/disable"
+        method: "POST"
+        provider: "entra_id"
+        reason: "oauth_abuse_investigation"
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-4"
+      name: "revoke_all_refresh_tokens"
+      action: "containment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/users/{userId}/tokens/revoke-all"
+        method: "POST"
+        providers: ["entra_id", "google_workspace", "slack"]
+      timeout: "60s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-5"
+      name: "assess_data_exposure"
+      action: "enrichment"
+      target: "BODY"
+      parameters:
+        endpoint: "/api/v1/dlp/exposure-assessment"
+        method: "POST"
+        user_id: "{target_user}"
+        timeframe: "7d"
+        include_file_access_logs: true
+        include_email_forwarding_rules: true
+      timeout: "120s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "continue"
+    - id: "step-6"
+      name: "notify_affected_user"
+      action: "notification"
+      target: "INTERNAL"
+      parameters:
+        channel: "email"
+        template: "oauth_abuse_user_notification"
+        recipient: "{target_user}"
+        include_password_reset_link: true
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+    - id: "step-7"
+      name: "create_incident_and_audit_trail"
+      action: "notification"
+      target: "INTERNAL"
+      parameters:
+        channel: "#soc-critical"
+        template: "oauth_abuse_incident"
+        ticket_system: "jira"
+        severity: "P2"
+        title: "OAuth Consent Abuse — {target_user}"
+        attach_exposure_report: true
+      timeout: "30s"
+      retry:
+        max_attempts: 2
+        backoff: "exponential"
+      on_failure: "skip"
+
+  outputs:
+    - name: "revocation_status"
+      type: "string"
+      description: "Status of the malicious app consent revocation"
+    - name: "all_app_permissions"
+      type: "array"
+      description: "Complete list of third-party app permissions for the user"
+    - name: "data_exposure_report"
+      type: "object"
+      description: "Assessment of data accessed by the malicious application"
+
+  rollback:
+    steps:
+      - id: "rollback-1"
+        name: "re_enable_user_account"
+        action: "api_call"
+        target: "BODY"
+        parameters:
+          action: "enable_user"
+          user_id: "{target_user}"
+      - id: "rollback-2"
+        name: "restore_legitimate_app_consents"
+        action: "api_call"
+        target: "BODY"
+        parameters:
+          action: "restore_app_consent"
+          app_id: "{malicious_app_id}"
+
+  governance:
+    requires_brain_oversight: true
+    max_blast_radius: "user"
+    audit_level: "verbose"
+    human_approval_required: false

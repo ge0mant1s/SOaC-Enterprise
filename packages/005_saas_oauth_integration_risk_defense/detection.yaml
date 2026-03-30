@@ -1,0 +1,172 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+
+metadata:
+  name: "saas-oauth-integration-risk-detection"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  package_id: "pkg-005"
+  mitre_attack:
+    - technique: "T1098.003"
+      tactic: "Persistence"
+    - technique: "T1566.002"
+      tactic: "Initial Access"
+    - technique: "T1567"
+      tactic: "Exfiltration"
+    - technique: "T1528"
+      tactic: "Credential Access"
+    - technique: "T1530"
+      tactic: "Collection"
+  severity: "HIGH"
+  confidence: "HIGH"
+  tags: ["pkg-005", "saas", "oauth", "consent-phishing", "exfiltration"]
+
+spec:
+  description: "Detects OAuth consent phishing, illicit consent grants to over-permissioned third-party applications, suspicious token usage patterns, SaaS-to-SaaS lateral movement, and bulk data exfiltration via SaaS integration APIs."
+
+  data_sources:
+    - name: "Azure AD Audit Logs"
+      type: "api"
+      fields: ["activityDisplayName", "targetResources", "initiatedBy", "additionalDetails"]
+    - name: "Microsoft 365 Unified Audit Log"
+      type: "api"
+      fields: ["Operation", "UserId", "ClientIP", "ObjectId"]
+    - name: "Google Workspace Admin Logs"
+      type: "api"
+      fields: ["event.name", "actor.email", "parameters"]
+
+  logic:
+    type: "correlation"
+    timewindow: "15m"
+    implementations:
+      sentinel:
+        kql: |
+          // Detect illicit OAuth consent grants with suspicious permissions
+          let consent_grants = AuditLogs
+          | where OperationName == "Consent to application"
+          | extend AppName = tostring(TargetResources[0].displayName)
+          | extend Permissions = tostring(TargetResources[0].modifiedProperties[0].newValue)
+          | where Permissions has_any ("Mail.ReadWrite", "Files.ReadWrite.All", "User.ReadWrite.All", "Directory.ReadWrite.All", "Mail.Send")
+          | project ConsentTime=TimeGenerated, UserPrincipalName=tostring(InitiatedBy.user.userPrincipalName), AppName, Permissions;
+          // Detect bulk data access following consent
+          let bulk_access = OfficeActivity
+          | where Operation in ("FileAccessed", "FileDownloaded", "FileSyncDownloadedFull")
+          | summarize FileCount=count(), Files=make_set(SourceFileName, 20) by UserId, ClientIP, bin(TimeGenerated, 5m)
+          | where FileCount > 50;
+          // Correlate consent grant with bulk access
+          consent_grants
+          | join kind=inner (bulk_access) on $left.UserPrincipalName == $right.UserId
+          | where datetime_diff('minute', TimeGenerated, ConsentTime) between (0 .. 60)
+          | project ConsentTime, UserPrincipalName, AppName, Permissions, FileCount, Files
+      sigma:
+        rule: |
+          title: Suspicious OAuth Application Consent with High Privileges
+          status: experimental
+          logsource:
+            product: azure
+            service: auditlogs
+          detection:
+            selection:
+              properties.message: Consent to application
+            filter_permissions:
+              TargetResources.modifiedProperties.newValue|contains:
+                - 'Mail.ReadWrite'
+                - 'Files.ReadWrite.All'
+                - 'User.ReadWrite.All'
+                - 'Directory.ReadWrite.All'
+            condition: selection and filter_permissions
+          level: high
+          tags:
+            - attack.persistence
+            - attack.t1098.003
+            - attack.initial_access
+            - attack.t1566.002
+      splunk:
+        spl: |
+          index=o365 sourcetype="o365:management:activity" Operation="Consent to application"
+          | spath output=app_name path=Target{}.Name
+          | spath output=permissions path=ModifiedProperties{}.NewValue
+          | where match(permissions, "(Mail\\.ReadWrite|Files\\.ReadWrite\\.All|User\\.ReadWrite\\.All|Directory\\.ReadWrite\\.All)")
+          | eval risk_score=case(
+              match(permissions, "Directory\\.ReadWrite\\.All"), 95,
+              match(permissions, "Mail\\.ReadWrite"), 85,
+              match(permissions, "Files\\.ReadWrite\\.All"), 90,
+              true(), 75)
+          | stats count min(_time) as first_seen max(_time) as last_seen values(app_name) as apps values(permissions) as granted_permissions by UserId
+          | sort -risk_score
+      crowdstrike:
+        hunt: |
+          // CrowdStrike Falcon Identity Protection: Suspicious OAuth consent
+          event_simpleName=OAuthAppConsent
+          | PermissionLevel IN ("high", "critical")
+          | stats count values(AppName) values(GrantedScopes) by UserPrincipalName timestamp
+          | where count >= 1
+          | sort -timestamp
+      wazuh:
+        rule: |
+          <group name="saas,oauth,consent-phishing,">
+            <rule id="100401" level="13">
+              <if_sid>99000</if_sid>
+              <field name="azure.operationName">Consent to application</field>
+              <field name="azure.properties.targetResources" type="pcre2">Mail\.ReadWrite|Files\.ReadWrite\.All</field>
+              <description>Suspicious OAuth consent grant with high-privilege permissions</description>
+              <mitre>
+                <id>T1098.003</id>
+                <id>T1566.002</id>
+              </mitre>
+            </rule>
+            <rule id="100402" level="12">
+              <if_sid>99000</if_sid>
+              <field name="o365.Operation">FileDownloaded</field>
+              <field name="o365.ObjectId" type="pcre2">\.xlsx|\.docx|\.pdf|\.csv</field>
+              <description>Bulk file download from SaaS platform after OAuth consent</description>
+              <mitre>
+                <id>T1530</id>
+                <id>T1567</id>
+              </mitre>
+            </rule>
+            <rule id="100403" level="14">
+              <if_sid>100401</if_sid>
+              <frequency>3</frequency>
+              <timeframe>300</timeframe>
+              <description>Multiple high-privilege OAuth consent grants in short window [Consent Phishing Campaign]</description>
+              <mitre>
+                <id>T1098.003</id>
+                <id>T1566.002</id>
+              </mitre>
+            </rule>
+          </group>
+
+  tuning:
+    threshold: 1
+    whitelist: ["Microsoft Flow", "Power Automate", "SharePoint Online"]
+    noise_reduction: "dedup_by_user_and_app"
+
+  response:
+    playbook: "saas-oauth-abuse-containment"
+    escalation: "auto"
+    notify: ["soc-team", "identity-team", "saas-admin-team"]
+
+  test_cases:
+    - name: "positive-consent-phishing"
+      description: "OAuth consent grant with Mail.ReadWrite.All should trigger alert"
+      input:
+        event_type: "consent_grant"
+        permission: "Mail.ReadWrite.All"
+        severity: "HIGH"
+      expected_result: "alert"
+    - name: "positive-bulk-download"
+      description: "More than 50 file downloads within 5 minutes should trigger alert"
+      input:
+        event_type: "file_download"
+        file_count: 75
+        timeframe_minutes: 5
+      expected_result: "alert"
+    - name: "negative-legitimate-consent"
+      description: "Microsoft Flow consent should not trigger alert"
+      input:
+        event_type: "consent_grant"
+        app_name: "Microsoft Flow"
+        permission: "Files.Read"
+      expected_result: "no_alert"
