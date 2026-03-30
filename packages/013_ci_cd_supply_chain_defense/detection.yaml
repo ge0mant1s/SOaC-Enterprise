@@ -1,5 +1,5 @@
 apiVersion: soac.io/v1
-kind: Detection
+kind: DetectionRule
 
 metadata:
   name: "ci-cd-supply-chain-detection"
