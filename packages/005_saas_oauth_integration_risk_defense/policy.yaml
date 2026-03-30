@@ -1,0 +1,106 @@
+apiVersion: soac.io/v1
+kind: Policy
+
+metadata:
+  name: "saas-oauth-integration-risk-policy"
+  version: "1.0.0"
+  author: "SOaC Community"
+  created: "2026-03-28T00:00:00Z"
+  package_id: "pkg-005"
+  scope: "package"
+  tags: ["pkg-005", "saas", "oauth", "governance", "integration-risk"]
+
+spec:
+  description: "Governs OAuth application consent policies, third-party SaaS integration risk management, token lifecycle controls, and data access governance for cloud application integrations."
+
+  environments:
+    - name: "lab"
+      mode: "simulate"
+      data_handling: "synthetic"
+      network_access: "isolated"
+      persistence: "ephemeral"
+      oauth_policy:
+        consent_model: "unrestricted"
+        allow_unverified_publishers: true
+    - name: "staging"
+      mode: "audit"
+      data_handling: "anonymized"
+      network_access: "restricted"
+      persistence: "persistent"
+      oauth_policy:
+        consent_model: "admin_consent_required"
+        allow_unverified_publishers: false
+        token_lifetime_hours: 8
+    - name: "production"
+      mode: "enforce"
+      data_handling: "live"
+      network_access: "full"
+      persistence: "persistent"
+      oauth_policy:
+        consent_model: "admin_consent_required"
+        allow_unverified_publishers: false
+        token_lifetime_hours: 4
+        require_app_allowlist: true
+        max_permission_scope: "delegated_only"
+        block_legacy_auth: true
+
+  actions:
+    allowed:
+      - "detect"
+      - "alert"
+      - "enrich"
+      - "revoke_consent"
+      - "revoke_tokens"
+      - "disable_account"
+      - "assess_exposure"
+      - "audit_permissions"
+      - "notify"
+    blocked:
+      - "delete_data"
+      - "exfiltrate"
+      - "disable_logging"
+      - "grant_consent_programmatically"
+      - "bypass_admin_consent"
+    requires_approval:
+      - "disable_account"
+      - "org_wide_consent_revocation"
+      - "modify_consent_policy"
+
+  access_control:
+    roles:
+      - name: "soc_analyst"
+        permissions: ["read", "execute", "revoke_consent"]
+      - name: "saas_admin"
+        permissions: ["read", "write", "audit_permissions", "modify_consent_policy"]
+      - name: "identity_engineer"
+        permissions: ["read", "write", "revoke_tokens", "disable_account"]
+      - name: "admin"
+        permissions: ["read", "write", "execute", "admin"]
+    authentication:
+      required: true
+      methods: ["sso", "mfa"]
+    conditional_access:
+      saas_admin_actions:
+        require_pim_activation: true
+        require_mfa_step_up: true
+        allowed_locations: ["corporate_network", "vpn"]
+
+  compliance:
+    frameworks: ["NIST CSF", "MITRE ATT&CK", "CIS Controls v8", "ISO 27001"]
+    controls: ["PR.AC-4", "DE.CM-7", "RS.MI-1", "PR.DS-5"]
+    review_frequency: "quarterly"
+    saas_governance:
+      app_review_cadence: "quarterly"
+      permission_audit_cadence: "monthly"
+      shadow_it_discovery: "continuous"
+      data_classification_required: true
+
+  audit:
+    log_level: "verbose"
+    retention: "365d"
+    immutable: true
+    oauth_audit:
+      track_consent_grants: true
+      track_token_usage: true
+      track_permission_changes: true
+      alert_on_new_high_privilege_app: true
