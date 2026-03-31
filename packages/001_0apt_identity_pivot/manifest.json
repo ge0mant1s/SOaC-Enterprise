@@ -13,7 +13,10 @@
     "phishing",
     "session-hijack",
     "okta",
-    "entra-id"
+    "entra-id",
+    "red_team",
+    "blue_team",
+    "soc_manager"
   ],
   "threat_actor": "0APT",
   "github_path": "packages/001_0apt_identity_pivot",
@@ -45,42 +48,57 @@
   "simulation_steps": [
     {
       "step_index": 1,
-      "role": "Red Team",
       "title": "Send AitM Phishing Email",
-      "technique": [
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
         "T1566.002"
       ]
     },
     {
       "step_index": 2,
-      "role": "Red Team",
       "title": "Intercept Credentials via AitM Proxy",
-      "technique": [
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
         "T1557.001"
       ]
     },
     {
       "step_index": 3,
-      "role": "Red Team",
       "title": "Steal Session Token",
-      "technique": [
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
         "T1539"
       ]
     },
     {
       "step_index": 4,
-      "role": "Red Team",
       "title": "Replay Session from Attacker Infrastructure",
-      "technique": [
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
         "T1539",
         "T1078.004"
       ]
     },
     {
       "step_index": 5,
-      "role": "Red Team",
       "title": "Pivot to Cloud Applications",
-      "technique": [
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
         "T1078.004"
       ]
     }
@@ -96,5 +114,6 @@
   "created": "2026-03-28",
   "updated": "2026-03-28",
   "license": "Apache-2.0",
-  "author": "SOaC Community"
+  "author": "SOaC Community",
+  "difficulty_label": "Advanced"
 }

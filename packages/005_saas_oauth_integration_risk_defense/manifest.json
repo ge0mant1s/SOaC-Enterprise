@@ -12,7 +12,10 @@
     "oauth",
     "token-abuse",
     "data-exfiltration",
-    "consent-phishing"
+    "consent-phishing",
+    "red_team",
+    "blue_team",
+    "soc_manager"
   ],
   "threat_actor": null,
   "github_path": "packages/005_saas_oauth_integration_risk_defense",
@@ -51,27 +54,47 @@
   "simulation_steps": [
     {
       "step_index": 1,
-      "role": "Red Team",
       "title": "Consent Phishing Campaign",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1098.003"
+      ]
     },
     {
       "step_index": 2,
-      "role": "Red Team",
       "title": "Illicit Consent Grant",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1566.002"
+      ]
     },
     {
       "step_index": 3,
-      "role": "Red Team",
       "title": "Mailbox Enumeration",
-      "technique": []
+      "description": "",
+      "role": "soc_team",
+      "phase": "Exfiltration",
+      "pillar": "Respond",
+      "mitre_techniques": [
+        "T1567"
+      ]
     },
     {
       "step_index": 5,
-      "role": "Red Team",
       "title": "Bulk File Download",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1528"
+      ]
     }
   ],
   "lab_scenarios": [
@@ -85,5 +108,6 @@
   "created": "2025-03-28",
   "updated": "",
   "license": "MIT",
-  "author": "SOaC Framework"
+  "author": "SOaC Framework",
+  "difficulty_label": "Advanced"
 }

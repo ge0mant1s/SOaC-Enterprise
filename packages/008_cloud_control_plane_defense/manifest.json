@@ -15,7 +15,10 @@
     "defense",
     "federation",
     "serverless",
-    "cryptojacking"
+    "cryptojacking",
+    "red_team",
+    "blue_team",
+    "soc_manager"
   ],
   "threat_actor": null,
   "github_path": "packages/008_cloud_control_plane_defense",
@@ -48,27 +51,47 @@
   "simulation_steps": [
     {
       "step_index": 1,
-      "role": "Red Team",
       "title": "Service Principal Abuse",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1484.002"
+      ]
     },
     {
       "step_index": 2,
-      "role": "Red Team",
       "title": "Federation Tampering",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1525"
+      ]
     },
     {
       "step_index": 4,
-      "role": "Red Team",
       "title": "Lambda Backdoor",
-      "technique": []
+      "description": "",
+      "role": "ciso",
+      "phase": "Impact",
+      "pillar": "Govern",
+      "mitre_techniques": [
+        "T1496"
+      ]
     },
     {
       "step_index": 5,
-      "role": "Red Team",
       "title": "GPU Instance Launch",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1098.001"
+      ]
     }
   ],
   "lab_scenarios": [
@@ -82,5 +105,6 @@
   "created": "2025-03-28",
   "updated": "",
   "license": "MIT",
-  "author": "SOaC Framework"
+  "author": "SOaC Framework",
+  "difficulty_label": "Elite"
 }

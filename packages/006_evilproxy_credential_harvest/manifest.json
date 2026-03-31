@@ -13,7 +13,10 @@
     "phishing",
     "mfa-bypass",
     "aitm",
-    "session-theft"
+    "session-theft",
+    "red_team",
+    "blue_team",
+    "soc_manager"
   ],
   "threat_actor": "EvilProxy",
   "github_path": "packages/006_evilproxy_credential_harvest",
@@ -45,33 +48,58 @@
   "simulation_steps": [
     {
       "step_index": 1,
-      "role": "Red Team",
       "title": "EvilProxy Link Delivery",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1557.001"
+      ]
     },
     {
       "step_index": 2,
-      "role": "Red Team",
       "title": "AitM Session Interception",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1539"
+      ]
     },
     {
       "step_index": 3,
-      "role": "Red Team",
       "title": "MFA Push Bombing",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1621"
+      ]
     },
     {
       "step_index": 5,
-      "role": "Red Team",
       "title": "Session Replay",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1566.002"
+      ]
     },
     {
       "step_index": 6,
-      "role": "Red Team",
       "title": "Inbox Rule Creation",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1114.003"
+      ]
     }
   ],
   "lab_scenarios": [
@@ -85,5 +113,6 @@
   "created": "2025-03-28",
   "updated": "",
   "license": "MIT",
-  "author": "SOaC Framework"
+  "author": "SOaC Framework",
+  "difficulty_label": "Advanced"
 }
