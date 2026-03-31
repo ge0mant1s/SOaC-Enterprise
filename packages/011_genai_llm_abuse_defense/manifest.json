@@ -14,7 +14,10 @@
     "data-exfiltration",
     "model-supply-chain",
     "owasp-llm",
-    "gtr-2025"
+    "gtr-2025",
+    "red_team",
+    "blue_team",
+    "soc_manager"
   ],
   "threat_actor": "Multiple (SCATTERED SPIDER, FAMOUS CHOLLIMA)",
   "github_path": "packages/011_genai_llm_abuse_defense",
@@ -45,49 +48,67 @@
   "simulation_steps": [
     {
       "step_index": 1,
-      "role": "Red Team",
       "title": "Enumerate AI Endpoints",
-      "technique": [
+      "description": "",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
         "T1595.002"
       ]
     },
     {
       "step_index": 2,
-      "role": "Red Team",
       "title": "DAN Jailbreak Prompt Injection",
-      "technique": [
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
         "T1190"
       ]
     },
     {
       "step_index": 4,
-      "role": "Red Team",
       "title": "Extract Credentials via Crafted Queries",
-      "technique": [
+      "description": "",
+      "role": "soc_team",
+      "phase": "Exfiltration",
+      "pillar": "Respond",
+      "mitre_techniques": [
         "T1041"
       ]
     },
     {
       "step_index": 6,
-      "role": "Red Team",
       "title": "Distribute Backdoored Model on Hugging Face",
-      "technique": [
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
         "T1195.002"
       ]
     },
     {
       "step_index": 7,
-      "role": "Victim",
       "title": "Data Scientist Downloads Poisoned Model",
-      "technique": [
+      "description": "",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
         "T1195.002"
       ]
     },
     {
       "step_index": 9,
-      "role": "Red Team",
       "title": "LLMjacking - Massive Unauthorized Inference",
-      "technique": [
+      "description": "",
+      "role": "ciso",
+      "phase": "Impact",
+      "pillar": "Govern",
+      "mitre_techniques": [
         "T1496"
       ]
     }
@@ -103,5 +124,6 @@
   "created": "2025-03-15",
   "updated": "2025-03-28",
   "license": "MIT",
-  "author": "SOaC Framework"
+  "author": "SOaC Framework",
+  "difficulty_label": "Advanced"
 }

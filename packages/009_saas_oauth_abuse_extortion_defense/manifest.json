@@ -13,7 +13,10 @@
     "oauth",
     "extortion",
     "defense",
-    "data-theft"
+    "data-theft",
+    "red_team",
+    "blue_team",
+    "soc_manager"
   ],
   "threat_actor": null,
   "github_path": "packages/009_saas_oauth_abuse_extortion_defense",
@@ -50,33 +53,58 @@
   "simulation_steps": [
     {
       "step_index": 1,
-      "role": "Red Team",
       "title": "OAuth Token Compromise",
-      "technique": []
+      "description": "",
+      "role": "soc_team",
+      "phase": "Exfiltration",
+      "pillar": "Respond",
+      "mitre_techniques": [
+        "T1567.002"
+      ]
     },
     {
       "step_index": 2,
-      "role": "Red Team",
       "title": "SaaS Data Mapping",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Discovery",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1213"
+      ]
     },
     {
       "step_index": 3,
-      "role": "Red Team",
       "title": "Bulk Data Staging",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Discovery",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1657"
+      ]
     },
     {
       "step_index": 5,
-      "role": "Red Team",
       "title": "Anonymous Link Creation",
-      "technique": []
+      "description": "",
+      "role": "red_team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1098.003"
+      ]
     },
     {
       "step_index": 6,
-      "role": "Red Team",
       "title": "Ransom Communication",
-      "technique": []
+      "description": "",
+      "role": "blue_team",
+      "phase": "Collection",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1530"
+      ]
     }
   ],
   "lab_scenarios": [
@@ -90,5 +118,6 @@
   "created": "2025-03-28",
   "updated": "",
   "license": "MIT",
-  "author": "SOaC Framework"
+  "author": "SOaC Framework",
+  "difficulty_label": "Advanced"
 }
