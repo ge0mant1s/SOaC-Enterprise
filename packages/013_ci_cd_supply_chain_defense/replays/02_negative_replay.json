@@ -1,0 +1,15 @@
+{
+  "test_id": "013-L3-002",
+  "description": "Negative replay for legitimate image scanning without secret access or tag mutation",
+  "expected_matches": [],
+  "events": [
+    {
+      "provider": "MDE",
+      "event_name": "ProcessExecution",
+      "data": {
+        "ProcessName": "trivy",
+        "CommandLine": "trivy image --severity HIGH,CRITICAL alpine:latest"
+      }
+    }
+  ]
+}

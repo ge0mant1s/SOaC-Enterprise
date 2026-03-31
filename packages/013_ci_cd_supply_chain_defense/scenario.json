@@ -1,141 +1,107 @@
 {
-  "package_id": "pkg-013",
-  "title": "CI/CD Supply Chain Defense",
+  "scenario_id": "013-SIM-001",
+  "name": "Trivy-Style CI/CD Version Tag Mutation, Secret Harvest, and Artifact Poisoning",
   "version": "1.0.0",
+  "difficulty": 4,
+  "roles": [
+    "red_team",
+    "blue_team",
+    "soc_manager"
+  ],
+  "objective": "Validate detection and response coverage for a CI/CD supply chain attack where a trusted tool tag is mutated to deliver a malicious payload that harvests secrets, poisons artifacts, and attempts cloud pivoting.",
   "steps": [
     {
+      "step_index": 0,
+      "step": 1,
+      "title": "Obtain CI token",
+      "description": "Exploit CI/CD misconfiguration or prior compromise to obtain a privileged service account token.",
+      "role": "red_team"
+    },
+    {
       "step_index": 1,
-      "role": "Red Team",
-      "phase": "Initial Access",
-      "pillar": "Offense",
-      "title": "Force-Push Mutated Version Tag",
-      "text": "Attacker force-pushes a mutated version tag (e.g., v0.69.3) to redirect builds to malicious code.",
-      "description": "The attacker exploits lax tag protection policies to force-push a modified tag pointing to a commit containing backdoored code. Downstream CI/CD pipelines pinned to this tag will now build the compromised version.",
-      "mitre": ["T1195.002"],
-      "expectedOutcome": "Builds now reference attacker-controlled code via the mutated tag",
-      "detectionHints": "Monitor GitHub audit logs for forced tag pushes, verify tag signatures",
-      "playbookRefs": []
+      "step": 2,
+      "title": "Access release pipeline",
+      "description": "Use the token to access the release automation environment and enumerate trusted tags and workflows.",
+      "role": "red_team"
     },
     {
       "step_index": 2,
-      "role": "Red Team",
-      "phase": "Execution",
-      "pillar": "Offense",
-      "title": "Inject Malicious Build Step",
-      "text": "Backdoored code injects a malicious step into the CI/CD workflow that runs during build.",
-      "description": "The compromised codebase includes a modified workflow file or build script that executes attacker code during the CI pipeline run. This step may download additional payloads, modify build outputs, or establish persistence.",
-      "mitre": ["T1059.004"],
-      "expectedOutcome": "Arbitrary code execution within the CI runner environment",
-      "detectionHints": "Monitor workflow file changes, detect unexpected process execution in runners",
-      "playbookRefs": ["pb-013-01"]
+      "step": 3,
+      "title": "Mutate trusted tag",
+      "description": "Force-push malicious code to an existing trusted version tag rather than creating a new suspicious release.",
+      "role": "red_team"
     },
     {
       "step_index": 3,
-      "role": "Red Team",
-      "phase": "Credential Access",
-      "pillar": "Offense",
-      "title": "Exfiltrate Secrets from Runner Environment",
-      "text": "Malicious build step harvests CI/CD secrets, tokens, and SSH keys from the runner.",
-      "description": "The attacker code reads environment variables containing GITHUB_TOKEN, AWS credentials, Docker registry passwords, SSH keys, and other secrets commonly available in CI runners. Secrets are staged for exfiltration.",
-      "mitre": ["T1552.001"],
-      "expectedOutcome": "CI/CD secrets and credentials captured from runner environment",
-      "detectionHints": "Monitor for SSH key creation in runner directories, unusual env var access",
-      "playbookRefs": ["pb-013-01"]
+      "step": 4,
+      "title": "Trigger downstream build",
+      "description": "Allow dependent pipelines to pull the poisoned action or artifact during normal build execution.",
+      "role": "red_team"
     },
     {
       "step_index": 4,
-      "role": "Red Team",
-      "phase": "Defense Evasion",
-      "pillar": "Offense",
-      "title": "Publish Tampered Artifact to Registry",
-      "text": "Attacker publishes a backdoored build artifact to the container/package registry.",
-      "description": "The compromised pipeline produces a tampered artifact (container image, npm package, or binary) and publishes it to the legitimate registry using stolen credentials. The artifact appears authentic but contains the backdoor.",
-      "mitre": ["T1195.002", "T1105"],
-      "expectedOutcome": "Tampered artifact published under legitimate version in registry",
-      "detectionHints": "Verify artifact signatures, compare build hashes with expected values",
-      "playbookRefs": ["pb-013-01", "pb-013-02"]
+      "step": 5,
+      "title": "Harvest SSH keys",
+      "description": "Enumerate runner filesystem locations and access SSH keys, tokens, cloud credential files, and kubeconfigs.",
+      "role": "red_team"
     },
     {
       "step_index": 5,
-      "role": "Red Team",
-      "phase": "Command and Control",
-      "pillar": "Offense",
-      "title": "C2 Callback from Compromised Pipeline",
-      "text": "Exfiltrated secrets are sent to attacker C2 via HTTPS from the CI runner.",
-      "description": "The malicious build step transmits harvested credentials and secrets to an attacker-controlled endpoint over HTTPS, blending with normal CI/CD outbound traffic.",
-      "mitre": ["T1071.001"],
-      "expectedOutcome": "Attacker receives stolen CI/CD credentials",
-      "detectionHints": "Network monitoring for unusual outbound connections from CI runners",
-      "playbookRefs": ["pb-013-01"]
+      "step": 6,
+      "title": "Detect malicious build behavior",
+      "description": "Blue team validates alerts for forced tag mutation, secret file access, and anomalous runner egress.",
+      "role": "blue_team"
     },
     {
       "step_index": 6,
-      "role": "Blue Team",
-      "phase": "Detection",
-      "pillar": "Defense",
-      "title": "Tag Mutation & Secret Exfil Alert",
-      "text": "Detection rules correlate forced tag push with secret access and unusual file creation.",
-      "description": "The detection analytics correlate three signals: forced tag push in GitHub audit logs, SSH key file creation in runner home directory, and outbound HTTPS to non-approved domains. A Critical alert fires.",
-      "mitre": ["T1195.002", "T1552.001"],
-      "expectedOutcome": "SOC receives correlated supply chain attack alert",
-      "detectionHints": "Sentinel correlation rule, Sigma for file creation, Splunk for network",
-      "playbookRefs": ["pb-013-01"]
+      "step": 7,
+      "title": "Contain pipeline",
+      "description": "Disable runners, pause active workflows, and revoke compromised CI/CD tokens and app installations.",
+      "role": "blue_team"
     },
     {
       "step_index": 7,
-      "role": "Blue Team",
-      "phase": "Containment",
-      "pillar": "Defense",
-      "title": "CLAW: Freeze Pipeline & Rotate Secrets",
-      "text": "Automated playbook disables compromised workflows, rotates all exposed secrets, and quarantines artifacts.",
-      "description": "The containment playbook: (1) disables the compromised GitHub Actions workflow, (2) revokes all GitHub tokens and PATs, (3) rotates AWS/Docker credentials, (4) quarantines the tampered artifact in the registry, (5) creates P1 incident.",
-      "mitre": ["T1195.002"],
-      "expectedOutcome": "Pipeline frozen, secrets rotated, tampered artifacts quarantined",
-      "detectionHints": "Verify playbook execution logs",
-      "playbookRefs": ["pb-013-01", "pb-013-02"]
+      "step": 8,
+      "title": "Rotate secrets",
+      "description": "Rotate exposed AWS, Azure, GCP, GitHub, Docker, and Kubernetes credentials accessible to affected runners.",
+      "role": "blue_team"
     },
     {
       "step_index": 8,
-      "role": "SOC",
-      "phase": "Investigation",
-      "pillar": "Defense",
-      "title": "Build Provenance Audit",
-      "text": "SOC analyst verifies build provenance chain and identifies all affected downstream consumers.",
-      "description": "Full audit of the build provenance: compare artifact hashes against signed manifests, trace all downstream consumers of the tampered artifact, enumerate all environments that pulled the compromised version.",
-      "mitre": ["T1195.002"],
-      "expectedOutcome": "Complete blast radius assessment with consumer list",
-      "detectionHints": "Registry pull logs, deployment manifests, SBOM analysis",
-      "playbookRefs": ["pb-013-02"]
+      "step": 9,
+      "title": "Validate artifact trust",
+      "description": "Rebuild from trusted commits, verify signatures, compare SBOMs, and block promotion of exposure-window artifacts.",
+      "role": "blue_team"
     },
     {
       "step_index": 9,
-      "role": "CISO",
-      "phase": "Decision",
-      "pillar": "Governance",
-      "title": "Artifact Recall Decision",
-      "text": "CISO decides: full artifact recall vs. targeted remediation.",
-      "description": "With confirmed supply chain compromise, the CISO must decide whether to initiate a full artifact recall affecting all consumers or targeted remediation of known-affected systems only.",
-      "mitre": ["T1195.002"],
-      "expectedOutcome": "Decision documented with rationale and timeline",
-      "cisoType": "binary_decision",
-      "cisoOptions": [
-        {"label": "Full Artifact Recall", "impact": "All consumers notified, artifact pulled from registry — 8h disruption"},
-        {"label": "Targeted Remediation", "impact": "Only confirmed-affected systems patched — 2h, residual risk"}
-      ],
-      "playbookRefs": ["pb-013-01"]
+      "step": 10,
+      "title": "Check cloud pivot",
+      "description": "Investigate attempted use of exposed credentials for AWS or cloud control-plane access.",
+      "role": "blue_team"
     },
     {
       "step_index": 10,
-      "role": "Blue Team",
-      "phase": "Hardening",
-      "pillar": "Defense",
-      "title": "Enforce Tag Protection & SLSA Build Provenance",
-      "text": "Deploy tag protection rules, artifact signing, and SLSA Level 3 build provenance verification.",
-      "description": "Apply governance controls: enable tag protection on all release branches, require signed commits and tags, enforce SLSA Level 3 build provenance for all artifacts, implement Sigstore cosign verification in deployment pipelines.",
-      "mitre": ["T1195.002"],
-      "expectedOutcome": "Hardened CI/CD pipeline with defense-in-depth against supply chain attacks",
-      "detectionHints": "Policy enforcement confirmed, monitoring active",
-      "playbookRefs": []
+      "step": 11,
+      "title": "Executive escalation",
+      "description": "SOC manager opens P1 incident, coordinates downstream notifications, and publishes internal advisory.",
+      "role": "soc_manager"
+    },
+    {
+      "step_index": 11,
+      "step": 12,
+      "title": "Lessons learned",
+      "description": "Capture detection gaps, enforce SHA pinning, ephemeral runners, signing, and OIDC-only cloud access as corrective actions.",
+      "role": "soc_manager"
     }
-  ]
+  ],
+  "success_criteria": [
+    "Forced tag mutation detected within 5 minutes",
+    "Secret-access or runner-behavior alert generated during build execution",
+    "Containment initiated within 15 minutes",
+    "All affected secrets rotated within 2 hours",
+    "No exposure-window artifact promoted to production",
+    "P1 incident and downstream advisory issued within 1 hour"
+  ],
+  "lab_safety_policy": "SIMULATE mode only | No production systems affected"
 }

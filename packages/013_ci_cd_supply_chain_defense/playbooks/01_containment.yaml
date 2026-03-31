@@ -1,0 +1,9 @@
+id: 013-PLY-001
+name: CLAW CI/CD Supply Chain Containment
+severity: critical
+steps:
+  - disable-runners
+  - pause-active-workflows
+  - revoke-github-tokens
+  - revoke-app-installations
+  - preserve-logs

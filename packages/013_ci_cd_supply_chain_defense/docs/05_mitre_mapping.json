@@ -1,0 +1,33 @@
+{
+  "package_id": "pkg-013",
+  "techniques": [
+    {
+      "id": "T1195.002",
+      "name": "Compromise Software Supply Chain"
+    },
+    {
+      "id": "T1552.001",
+      "name": "Credentials In Files"
+    },
+    {
+      "id": "T1552.004",
+      "name": "Private Keys"
+    },
+    {
+      "id": "T1078.004",
+      "name": "Cloud Accounts"
+    },
+    {
+      "id": "T1567.001",
+      "name": "Exfiltration to Code Repository"
+    },
+    {
+      "id": "T1528",
+      "name": "Steal Application Access Token"
+    },
+    {
+      "id": "T1550.001",
+      "name": "Use Alternate Authentication Material"
+    }
+  ]
+}

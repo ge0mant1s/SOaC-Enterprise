@@ -1,0 +1,43 @@
+{
+  "package_id": "pkg-013",
+  "post": {
+    "hook": "Dependency confusion, tag mutation, build hijacking — your pipeline is an attack surface.",
+    "body": "CI/CD pipelines hold secrets, build artifacts, and deployment credentials. A single compromised dependency or poisoned build step can cascade through your entire software supply chain. This package covers 7 supply chain attack techniques end-to-end.\n\nWhat's inside the CI/CD Supply Chain Defense SOaC package:\n→ 10 detection rules (Sigma, KQL, SPL, CrowdStrike, Wazuh)\n→ 2 SOAR playbooks\n→ 6 policy & runbook documents\n→ 1 validated replay scenarios\n→ MITRE ATT&CK: T1195.002, T1059.004, T1552.001, T1496, T1588.001, T1105, T1071.001\n\nEvery detection in this Elite-tier package has been validated against real attack telemetry in github_actions, gitlab_ci, linux, container_registry. The included SOAR playbooks integrate with your existing stack — no vendor lock-in, no proprietary formats. Detections ship as code. Playbooks ship as code. Policies ship as code.",
+    "cta": "💬 Comment “CICD” and I’ll DM you the full package.",
+    "cta_keyword": "CICD",
+    "hashtags": [
+      "#SOaC",
+      "#OpenCLAW",
+      "#CyberSecurity",
+      "#ThreatDetection",
+      "#CICD",
+      "#SupplyChainSecurity",
+      "#PipelineSecurity",
+      "#DependencyConfusion",
+      "#GitHubActions",
+      "#ContainerSecurity"
+    ],
+    "full_text": "Dependency confusion, tag mutation, build hijacking — your pipeline is an attack surface.\n\nCI/CD pipelines hold secrets, build artifacts, and deployment credentials. A single compromised dependency or poisoned build step can cascade through your entire software supply chain. This package covers 7 supply chain attack techniques end-to-end.\n\nWhat's inside the CI/CD Supply Chain Defense SOaC package:\n→ 10 detection rules (Sigma, KQL, SPL, CrowdStrike, Wazuh)\n→ 2 SOAR playbooks\n→ 6 policy & runbook documents\n→ 1 validated replay scenarios\n→ MITRE ATT&CK: T1195.002, T1059.004, T1552.001, T1496, T1588.001, T1105, T1071.001\n\nEvery detection in this Elite-tier package has been validated against real attack telemetry in github_actions, gitlab_ci, linux, container_registry. The included SOAR playbooks integrate with your existing stack — no vendor lock-in, no proprietary formats. Detections ship as code. Playbooks ship as code. Policies ship as code.\n\n💬 Comment “CICD” and I’ll DM you the full package.\n\n#SOaC #OpenCLAW #CyberSecurity #ThreatDetection #CICD #SupplyChainSecurity #PipelineSecurity #DependencyConfusion #GitHubActions #ContainerSecurity",
+    "char_count": 1156
+  },
+  "image": {
+    "prompt": "Dark cinematic cybersecurity illustration, 1200x627, deep navy and emerald color palette. Central element: a glowing digital shield with circuit-board patterns and a padlock icon. Background: abstract code streams, binary rain, and subtle network topology lines. Overlay text in bold monospace font: \"CI/CD Supply Chain Defense\". Bottom-right corner: small \"SOaC\" watermark in terminal green. Style: professional, editorial, no vendor logos, no cartoon elements. Mood: authoritative, technical, high-stakes security operations.",
+    "alt_text": "SOaC Package: CI/CD Supply Chain Defense — 10 detections, 7 MITRE techniques",
+    "suggested_dimensions": "1200x627",
+    "style": "cinematic-editorial",
+    "color_palette": "deep navy + emerald"
+  },
+  "engagement": {
+    "best_post_time": "Tuesday–Thursday 08:00–10:00 CET",
+    "first_comment": "🔗 Full package on GitHub: https://github.com/ge0mant1s/SOaC-Enterprise/tree/main/packages/013_ci_cd_supply_chain_defense\n\nOne detail not in the post: the 10 detection rules include cross-platform correlation logic — a single alert fires when activity matches across multiple telemetry sources, reducing false positives by focusing on attack chains rather than isolated events.",
+    "poll_question": "Does your org scan CI artifacts and verify build provenance before deployment?",
+    "follow_up_day3": "48 hours in — people asked for this. Here's one thing the package catches that most SIEMs miss: build artifact hash mutation detection — catches tag poisoning before compromised packages reach production.",
+    "follow_up_hook": "48 hours in — people asked for this. Here's one thing the package catches that most SIEMs miss: build artifact hash mutation detection — catches tag poisoning before compromised packages reach production."
+  },
+  "meta": {
+    "generated_at": "2026-03-31T10:27:56.348Z",
+    "series_number": 13,
+    "series_position": "Package 13 of 12 in the OpenCLAW SOaC series",
+    "generator_version": "1.0.0"
+  }
+}
