@@ -1,150 +1,126 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://soacframe.io/schemas/manifest.schema.json",
-  "title": "SOaC Package Manifest v3.0",
-  "description": "JSON Schema for SOaC package manifest.json files \u2014 Harness v3.0 compliant",
-  "type": "object",
-  "required": [
-    "package_id",
-    "title",
-    "description",
-    "difficulty",
-    "tier",
-    "roles",
-    "mitre",
-    "stacks",
-    "schema_version",
-    "mitre_version",
-    "platform_targets",
-    "simulation_steps"
-  ],
-  "properties": {
-    "package_id": {
-      "type": "string",
-      "pattern": "^pkg-\\d{3}$",
-      "description": "Canonical package ID (e.g., pkg-001)"
-    },
-    "version": {
-      "type": "string",
-      "description": "Package version (semver)"
-    },
-    "schema_version": {
-      "type": "string",
-      "enum": [
-        "3.0"
-      ],
-      "description": "Harness schema version"
-    },
-    "title": {
-      "type": "string",
-      "minLength": 3,
-      "description": "Human-readable package title"
-    },
-    "description": {
-      "type": "string",
-      "minLength": 10,
-      "description": "Package description"
-    },
-    "difficulty": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 4,
-      "description": "1=Foundations, 2=Intermediate, 3=Advanced, 4=Elite"
-    },
-    "tier": {
-      "type": "string",
-      "enum": [
-        "Foundations",
-        "Intermediate",
-        "Advanced",
-        "Elite"
-      ],
-      "description": "Canonical tier label"
-    },
-    "category": {
-      "type": "string",
-      "description": "Threat category"
-    },
-    "tags": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Searchable tags"
-    },
-    "threat_actor": {
-      "type": [
-        "string",
-        "null"
-      ],
-      "description": "Associated threat actor name (nullable for packages without a specific actor)"
-    },
-    "github_path": {
-      "type": "string",
-      "pattern": "^packages/\\d{3}_",
-      "description": "Relative path in GitHub repo"
-    },
-    "roles": {
-      "type": "array",
-      "items": {},
-      "minItems": 1,
-      "description": "Required roles (string or object format)"
-    },
-    "mitre": {
-      "type": "array",
-      "items": {},
-      "minItems": 1,
-      "description": "MITRE ATT&CK technique references (string IDs or objects)"
-    },
-    "mitre_version": {
-      "type": "string",
-      "description": "MITRE ATT&CK version (e.g., v15.1 or 16.1)"
-    },
-    "stacks": {
-      "type": "array",
-      "items": {},
-      "description": "Detection stacks (string or object format)"
-    },
-    "platform_targets": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Target platforms"
-    },
-    "saas_targets": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "SaaS targets (optional)"
-    },
-    "simulation_steps": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      },
-      "description": "High-level simulation steps"
-    },
-    "lab_scenarios": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      },
-      "description": "Lab scenario references"
-    },
-    "created": {
-      "type": "string"
-    },
-    "updated": {
-      "type": "string"
-    },
-    "license": {
-      "type": "string"
-    },
-    "author": {
-      "type": "string"
-    }
-  },
-  "additionalProperties": true
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "$id": "https://soacframe.io/schemas/manifest.schema.json",
+ "title": "SOaC Package Manifest v3.0 — Canonical v2.0.0",
+ "description": "JSON Schema for SOaC package manifest.json files — accepts both legacy and canonical v2.0.0 fields",
+ "type": "object",
+ "required": [
+ "package_id",
+ "title",
+ "description",
+ "difficulty",
+ "schema_version",
+ "mitre_version",
+ "platform_targets",
+ "simulation_steps"
+ ],
+ "anyOf": [
+ { "required": ["mitre_techniques"] },
+ { "required": ["mitre"] }
+ ],
+ "properties": {
+ "package_id": {
+ "type": "string",
+ "pattern": "^pkg-\\d{3}$",
+ "description": "Canonical package ID (e.g., pkg-001)"
+ },
+ "version": {
+ "type": "string",
+ "description": "Package version (semver)"
+ },
+ "schema_version": {
+ "type": "string",
+ "enum": ["3.0"],
+ "description": "Harness schema version"
+ },
+ "title": {
+ "type": "string",
+ "minLength": 3,
+ "description": "Human-readable package title"
+ },
+ "description": {
+ "type": "string",
+ "minLength": 10,
+ "description": "Package description"
+ },
+ "difficulty": {
+ "type": "integer",
+ "minimum": 1,
+ "maximum": 4,
+ "description": "1=Foundations, 2=Intermediate, 3=Advanced, 4=Elite"
+ },
+ "tier": {
+ "type": "string",
+ "enum": ["Foundations", "Intermediate", "Advanced", "Elite"],
+ "description": "Canonical tier label (optional — derived from difficulty)"
+ },
+ "category": {
+ "type": "string",
+ "description": "Threat category"
+ },
+ "tags": {
+ "type": "array",
+ "items": { "type": "string" },
+ "description": "Searchable tags"
+ },
+ "threat_actor": {
+ "type": ["string", "null"],
+ "description": "Associated threat actor name (nullable)"
+ },
+ "github_path": {
+ "type": "string",
+ "pattern": "^packages/\\d{3}_",
+ "description": "Relative path in GitHub repo"
+ },
+ "roles": {
+ "type": "array",
+ "items": {},
+ "description": "Required roles (optional — can be derived from tags)"
+ },
+ "mitre": {
+ "type": "array",
+ "items": {},
+ "description": "Legacy MITRE ATT&CK references (string IDs or objects)"
+ },
+ "mitre_techniques": {
+ "type": "array",
+ "items": { "type": "string", "pattern": "^T\\d{4}" },
+ "minItems": 1,
+ "description": "Canonical MITRE ATT&CK technique IDs (e.g., T1195.002)"
+ },
+ "mitre_version": {
+ "type": "string",
+ "description": "MITRE ATT&CK version (e.g., v15.1 or 16.1)"
+ },
+ "stacks": {
+ "type": "array",
+ "items": {},
+ "description": "Legacy detection stacks (optional — use platform_targets)"
+ },
+ "platform_targets": {
+ "type": "array",
+ "items": { "type": "string" },
+ "description": "Target platforms"
+ },
+ "saas_targets": {
+ "type": "array",
+ "items": { "type": "string" },
+ "description": "SaaS targets (optional)"
+ },
+ "simulation_steps": {
+ "type": "array",
+ "items": { "type": "object" },
+ "description": "High-level simulation steps (objects with title, role, description)"
+ },
+ "lab_scenarios": {
+ "type": "array",
+ "items": { "type": "object" },
+ "description": "Lab scenario references"
+ },
+ "created": { "type": "string" },
+ "updated": { "type": "string" },
+ "license": { "type": "string" },
+ "author": { "type": "string" }
+ },
+ "additionalProperties": true
 }
