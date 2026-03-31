@@ -1,0 +1,9 @@
+id: 013-CS-004
+name: Anomalous Outbound Connection from Build Runner
+platform: crowdstrike
+severity: high
+logic: |
+  event_simpleName=NetworkConnectIP
+  | filter ProcessName=="Runner.Worker" OR ProcessName=="trivy"
+  | filter RemoteIP!="127.0.0.1" AND RemoteIP!="*.github.com"
+mitre: [T1567.001]

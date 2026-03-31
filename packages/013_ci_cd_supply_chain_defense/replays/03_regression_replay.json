@@ -1,0 +1,19 @@
+{
+  "test_id": "013-L3-003",
+  "description": "Regression replay for anomalous runner egress after compromised build execution",
+  "expected_matches": [
+    "CS-004"
+  ],
+  "events": [
+    {
+      "provider": "NetworkLog",
+      "event_name": "OutboundConnection",
+      "data": {
+        "DestinationIP": "185.199.108.153",
+        "DestinationPort": 443,
+        "ProcessName": "Runner.Worker",
+        "BytesSent": 48200
+      }
+    }
+  ]
+}

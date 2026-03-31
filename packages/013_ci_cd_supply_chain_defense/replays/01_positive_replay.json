@@ -1,0 +1,38 @@
+{
+  "test_id": "013-L3-001",
+  "description": "Positive replay for forced tag mutation and secret harvesting",
+  "expected_matches": [
+    "KQL-001",
+    "Sigma-002",
+    "Splunk-003"
+  ],
+  "events": [
+    {
+      "provider": "GitHubAuditLog",
+      "event_name": "git.push",
+      "data": {
+        "ref": "refs/tags/v0.69.3",
+        "forced": true,
+        "actor": "aqua-bot"
+      }
+    },
+    {
+      "provider": "MDE",
+      "event_name": "FileRead",
+      "data": {
+        "FileName": "id_rsa",
+        "FolderPath": "/home/runner/.ssh/",
+        "ProcessName": "trivy"
+      }
+    },
+    {
+      "provider": "GitHubAuditLog",
+      "event_name": "repo.create",
+      "data": {
+        "repository": "tpcp-docs",
+        "visibility": "public",
+        "actor": "aqua-bot"
+      }
+    }
+  ]
+}

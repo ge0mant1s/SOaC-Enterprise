@@ -1,33 +1,57 @@
 {
   "package_id": "pkg-013",
+  "title": "CI/CD Supply Chain Secret Exposure Defense",
+  "slug": "013_ci_cd_supply_chain_defense",
   "version": "1.0.0",
   "schema_version": "3.0",
-  "title": "CI/CD Supply Chain Defense",
-  "description": "Defense package targeting CI/CD pipeline supply chain attacks including dependency confusion, pipeline poisoning, artifact tampering, version tag mutation (Trivy-style), and secret exfiltration from build environments. Covers GitHub Actions, GitLab CI, and container registries.",
+  "mitre_version": "14.1",
+  "status": "active",
+  "severity": "critical",
   "difficulty": 4,
-  "tier": "Elite",
-  "category": "Supply Chain",
-  "tags": ["ci-cd", "supply-chain", "pipeline-poisoning", "dependency-confusion", "artifact-tampering", "github-actions", "container-security"],
-  "threat_actor": null,
-  "github_path": "packages/013_ci_cd_supply_chain_defense",
-  "roles": ["Red Team", "Blue Team", "SOC", "CISO"],
-  "mitre": ["T1195.002", "T1059.004", "T1552.001", "T1496", "T1588.001", "T1105", "T1071.001"],
-  "mitre_version": "v15.1",
-  "stacks": ["sentinel", "sigma", "splunk", "wazuh", "crowdstrike"],
-  "platform_targets": ["github_actions", "gitlab_ci", "linux", "container_registry"],
-  "saas_targets": ["github", "gitlab", "docker_hub"],
+  "category": "supply-chain",
+  "tags": [
+    "ci-cd",
+    "supply-chain",
+    "secrets",
+    "github-actions",
+    "trivy",
+    "artifact-poisoning",
+    "gtr-2025"
+  ],
+  "platform_targets": [
+    "GitHub Actions",
+    "GitLab CI",
+    "Azure DevOps",
+    "Docker",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Kubernetes"
+  ],
+  "saas_targets": [
+    "GitHub",
+    "DockerHub"
+  ],
+  "description": "Defends against CI/CD supply chain attacks involving version tag mutation, artifact poisoning, and secret harvesting from build runners. Grounded in the March 2026 Trivy-action compromise pattern.",
+  "threat_pattern": "Adversaries steal privileged CI/CD tokens, mutate trusted tags, poison build artifacts, harvest runner secrets, and exfiltrate credentials or staged artifacts to attacker-controlled destinations.",
+  "mitre_techniques": [
+    "T1195.002",
+    "T1552.001",
+    "T1552.004",
+    "T1078.004",
+    "T1567.001",
+    "T1528",
+    "T1550.001"
+  ],
   "simulation_steps": [
-    {"step_index": 1, "role": "Red Team", "title": "Force-Push Mutated Version Tag", "technique": ["T1195.002"]},
-    {"step_index": 2, "role": "Red Team", "title": "Inject Malicious Build Step", "technique": ["T1059.004"]},
-    {"step_index": 3, "role": "Red Team", "title": "Exfiltrate Secrets from Runner Environment", "technique": ["T1552.001"]},
-    {"step_index": 4, "role": "Red Team", "title": "Publish Tampered Artifact to Registry", "technique": ["T1195.002", "T1105"]},
-    {"step_index": 5, "role": "Red Team", "title": "C2 Callback from Compromised Pipeline", "technique": ["T1071.001"]}
+    "Steal CI/CD service account token via misconfiguration or prior compromise",
+    "Access release automation environment or workflow repository",
+    "Force-push malicious code to trusted version tags",
+    "Poison downstream builds that consume mutated tags",
+    "Harvest secrets from runner filesystem and environment variables",
+    "Attempt cloud pivot using exposed credentials or tokens",
+    "Stage or exfiltrate data to attacker-controlled repo or network endpoint",
+    "Trigger recovery, secret rotation, artifact validation, and incident escalation"
   ],
-  "lab_scenarios": [
-    {"id": "lab-013-full", "title": "CI/CD Supply Chain Defense \u2014 Full Simulation", "type": "full", "estimated_minutes": 45}
-  ],
-  "created": "2026-03-30",
-  "updated": "2026-03-30",
-  "license": "Apache-2.0",
-  "author": "SOaC Community"
+  "linkedin_cta": "TRIVY"
 }

@@ -1,0 +1,9 @@
+id: 013-PLY-003
+name: Artifact Trust Recovery and Safe Rebuild
+severity: high
+steps:
+  - enforce-sha-pinning
+  - rebuild-from-trusted-commit
+  - verify-signatures
+  - compare-sbom
+  - block-promotion-of-exposure-window-artifacts

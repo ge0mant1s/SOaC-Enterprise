@@ -1,0 +1,8 @@
+id: 013-SPL-003
+name: Suspicious Public Repo Staging After CI Compromise
+platform: splunk
+severity: high
+logic: |
+  index=github_logs action="public_repo_created" repository="*tpcp-docs*"
+  | stats count by user, repository, src_ip
+mitre: [T1567.001]

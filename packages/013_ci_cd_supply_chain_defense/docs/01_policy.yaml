@@ -1,0 +1,11 @@
+id: 013-POL-001
+name: CI/CD Supply Chain Security Policy
+controls:
+  - sha-pinning-required
+  - oidc-only-cloud-access
+  - ephemeral-runners
+  - artifact-signing
+  - sbom-required
+compliance:
+  - SLSA Level 3
+  - NIST SP 800-218

@@ -1,0 +1,11 @@
+id: 013-DET-KQL-001
+name: Forced CI/CD Version Tag Mutation
+platform: microsoft_sentinel
+severity: critical
+logic: |
+  GitHubAuditLog
+  | where Action == "git.push"
+  | where Data.forced == true
+  | where Data.ref startswith "refs/tags/"
+  | project TimeGenerated, Actor, Repository, Tag=Data.ref, IsForced=Data.forced
+mitre: [T1195.002, T1078.004]
