@@ -1,0 +1,169 @@
+{
+  "test_id": "014-L3-001",
+  "package_id": "pkg-014",
+  "description": "Synthetic telemetry for Supply Chain Package Compromise Defense",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-01T19:57:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "npm account compromise and malicious package injection",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1195.002"
+        ],
+        "description": "Attackers hijacked an Axios maintainer's npm account and released compromised versions (v1.14.1 and v0.30.4) that injected plain-crypto-js as a hidden dependency without modifying Axios source code"
+      },
+      "expected_detection": "rule-014-001",
+      "mitre": [
+        "T1195.002"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-01T19:59:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "Postinstall dropper execution via npm lifecycle hook",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1204.005",
+          "T1027"
+        ],
+        "description": "When developers run npm install axios, the malicious plain-crypto-js dependency triggers npm's postinstall lifecycle hook, executing a heavily obfuscated Node.js dropper script (setup.js) using two-layer encoding with string reversal, Base64-decoding and XOR cipher"
+      },
+      "expected_detection": "rule-014-002",
+      "mitre": [
+        "T1204.005",
+        "T1027"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-01T20:01:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "C2 communication with platform detection",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1082",
+          "T1071.001",
+          "T1105"
+        ],
+        "description": "The dropper queries the operating system and sends HTTP POST requests to C2 server sfrclak[.]com:8000, disguising traffic as benign npm registry requests with platform-specific paths (packages.npm[.]org/product0/1/2)"
+      },
+      "expected_detection": "rule-014-003",
+      "mitre": [
+        "T1082",
+        "T1071.001",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-01T20:03:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "Platform-specific RAT payload deployment",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1105",
+          "T1036.005"
+        ],
+        "description": "C2 server delivers different payloads per OS: macOS receives C++ Mach-O binary saved to /Library/Caches/com.apple.act.mond, Windows gets PowerShell RAT disguised as Windows Terminal (wt.exe), Linux receives Python RAT script (/tmp/ld.py)"
+      },
+      "expected_detection": "rule-014-001",
+      "mitre": [
+        "T1105",
+        "T1036.005"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-01T20:05:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "Cross-platform RAT execution and persistence",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1547.001",
+          "T1036.005",
+          "T1059.001",
+          "T1059.006"
+        ],
+        "description": "All three RAT variants establish persistence using platform-specific methods: macOS via silent execution, Windows via registry Run keys and disguised PowerShell binary, Linux via nohup background execution. All use identical C2 protocol with 60-second beacons"
+      },
+      "expected_detection": "rule-014-002",
+      "mitre": [
+        "T1547.001",
+        "T1036.005",
+        "T1059.001",
+        "T1059.006"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-04-01T20:07:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "Remote access and command execution capabilities",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1219",
+          "T1059",
+          "T1083",
+          "T1105"
+        ],
+        "description": "The unified RAT framework accepts four commands: kill (self-terminate), runscript (execute shell/script commands), peinject (drop and execute binary payloads), and rundir (enumerate directories). All variants use anachronistic IE8/WinXP user-agent for evasion"
+      },
+      "expected_detection": "rule-014-003",
+      "mitre": [
+        "T1219",
+        "T1059",
+        "T1083",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-04-01T20:09:12.414Z",
+      "provider": "Supply Chain",
+      "event_name": "Anti-forensic cleanup and evidence destruction",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1070.004",
+          "T1070.006"
+        ],
+        "description": "After successful payload deployment (15 seconds total), the Node.js dropper performs aggressive cleanup by deleting setup.js, removing postinstall hooks, and replacing tampered package.json with clean decoy file (package.md)"
+      },
+      "expected_detection": "rule-014-001",
+      "mitre": [
+        "T1070.004",
+        "T1070.006"
+      ]
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-014-001",
+      "file": "detection.yaml",
+      "platform": "windows",
+      "description": "Suspicious NPM Package Installation with Postinstall Scripts"
+    },
+    {
+      "detection_id": "rule-014-002",
+      "file": "detection.yaml",
+      "platform": "linux",
+      "description": "Obfuscated Script Execution from Package Directories"
+    },
+    {
+      "detection_id": "rule-014-003",
+      "file": "detection.yaml",
+      "platform": "windows",
+      "description": "Suspicious Network Communication from Node Processes"
+    }
+  ]
+}

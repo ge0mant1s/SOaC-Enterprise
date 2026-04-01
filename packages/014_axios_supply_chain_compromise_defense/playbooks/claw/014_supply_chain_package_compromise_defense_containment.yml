@@ -1,0 +1,73 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: supply-chain-package-compromise-response
+  version: 1.2.0
+  author: SOaC CLAW Security Team
+  created: '2024-01-15T10:30:00Z'
+  tags:
+    - supply-chain
+    - npm
+    - package-compromise
+    - c2
+    - rat
+    - dprk
+    - ci-cd
+  mitre_attack:
+    - T1195.002
+    - T1204.005
+    - T1027
+    - T1071.001
+    - T1105
+    - T1036.005
+    - T1547.001
+    - T1219
+    - T1070.004
+  severity: critical
+  package_id: pkg-014
+spec:
+  steps:
+    - name: immediate_containment
+      action: isolate_systems
+      target: network_security
+      parameters:
+        systems: '{{ inputs.affected_systems }}'
+        isolation_type: network_quarantine
+        preserve_evidence: true
+      timeout: 120
+      retry: 2
+      on_failure: continue
+    - name: block_malicious_package
+      action: package_registry_block
+      target: npm_registry
+      parameters:
+        package_name: '{{ inputs.compromised_package }}'
+        action: immediate_takedown
+        notify_users: true
+      timeout: 60
+      retry: 3
+      on_failure: escalate
+    - name: c2_domain_blocking
+      action: dns_firewall_block
+      target: network_security
+      parameters:
+        domains: '{{ inputs.c2_domains }}'
+        block_type: sinkhole
+        log_attempts: true
+      timeout: 90
+      retry: 2
+      on_failure: continue
+    - name: forensic_evidence_collection
+      action: collect_artifacts
+      target: endpoint_security
+      parameters:
+        systems: '{{ inputs.affected_systems }}'
+        artifacts:
+          - process_memory
+          - network_connections
+          - file_system
+          - registry_changes
+        preserve_chain_of_custody: true
+      timeout: 300
+      retry: 1
+      on_failure: continue

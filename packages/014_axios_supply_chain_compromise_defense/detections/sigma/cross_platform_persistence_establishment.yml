@@ -1,0 +1,14 @@
+title: Cross-Platform Persistence Establishment
+id: rule-014-005
+status: production
+description: Cross-Platform Persistence Establishment
+logsource:
+  product: supply chain
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1547.001
+  - T1036.005
+level: high

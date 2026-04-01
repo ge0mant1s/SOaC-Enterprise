@@ -1,0 +1,9 @@
+DeviceFileEvents
+| where FolderPath contains_any ("node_modules", "npm", "temp", "tmp")
+| where FileName matches regex @"^[a-zA-Z0-9]{8,16}\.(exe|dll|bat|ps1)$"
+| where ActionType == "FileCreated"
+| join kind=inner (
+    DeviceNetworkEvents
+    | where RemoteUrl !contains_any ("npmjs.org", "github.com", "microsoft.com")
+) on DeviceId
+| project Timestamp, DeviceName, FolderPath, FileName, RemoteUrl, InitiatingProcessCommandLine
