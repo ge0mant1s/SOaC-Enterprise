@@ -1,0 +1,79 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: supply-chain-package-compromise-response
+  version: 1.2.0
+  author: SOaC CLAW Security Team
+  created: '2024-01-15T10:30:00Z'
+  tags:
+    - supply-chain
+    - npm
+    - package-compromise
+    - c2
+    - rat
+    - dprk
+    - ci-cd
+  mitre_attack:
+    - T1195.002
+    - T1204.005
+    - T1027
+    - T1071.001
+    - T1105
+    - T1036.005
+    - T1547.001
+    - T1219
+    - T1070.004
+  severity: critical
+  package_id: pkg-014
+spec:
+  steps:
+    - name: malware_analysis
+      action: dynamic_analysis
+      target: sandbox_environment
+      parameters:
+        package_source: '{{ inputs.compromised_package }}'
+        analysis_depth: comprehensive
+        platforms:
+          - windows
+          - linux
+          - macos
+      timeout: 600
+      retry: 1
+      on_failure: continue
+    - name: persistence_removal
+      action: eradicate_persistence
+      target: endpoint_security
+      parameters:
+        systems: '{{ inputs.affected_systems }}'
+        persistence_types:
+          - startup_items
+          - scheduled_tasks
+          - services
+          - registry_keys
+        verification_required: true
+      timeout: 240
+      retry: 2
+      on_failure: manual_intervention
+    - name: ci_cd_pipeline_scan
+      action: pipeline_security_scan
+      target: ci_cd_security
+      parameters:
+        scan_type: dependency_audit
+        remediation_mode: automatic
+        block_vulnerable_builds: true
+      timeout: 180
+      retry: 1
+      on_failure: continue
+    - name: threat_intelligence_sharing
+      action: share_indicators
+      target: threat_intelligence
+      parameters:
+        iocs: '{{ steps.malware_analysis.outputs.indicators }}'
+        attribution: DPRK
+        sharing_groups:
+          - industry_partners
+          - government_agencies
+        tlp_marking: amber
+      timeout: 120
+      retry: 2
+      on_failure: continue

@@ -1,0 +1,10 @@
+{
+  "name": "Suspicious NPM Package Installation with Postinstall Scripts",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1195.002",
+    "T1204.005"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "rule-014-001"
+}

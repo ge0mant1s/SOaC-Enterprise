@@ -1,0 +1,6 @@
+index=network sourcetype=firewall OR sourcetype=proxy
+| where process_name="node.exe" OR parent_process="npm.exe"
+| where dest_port NOT IN (80,443,22,53)
+| where dest_ip NOT IN (registry.npmjs.org, github.com, raw.githubusercontent.com)
+| stats count by src_ip, dest_ip, dest_port, process_name
+| where count > 5

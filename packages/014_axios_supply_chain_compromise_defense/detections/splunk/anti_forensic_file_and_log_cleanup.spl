@@ -1,0 +1,6 @@
+index=windows EventCode=4663 OR EventCode=4656
+| where Object_Name LIKE "%npm-debug.log%" OR Object_Name LIKE "%node_modules%"
+| where Access_Mask="0x10000" OR Access_Mask="DELETE"
+| where Process_Name!="npm.exe" AND Process_Name!="node.exe"
+| stats count by Computer_Name, Process_Name, Object_Name, Account_Name
+| where count > 3

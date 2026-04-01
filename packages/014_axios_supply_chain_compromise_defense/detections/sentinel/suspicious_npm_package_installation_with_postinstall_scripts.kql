@@ -1,0 +1,6 @@
+DeviceProcessEvents
+| where ProcessCommandLine contains "npm" and ProcessCommandLine contains "install"
+| where ProcessCommandLine contains_any ("postinstall", "preinstall", "install")
+| where ProcessCommandLine contains_any ("--unsafe-perm", "--allow-root", "--ignore-scripts=false")
+| where ParentProcessName in~ ("cmd.exe", "powershell.exe", "node.exe")
+| project Timestamp, DeviceName, ProcessCommandLine, ParentProcessName, InitiatingProcessAccountName

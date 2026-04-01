@@ -1,0 +1,11 @@
+<rule id="100014" level="12">
+  <if_group>syscheck</if_group>
+  <field name="file">node_modules|\.npm</field>
+  <field name="command">sh|bash|curl|wget</field>
+  <regex>eval|exec|system</regex>
+  <description>Remote access tool command execution from package directories</description>
+  <mitre>
+    <id>T1219</id>
+    <id>T1059</id>
+  </mitre>
+</rule>

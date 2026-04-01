@@ -1,0 +1,3 @@
+name: lab
+mode: monitor
+alert_threshold: medium

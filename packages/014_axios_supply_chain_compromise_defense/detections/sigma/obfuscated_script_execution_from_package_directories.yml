@@ -1,0 +1,14 @@
+title: Obfuscated Script Execution from Package Directories
+id: rule-014-002
+status: production
+description: Obfuscated Script Execution from Package Directories
+logsource:
+  product: supply chain
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1027
+  - T1059.001
+level: high
