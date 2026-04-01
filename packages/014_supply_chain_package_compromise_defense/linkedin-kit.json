@@ -31,9 +31,9 @@
     "follow_up_hook": "48 hours in — people asked for this. Here's one thing the package catches that most SIEMs miss: build artifact hash mutation detection — catches tag poisoning before compromised packages reach production."
   },
   "meta": {
-    "generated_at": "2026-04-01T19:30:31.173Z",
+    "generated_at": "2026-04-01T19:35:46.764Z",
     "series_number": 14,
-    "series_position": "Package 14 of the OpenCLAW SOaC series",
+    "series_position": "Package 14 of 14 in the OpenCLAW SOaC series",
     "generator_version": "1.0.0"
   }
 }
