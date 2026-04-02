@@ -1,0 +1,13 @@
+DeviceFileEvents
+| where Timestamp > ago(24h)
+| where ActionType in ("FileCreated", "FileModified")
+| where FileName has_any(".zip", ".rar", ".7z", ".tar", ".gz")
+| where FolderPath has_any("temp", "appdata", "programdata")
+| join kind=inner (
+    DeviceNetworkEvents
+    | where Timestamp > ago(24h)
+    | where RemoteUrl has_any("dropbox", "onedrive", "googledrive", "mega.nz", "pcloud")
+    | where ActionType == "ConnectionSuccess"
+) on DeviceId
+| where abs(datetime_diff('minute', Timestamp, Timestamp1)) <= 30
+| project Timestamp, DeviceName, FileName, FolderPath, RemoteUrl, InitiatingProcessFileName

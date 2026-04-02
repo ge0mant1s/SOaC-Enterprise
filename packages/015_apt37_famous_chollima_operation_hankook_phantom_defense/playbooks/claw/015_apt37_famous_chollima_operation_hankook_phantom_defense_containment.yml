@@ -1,0 +1,72 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: apt37-hankook-phantom-defense-response
+  version: 1.0.0
+  author: SOaC CLAW Security Team
+  created: '2024-01-15T10:30:00Z'
+  tags:
+    - apt37
+    - famous-chollima
+    - rokrat
+    - spear-phishing
+    - powershell
+    - c2
+    - exfiltration
+  mitre_attack:
+    - T1566.001
+    - T1566.002
+    - T1059.001
+    - T1567.002
+    - T1573.001
+  severity: critical
+  package_id: pkg-015
+spec:
+  steps:
+    - name: isolate_compromised_endpoints
+      action: endpoint.isolate
+      target: '{{ inputs.affected_endpoints }}'
+      parameters:
+        isolation_type: network
+        preserve_management: true
+        reason: APT37 RokRat infection containment
+      timeout: 120s
+      retry: 2
+      on_failure: continue
+    - name: block_malicious_indicators
+      action: network.block_iocs
+      target: firewall
+      parameters:
+        domains: '{{ inputs.c2_domains }}'
+        file_hashes: '{{ inputs.file_hashes }}'
+        block_duration: 24h
+        rule_priority: high
+      timeout: 60s
+      retry: 3
+      on_failure: escalate
+    - name: terminate_powershell_processes
+      action: endpoint.kill_processes
+      target: '{{ inputs.affected_endpoints }}'
+      parameters:
+        process_names:
+          - powershell.exe
+          - cmd.exe
+        filter_suspicious: true
+        force_terminate: true
+      timeout: 90s
+      retry: 2
+      on_failure: continue
+    - name: collect_forensic_artifacts
+      action: endpoint.collect_evidence
+      target: '{{ inputs.affected_endpoints }}'
+      parameters:
+        artifacts:
+          - memory_dump
+          - disk_image
+          - registry_hives
+          - event_logs
+        compression: true
+        encryption: true
+      timeout: 1800s
+      retry: 1
+      on_failure: continue

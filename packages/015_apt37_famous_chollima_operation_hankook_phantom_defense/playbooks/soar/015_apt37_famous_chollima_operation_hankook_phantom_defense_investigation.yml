@@ -1,0 +1,75 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: apt37-hankook-phantom-defense-response
+  version: 1.0.0
+  author: SOaC CLAW Security Team
+  created: '2024-01-15T10:30:00Z'
+  tags:
+    - apt37
+    - famous-chollima
+    - rokrat
+    - spear-phishing
+    - powershell
+    - c2
+    - exfiltration
+  mitre_attack:
+    - T1566.001
+    - T1566.002
+    - T1059.001
+    - T1567.002
+    - T1573.001
+  severity: critical
+  package_id: pkg-015
+spec:
+  steps:
+    - name: analyze_email_campaign
+      action: email.investigate_phishing
+      target: email_security
+      parameters:
+        sender_addresses: '{{ inputs.suspicious_email_addresses }}'
+        search_timeframe: 7d
+        quarantine_similar: true
+        extract_attachments: true
+      timeout: 300s
+      retry: 2
+      on_failure: continue
+    - name: hunt_lateral_movement
+      action: siem.threat_hunt
+      target: security_platform
+      parameters:
+        hunt_queries:
+          - rokrat_persistence
+          - apt37_ttps
+          - powershell_anomalies
+        timeframe: 72h
+        scope: enterprise
+      timeout: 600s
+      retry: 1
+      on_failure: continue
+    - name: remediate_persistence_mechanisms
+      action: endpoint.remove_persistence
+      target: '{{ inputs.affected_endpoints }}'
+      parameters:
+        registry_cleanup: true
+        scheduled_tasks: true
+        startup_items: true
+        services: true
+      timeout: 180s
+      retry: 2
+      on_failure: manual_intervention
+    - name: escalate_to_incident_response
+      action: notification.escalate
+      target: incident_response_team
+      parameters:
+        severity: critical
+        threat_actor: APT37
+        campaign: Operation HanKook Phantom Defense
+        affected_systems: '{{ inputs.affected_endpoints }}'
+        recommended_actions:
+          - forensic_analysis
+          - threat_intelligence_sharing
+          - attribution_analysis
+      timeout: 30s
+      retry: 3
+      on_failure: log_error

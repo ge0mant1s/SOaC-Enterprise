@@ -1,0 +1,14 @@
+title: APT37 PowerShell Infection Chain
+id: apt37-powershell-infection-chain
+status: production
+description: APT37 PowerShell Infection Chain
+logsource:
+  product: endpoint
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1059.001
+  - T1105
+level: high

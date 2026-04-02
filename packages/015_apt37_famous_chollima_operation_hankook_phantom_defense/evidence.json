@@ -1,0 +1,148 @@
+{
+  "test_id": "015-L3-001",
+  "package_id": "pkg-015",
+  "description": "Synthetic telemetry for APT37 (Famous Chollima) - Operation HanKook Phantom Defense",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-02T12:14:51.416Z",
+      "provider": "Endpoint",
+      "event_name": "Spear-phishing with malicious decoy documents",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1566.001",
+          "T1566.002"
+        ],
+        "description": "APT37 sends targeted spear-phishing emails containing malicious decoy documents (HWP, PDF, LNK files) such as 'National Intelligence Research Society Newsletter' to South Korean academics, think tanks, and energy/security associations"
+      },
+      "expected_detection": "apt37-spearphish-lnk-execution",
+      "mitre": [
+        "T1566.001",
+        "T1566.002"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-02T12:16:51.416Z",
+      "provider": "Endpoint",
+      "event_name": "Initial payload execution via LNK files",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1204.002",
+          "T1059.001"
+        ],
+        "description": "Malicious LNK files are executed on victim systems, initiating the infection chain and preparing for malware deployment"
+      },
+      "expected_detection": "apt37-powershell-infection-chain",
+      "mitre": [
+        "T1204.002",
+        "T1059.001"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-02T12:18:51.416Z",
+      "provider": "Endpoint",
+      "event_name": "PowerShell-based infection chain deployment",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1059.001",
+          "T1105"
+        ],
+        "description": "The attack leverages PowerShell scripts to execute the infection chain, downloading and installing the RokRat backdoor on compromised systems"
+      },
+      "expected_detection": "apt37-rokrat-persistence",
+      "mitre": [
+        "T1059.001",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-02T12:20:51.416Z",
+      "provider": "Endpoint",
+      "event_name": "RokRat backdoor installation and persistence",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1053.005",
+          "T1112",
+          "T1219"
+        ],
+        "description": "RokRat malware is installed with persistence mechanisms including scheduled tasks, registry modifications, and remote management tools to maintain long-term access"
+      },
+      "expected_detection": "apt37-spearphish-lnk-execution",
+      "mitre": [
+        "T1053.005",
+        "T1112",
+        "T1219"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-02T12:22:51.416Z",
+      "provider": "Endpoint",
+      "event_name": "Cloud-based C2 communication establishment",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1071.001",
+          "T1567.002",
+          "T1573.001"
+        ],
+        "description": "The malware establishes encrypted command and control communications using compromised cloud services including Dropbox, Yandex, and pCloud for data exfiltration and remote control"
+      },
+      "expected_detection": "apt37-powershell-infection-chain",
+      "mitre": [
+        "T1071.001",
+        "T1567.002",
+        "T1573.001"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-04-02T12:24:51.416Z",
+      "provider": "Endpoint",
+      "event_name": "Data collection and exfiltration",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1005",
+          "T1041",
+          "T1567.002"
+        ],
+        "description": "Sensitive data is collected from compromised systems and exfiltrated through the established cloud-based C2 infrastructure to support DPRK espionage objectives"
+      },
+      "expected_detection": "apt37-rokrat-persistence",
+      "mitre": [
+        "T1005",
+        "T1041",
+        "T1567.002"
+      ]
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "apt37-spearphish-lnk-execution",
+      "file": "detection.yaml",
+      "platform": "windows",
+      "description": "APT37 Spear-phishing LNK File Execution"
+    },
+    {
+      "detection_id": "apt37-powershell-infection-chain",
+      "file": "detection.yaml",
+      "platform": "windows",
+      "description": "APT37 PowerShell Infection Chain"
+    },
+    {
+      "detection_id": "apt37-rokrat-persistence",
+      "file": "detection.yaml",
+      "platform": "windows",
+      "description": "APT37 RokRat Backdoor Persistence"
+    }
+  ]
+}

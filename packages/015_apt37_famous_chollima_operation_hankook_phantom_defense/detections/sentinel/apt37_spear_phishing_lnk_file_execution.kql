@@ -1,0 +1,8 @@
+DeviceProcessEvents
+| where Timestamp > ago(24h)
+| where ProcessCommandLine contains ".lnk"
+| where ProcessCommandLine has_any("cmd.exe", "powershell.exe", "wscript.exe", "cscript.exe")
+| where ProcessCommandLine has_any("/c", "-c", "-ep bypass", "-w hidden")
+| where ParentProcessName in~ ("explorer.exe", "winword.exe", "excel.exe", "powerpnt.exe", "outlook.exe")
+| where ProcessCommandLine has_any("http", "https", "ftp", "download", "invoke", "iex")
+| project Timestamp, DeviceName, ProcessCommandLine, ParentProcessName, InitiatingProcessFileName
