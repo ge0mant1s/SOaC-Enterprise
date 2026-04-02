@@ -1,0 +1,65 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: apt37-hankook-phantom-defense-governance
+  version: "1.0.0"
+  author: "SOaC Policy Engineering Team"
+  created: "2024-01-15T10:30:00Z"
+  package_id: "pkg-015"
+  scope: package
+  tags:
+    - apt37
+    - famous-chollima
+    - operation-hankook
+    - phantom-defense
+    - saas
+    - endpoint
+    - advanced-threat
+spec:
+  description: "Governance policy for APT37 (Famous Chollima) Operation HanKook Phantom Defense simulation package targeting SaaS and Endpoint environments with advanced spear-phishing and data exfiltration techniques"
+  environments:
+    - name: lab
+      mode: permissive
+      monitoring: enhanced
+    - name: staging
+      mode: restrictive
+      monitoring: full
+    - name: production
+      mode: blocked
+      monitoring: full
+  access_control:
+    roles:
+      - red_team_lead
+      - security_researcher
+      - threat_intelligence_analyst
+      - senior_penetration_tester
+  compliance_frameworks:
+    - NIST-CSF
+    - ISO-27001
+    - MITRE-ATT&CK
+    - SOC2-Type2
+  controls:
+    - name: spear_phishing_attachment_control
+      description: "Monitor and control T1566.001 spear-phishing attachment simulations"
+      enforcement: strict
+      evidence: email_security_logs
+    - name: spear_phishing_link_control
+      description: "Govern T1566.002 spear-phishing link execution scenarios"
+      enforcement: strict
+      evidence: web_proxy_logs
+    - name: powershell_execution_control
+      description: "Restrict T1059.001 PowerShell command and scripting interpreter usage"
+      enforcement: monitor
+      evidence: powershell_transcripts
+    - name: saas_exfiltration_control
+      description: "Control T1567.002 exfiltration over web service to cloud storage"
+      enforcement: strict
+      evidence: cloud_access_logs
+    - name: encrypted_channel_control
+      description: "Monitor T1573.001 symmetric cryptography communication channels"
+      enforcement: monitor
+      evidence: network_traffic_analysis
+    - name: advanced_threat_simulation_control
+      description: "Comprehensive governance for advanced APT37 simulation activities"
+      enforcement: strict
+      evidence: simulation_audit_logs

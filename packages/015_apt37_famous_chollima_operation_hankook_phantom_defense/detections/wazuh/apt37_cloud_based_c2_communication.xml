@@ -1,0 +1,12 @@
+<rule id="100001" level="12">
+  <if_group>sysmon_event1</if_group>
+  <field name="win.eventdata.commandLine" type="pcre2">(?i)(dropbox|onedrive|googledrive|mega\.nz|pcloud)</field>
+  <field name="win.eventdata.commandLine" type="pcre2">(?i)(upload|download|sync|api)</field>
+  <field name="win.eventdata.parentImage" type="pcre2">(?i)(powershell\.exe|cmd\.exe|rundll32\.exe)</field>
+  <description>APT37 Cloud-based C2 Communication Detected</description>
+  <mitre>
+    <id>T1071.001</id>
+    <id>T1567.002</id>
+    <id>T1573.001</id>
+  </mitre>
+</rule>

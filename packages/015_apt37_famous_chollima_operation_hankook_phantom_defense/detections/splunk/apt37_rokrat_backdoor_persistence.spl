@@ -1,0 +1,8 @@
+(source="WinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
+OR (source="WinEventLog:Security" EventCode=4688)
+| where (CommandLine="*schtasks*" AND CommandLine="*/create*" AND CommandLine="*powershell*")
+OR (CommandLine="*reg*" AND CommandLine="*add*" AND CommandLine="*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*")
+OR (Image="*\\svchost.exe" AND ParentImage!="*\\services.exe")
+| eval suspicious_persistence=if(match(CommandLine, "(?i)(schtasks.*create.*powershell|reg.*add.*run)"), "high", "medium")
+| where suspicious_persistence="high"
+| table _time, Computer, Image, CommandLine, ParentImage, suspicious_persistence

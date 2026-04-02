@@ -1,0 +1,19 @@
+package_id: pkg-015
+title: APT37 (Famous Chollima) - Operation HanKook Phantom Defense
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 3
+tier: Advanced
+category: SaaS
+mitre_techniques:
+  - T1566.001
+  - T1566.002
+  - T1059.001
+  - T1567.002
+  - T1573.001
+platform_targets:
+  - Endpoint
+  - SaaS
+author: SOaC Community
+created: '2026-04-02T12:14:51.408Z'
+generated_by: soac-wizard-finalizer
