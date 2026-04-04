@@ -1,12 +1,13 @@
 apiVersion: soac.io/v1
 kind: Policy
+
 metadata:
   name: uat-8837-ad-recon-identity-pivot-reverse-tunnel-defense
   version: "1.0.0"
   author: "SOaC Policy Engineering Team"
   created: "2024-01-15T10:30:00Z"
   package_id: "pkg-016"
-  scope: package
+  scope: "package"
   tags:
     - endpoint-security
     - identity-protection
@@ -18,9 +19,15 @@ metadata:
 spec:
   description: "Comprehensive governance policy for defending against Active Directory reconnaissance, identity pivoting, and reverse tunnel attacks. Implements advanced detection and prevention controls across endpoint, identity, and network domains."
   environments:
-    - production
-    - staging
-    - development
+    - name: production
+      mode: production
+      data_handling: strict
+    - name: staging
+      mode: staging
+      data_handling: standard
+    - name: development
+      mode: development
+      data_handling: relaxed
   access_control:
     required_roles:
       - security-engineer

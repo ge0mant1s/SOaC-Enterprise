@@ -35,12 +35,12 @@ metadata:
     - "T1560"
     - "T1556"
     - "T1005"
-  severity: "critical"
+  severity: "CRITICAL"
   package_id: "pkg-016"
 spec:
   description: "Automated response playbook for UAT-8837 threat actor conducting AD reconnaissance, identity pivoting, and reverse tunnel establishment. Addresses multi-phase attack chain from initial access through persistence."
   trigger:
-    type: "alert"
+    source: "BODY"
     conditions:
       - "threat_actor == 'UAT-8837'"
       - "mitre_techniques intersects ['T1087.002', 'T1090', 'T1572', 'T1136.002']"
@@ -63,8 +63,9 @@ spec:
       required: false
       description: "Network IOCs including tunnel endpoints and C2 infrastructure"
   steps:
-    - name: "isolate_compromised_endpoints"
-      action: "endpoint.isolate"
+    - id: "step-1"
+      name: "isolate_compromised_endpoints"
+      action: "api_call"
       target: "{{ inputs.affected_hosts }}"
       parameters:
         isolation_type: "network"
@@ -73,8 +74,9 @@ spec:
       timeout: 300
       retry: 2
       on_failure: "continue"
-    - name: "disable_suspicious_accounts"
-      action: "identity.disable_accounts"
+    - id: "step-2"
+      name: "disable_suspicious_accounts"
+      action: "api_call"
       target: "entra_id"
       parameters:
         accounts: "{{ inputs.suspicious_accounts }}"
@@ -84,8 +86,9 @@ spec:
       timeout: 180
       retry: 3
       on_failure: "escalate"
-    - name: "block_tunnel_infrastructure"
-      action: "network.block_indicators"
+    - id: "step-3"
+      name: "block_tunnel_infrastructure"
+      action: "api_call"
       target: "firewall"
       parameters:
         indicators: "{{ inputs.network_indicators.tunnel_endpoints }}"
@@ -95,8 +98,9 @@ spec:
       timeout: 120
       retry: 2
       on_failure: "continue"
-    - name: "hunt_ad_reconnaissance_artifacts"
-      action: "threat_hunting.execute_query"
+    - id: "step-4"
+      name: "hunt_ad_reconnaissance_artifacts"
+      action: "script"
       target: "siem"
       parameters:
         query_template: "uac_8837_ad_recon"
@@ -106,8 +110,9 @@ spec:
       timeout: 600
       retry: 1
       on_failure: "continue"
-    - name: "reset_rdp_configurations"
-      action: "endpoint.remediate_registry"
+    - id: "step-5"
+      name: "reset_rdp_configurations"
+      action: "script"
       target: "{{ inputs.affected_hosts }}"
       parameters:
         registry_keys:
@@ -118,8 +123,9 @@ spec:
       timeout: 300
       retry: 2
       on_failure: "continue"
-    - name: "revoke_kerberos_tickets"
-      action: "identity.revoke_tickets"
+    - id: "step-6"
+      name: "revoke_kerberos_tickets"
+      action: "api_call"
       target: "domain_controller"
       parameters:
         accounts: "{{ inputs.suspicious_accounts }}"
@@ -128,8 +134,9 @@ spec:
       timeout: 240
       retry: 3
       on_failure: "escalate"
-    - name: "deploy_enhanced_monitoring"
-      action: "monitoring.deploy_sensors"
+    - id: "step-7"
+      name: "deploy_enhanced_monitoring"
+      action: "api_call"
       target: "{{ inputs.affected_hosts }}"
       parameters:
         sensor_types: ["process_monitoring", "network_monitoring", "file_integrity"]
@@ -139,8 +146,9 @@ spec:
       timeout: 180
       retry: 2
       on_failure: "continue"
-    - name: "generate_incident_report"
-      action: "reporting.create_incident"
+    - id: "step-8"
+      name: "generate_incident_report"
+      action: "notify"
       target: "soar_platform"
       parameters:
         incident_type: "advanced_persistent_threat"
@@ -168,14 +176,14 @@ spec:
     enabled: true
     steps:
       - name: "restore_endpoint_connectivity"
-        action: "endpoint.unisolate"
+        action: "api_call"
         target: "{{ inputs.affected_hosts }}"
         condition: "false_positive_confirmed"
       - name: "re_enable_accounts"
-        action: "identity.enable_accounts"
+        action: "api_call"
         target: "entra_id"
         condition: "account_validation_passed"
       - name: "remove_network_blocks"
-        action: "network.unblock_indicators"
+        action: "api_call"
         target: "firewall"
         condition: "infrastructure_validated_clean"
