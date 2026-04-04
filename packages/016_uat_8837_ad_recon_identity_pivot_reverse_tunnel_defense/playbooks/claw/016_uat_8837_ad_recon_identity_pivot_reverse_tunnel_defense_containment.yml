@@ -1,0 +1,87 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: uac-8837-ad-recon-identity-pivot-reverse-tunnel-defense
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2024-01-15T10:30:00Z'
+  tags:
+    - active-directory
+    - lateral-movement
+    - tunneling
+    - credential-harvesting
+    - persistence
+    - uac-8837
+  mitre_attack:
+    - T1190
+    - T1078
+    - T1082
+    - T1033
+    - T1049
+    - T1112
+    - T1021.001
+    - T1105
+    - T1027
+    - T1090
+    - T1572
+    - T1087.002
+    - T1069.002
+    - T1018
+    - T1134
+    - T1558
+    - T1550
+    - T1136.002
+    - T1098
+    - T1560
+    - T1556
+    - T1005
+  severity: critical
+  package_id: pkg-016
+spec:
+  steps:
+    - name: isolate_compromised_endpoints
+      action: endpoint.isolate
+      target: '{{ inputs.affected_hosts }}'
+      parameters:
+        isolation_type: network
+        preserve_management: true
+        notification_message: Endpoint isolated due to UAT-8837 activity detection
+      timeout: 300
+      retry: 2
+      on_failure: continue
+    - name: disable_suspicious_accounts
+      action: identity.disable_accounts
+      target: entra_id
+      parameters:
+        accounts: '{{ inputs.suspicious_accounts }}'
+        disable_type: temporary
+        reason: Suspected compromise by UAT-8837
+        force_signout: true
+      timeout: 180
+      retry: 3
+      on_failure: escalate
+    - name: block_tunnel_infrastructure
+      action: network.block_indicators
+      target: firewall
+      parameters:
+        indicators: '{{ inputs.network_indicators.tunnel_endpoints }}'
+        block_type: bidirectional
+        rule_priority: high
+        duration: 24h
+      timeout: 120
+      retry: 2
+      on_failure: continue
+    - name: hunt_ad_reconnaissance_artifacts
+      action: threat_hunting.execute_query
+      target: siem
+      parameters:
+        query_template: uac_8837_ad_recon
+        timeframe: last_4_hours
+        focus_techniques:
+          - T1087.002
+          - T1069.002
+          - T1018
+        output_format: structured
+      timeout: 600
+      retry: 1
+      on_failure: continue

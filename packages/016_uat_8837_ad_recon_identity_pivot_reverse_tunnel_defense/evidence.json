@@ -1,0 +1,192 @@
+{
+  "test_id": "016-L3-001",
+  "package_id": "pkg-016",
+  "description": "Synthetic telemetry for UAT-8837: AD Recon, Identity Pivot & Reverse Tunnel Defense",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-04T08:23:07.047Z",
+      "provider": "SaaS",
+      "event_name": "Initial access via vulnerability exploitation",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1190",
+          "T1078"
+        ],
+        "description": "UAT-8837 exploits zero-day vulnerabilities like CVE-2025-53690 (ViewState Deserialization in SiteCore) or uses compromised credentials to gain initial access to target environments."
+      },
+      "expected_detection": "rule-001-rdp-config-modification",
+      "mitre": [
+        "T1190",
+        "T1078"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-04T08:25:07.047Z",
+      "provider": "SaaS",
+      "event_name": "System reconnaissance and discovery",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1082",
+          "T1033",
+          "T1049"
+        ],
+        "description": "Conducts preliminary reconnaissance using commands like ping, tasklist, netstat, whoami, quser, and hostname to understand the compromised environment."
+      },
+      "expected_detection": "rule-002-ad-recon-activities",
+      "mitre": [
+        "T1082",
+        "T1033",
+        "T1049"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-04T08:27:07.047Z",
+      "provider": "SaaS",
+      "event_name": "RDP configuration modification",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1112",
+          "T1021.001"
+        ],
+        "description": "Disables RestrictedAdmin for Remote Desktop Protocol to facilitate credential harvesting and lateral movement by modifying registry settings."
+      },
+      "expected_detection": "rule-003-network-tunneling-detection",
+      "mitre": [
+        "T1112",
+        "T1021.001"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-04T08:29:07.047Z",
+      "provider": "SaaS",
+      "event_name": "Tool deployment and staging",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1105",
+          "T1027"
+        ],
+        "description": "Downloads and stages multiple tools including GoTokenTheft, Earthworm, DWAgent, and SharpHound to various directories for post-compromise activities."
+      },
+      "expected_detection": "rule-001-rdp-config-modification",
+      "mitre": [
+        "T1105",
+        "T1027"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-04T08:31:07.047Z",
+      "provider": "SaaS",
+      "event_name": "Network tunneling establishment",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1090",
+          "T1572"
+        ],
+        "description": "Deploys Earthworm network tunneling tool to create reverse tunnels to attacker-controlled infrastructure, enabling persistent access and command execution."
+      },
+      "expected_detection": "rule-002-ad-recon-activities",
+      "mitre": [
+        "T1090",
+        "T1572"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-04-04T08:33:07.047Z",
+      "provider": "SaaS",
+      "event_name": "Active Directory reconnaissance",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1087.002",
+          "T1069.002",
+          "T1018"
+        ],
+        "description": "Uses SharpHound, Certipy, and native Windows tools like dsquery/dsget to enumerate Active Directory structure, users, groups, and service principal names."
+      },
+      "expected_detection": "rule-003-network-tunneling-detection",
+      "mitre": [
+        "T1087.002",
+        "T1069.002",
+        "T1018"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-04-04T08:35:07.047Z",
+      "provider": "SaaS",
+      "event_name": "Credential harvesting and privilege escalation",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1134",
+          "T1558",
+          "T1550"
+        ],
+        "description": "Deploys GoTokenTheft, Rubeus, and Impacket tools to steal access tokens, abuse Kerberos, and execute commands with elevated privileges across the network."
+      },
+      "expected_detection": "rule-001-rdp-config-modification",
+      "mitre": [
+        "T1134",
+        "T1558",
+        "T1550"
+      ]
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2026-04-04T08:37:07.047Z",
+      "provider": "SaaS",
+      "event_name": "Persistence through backdoor accounts",
+      "data": {
+        "step": 8,
+        "mitre": [
+          "T1136.002",
+          "T1098",
+          "T1560",
+          "T1556",
+          "T1005"
+        ],
+        "description": "Creates new user accounts and adds existing accounts to privileged groups to maintain persistent access to the compromised environment."
+      },
+      "expected_detection": "rule-002-ad-recon-activities",
+      "mitre": [
+        "T1136.002",
+        "T1098",
+        "T1560",
+        "T1556",
+        "T1005"
+      ]
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-001-rdp-config-modification",
+      "file": "detection.yaml",
+      "platform": "Endpoint",
+      "description": "RDP Configuration Registry Modification"
+    },
+    {
+      "detection_id": "rule-002-ad-recon-activities",
+      "file": "detection.yaml",
+      "platform": "Network",
+      "description": "Active Directory Reconnaissance Activities"
+    },
+    {
+      "detection_id": "rule-003-network-tunneling-detection",
+      "file": "detection.yaml",
+      "platform": "Network",
+      "description": "Network Tunneling and Proxy Activity"
+    }
+  ]
+}

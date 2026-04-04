@@ -1,0 +1,113 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: uat-8837-ad-recon-identity-pivot-reverse-tunnel-defense
+  version: "1.0.0"
+  author: "SOaC Policy Engineering Team"
+  created: "2024-01-15T10:30:00Z"
+  package_id: "pkg-016"
+  scope: package
+  tags:
+    - endpoint-security
+    - identity-protection
+    - network-defense
+    - active-directory
+    - advanced-threats
+    - mitre-attack
+    - uat-8837
+spec:
+  description: "Comprehensive governance policy for defending against Active Directory reconnaissance, identity pivoting, and reverse tunnel attacks. Implements advanced detection and prevention controls across endpoint, identity, and network domains."
+  environments:
+    - production
+    - staging
+    - development
+  access_control:
+    required_roles:
+      - security-engineer
+      - identity-administrator
+      - network-administrator
+    approval_workflow: true
+    emergency_override: false
+  compliance_frameworks:
+    - NIST-CSF
+    - ISO-27001
+    - MITRE-ATT&CK
+    - CIS-Controls
+  controls:
+    - id: "EPD-001"
+      name: "Endpoint Process Monitoring"
+      category: "Endpoint"
+      mitre_techniques:
+        - "T1082"
+        - "T1033"
+        - "T1049"
+        - "T1112"
+      enforcement: "mandatory"
+      implementation: "real-time"
+      
+    - id: "IDM-002"
+      name: "Identity Privilege Escalation Detection"
+      category: "Identity"
+      mitre_techniques:
+        - "T1078"
+        - "T1134"
+        - "T1558"
+        - "T1550"
+      enforcement: "mandatory"
+      implementation: "continuous"
+      
+    - id: "NET-003"
+      name: "Network Tunnel Detection"
+      category: "Network"
+      mitre_techniques:
+        - "T1090"
+        - "T1572"
+        - "T1105"
+      enforcement: "mandatory"
+      implementation: "real-time"
+      
+    - id: "ADR-004"
+      name: "Active Directory Reconnaissance Prevention"
+      category: "Identity"
+      mitre_techniques:
+        - "T1087.002"
+        - "T1069.002"
+        - "T1018"
+      enforcement: "mandatory"
+      implementation: "continuous"
+      
+    - id: "LAT-005"
+      name: "Lateral Movement Detection"
+      category: "Network"
+      mitre_techniques:
+        - "T1021.001"
+        - "T1027"
+      enforcement: "mandatory"
+      implementation: "real-time"
+      
+    - id: "PER-006"
+      name: "Persistence Mechanism Monitoring"
+      category: "Endpoint"
+      mitre_techniques:
+        - "T1136.002"
+        - "T1098"
+        - "T1556"
+      enforcement: "mandatory"
+      implementation: "continuous"
+      
+    - id: "EXF-007"
+      name: "Data Exfiltration Prevention"
+      category: "Network"
+      mitre_techniques:
+        - "T1560"
+        - "T1005"
+      enforcement: "mandatory"
+      implementation: "real-time"
+      
+    - id: "INI-008"
+      name: "Initial Access Vector Blocking"
+      category: "Network"
+      mitre_techniques:
+        - "T1190"
+      enforcement: "mandatory"
+      implementation: "preventive"

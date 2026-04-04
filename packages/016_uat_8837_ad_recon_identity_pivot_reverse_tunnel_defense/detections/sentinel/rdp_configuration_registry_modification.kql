@@ -1,0 +1,10 @@
+DeviceRegistryEvents
+| where RegistryKey has_any ("HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server", "fDenyTSConnections", "UserAuthentication")
+| where ActionType == "RegistryValueSet"
+| where RegistryValueData in ("0", "1")
+| project Timestamp, DeviceName, InitiatingProcessAccountName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessCommandLine
+| extend ThreatLevel = case(
+    RegistryValueName == "fDenyTSConnections" and RegistryValueData == "0", "High",
+    RegistryValueName == "UserAuthentication" and RegistryValueData == "0", "Medium",
+    "Low"
+)

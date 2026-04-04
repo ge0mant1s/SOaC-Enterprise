@@ -1,0 +1,10 @@
+{
+  "name": "RDP Configuration Registry Modification",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1112",
+    "T1021.001"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "rule-001-rdp-config-modification"
+}

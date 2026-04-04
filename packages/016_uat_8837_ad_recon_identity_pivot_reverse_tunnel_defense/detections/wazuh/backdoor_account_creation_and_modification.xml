@@ -1,0 +1,20 @@
+<rule id="100001" level="12">
+  <if_group>authentication_success,authentication_failed</if_group>
+  <field name="win.eventdata.targetUserName">.*\$|.*admin.*|.*service.*</field>
+  <field name="win.system.eventID">4720|4722|4724|4738</field>
+  <description>Suspicious account creation or modification detected</description>
+  <mitre>
+    <id>T1136.002</id>
+    <id>T1098</id>
+  </mitre>
+</rule>
+
+<rule id="100002" level="15">
+  <if_sid>100001</if_sid>
+  <field name="win.eventdata.privilegeList">.*SeDebugPrivilege.*|.*SeTcbPrivilege.*|.*SeBackupPrivilege.*</field>
+  <description>High privilege account creation with dangerous privileges</description>
+  <mitre>
+    <id>T1136.002</id>
+    <id>T1098</id>
+  </mitre>
+</rule>

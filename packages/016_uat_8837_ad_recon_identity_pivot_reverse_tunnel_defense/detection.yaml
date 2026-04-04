@@ -1,0 +1,254 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: UAT-8837-AD-Recon-Identity-Pivot-Reverse-Tunnel-Defense
+  version: "1.0.0"
+  author: SOaC Detection Engineering Team
+  created: "2024-01-15"
+  package_id: "pkg-016"
+  mitre_attack:
+    - T1190
+    - T1078
+    - T1082
+    - T1033
+    - T1049
+    - T1112
+    - T1021.001
+    - T1105
+    - T1027
+    - T1090
+    - T1572
+    - T1087.002
+    - T1069.002
+    - T1018
+    - T1134
+    - T1558
+    - T1550
+    - T1136.002
+    - T1098
+    - T1560
+    - T1556
+    - T1005
+  severity: "high"
+  data_sources:
+    - Windows Event Logs
+    - Active Directory Logs
+    - Network Traffic
+    - Process Monitoring
+    - Registry Monitoring
+    - Authentication Logs
+
+spec:
+  description: "Detection rules for UAT-8837 attack chain involving AD reconnaissance, identity pivoting, and reverse tunnel establishment with persistence mechanisms"
+  platforms:
+    - SaaS
+    - Endpoint
+    - Network
+    - Entra
+  
+  inline_rules:
+    - id: "rule-001-rdp-config-modification"
+      name: "RDP Configuration Registry Modification"
+      format: "kql"
+      platform: "Endpoint"
+      mitre:
+        - T1112
+        - T1021.001
+      severity: "medium"
+      query: |
+        DeviceRegistryEvents
+        | where RegistryKey has_any ("HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server", "fDenyTSConnections", "UserAuthentication")
+        | where ActionType == "RegistryValueSet"
+        | where RegistryValueData in ("0", "1")
+        | project Timestamp, DeviceName, InitiatingProcessAccountName, RegistryKey, RegistryValueName, RegistryValueData, InitiatingProcessCommandLine
+        | extend ThreatLevel = case(
+            RegistryValueName == "fDenyTSConnections" and RegistryValueData == "0", "High",
+            RegistryValueName == "UserAuthentication" and RegistryValueData == "0", "Medium",
+            "Low"
+        )
+
+    - id: "rule-002-ad-recon-activities"
+      name: "Active Directory Reconnaissance Activities"
+      format: "sigma"
+      platform: "Network"
+      mitre:
+        - T1087.002
+        - T1069.002
+        - T1018
+      severity: "high"
+      query: |
+        title: Active Directory Reconnaissance via LDAP Queries
+        id: 8f2e9c4d-1a3b-4c5d-9e7f-2a4b6c8d0e1f
+        status: experimental
+        description: Detects suspicious LDAP queries indicative of AD reconnaissance
+        logsource:
+          category: network
+          product: windows
+        detection:
+          selection:
+            EventID: 4624
+            LogonType: 3
+          ldap_queries:
+            - "*(&(objectClass=user)*"
+            - "*(&(objectClass=group)*"
+            - "*(&(objectClass=computer)*"
+            - "*adminCount=1*"
+            - "*memberOf=*Admin*"
+          condition: selection and ldap_queries
+        falsepositives:
+          - Legitimate administrative tools
+          - Automated inventory systems
+        level: high
+
+    - id: "rule-003-network-tunneling-detection"
+      name: "Network Tunneling and Proxy Activity"
+      format: "splunk"
+      platform: "Network"
+      mitre:
+        - T1090
+        - T1572
+      severity: "high"
+      query: |
+        index=network sourcetype=firewall OR sourcetype=proxy
+        | eval suspicious_ports=if(match(dest_port, "^(1080|3128|8080|9050|9150)$"), "SOCKS/HTTP_Proxy", "")
+        | eval tunnel_indicators=case(
+            match(url, ".*tunnel.*|.*proxy.*|.*socks.*"), "URL_Tunnel_Keywords",
+            match(user_agent, ".*curl.*|.*wget.*|.*python.*"), "Suspicious_User_Agent",
+            bytes_out > 1000000 AND bytes_in > 1000000, "High_Bidirectional_Traffic",
+            1==1, ""
+        )
+        | where suspicious_ports!="" OR tunnel_indicators!=""
+        | stats count, values(dest_port) as ports, values(url) as urls, sum(bytes_out) as total_out, sum(bytes_in) as total_in by src_ip, dest_ip
+        | where count > 10 OR total_out > 5000000
+        | eval risk_score=case(
+            count > 50, 90,
+            total_out > 10000000, 85,
+            count > 20, 70,
+            1==1, 60
+        )
+
+    - id: "rule-004-credential-harvesting"
+      name: "Credential Harvesting and Token Manipulation"
+      format: "kql"
+      platform: "Endpoint"
+      mitre:
+        - T1134
+        - T1558
+        - T1550
+      severity: "high"
+      query: |
+        union DeviceProcessEvents, DeviceLogonEvents
+        | where (ProcessCommandLine has_any ("sekurlsa", "kerberos", "lsadump", "dcsync") and InitiatingProcessFileName in~ ("powershell.exe", "cmd.exe", "rundll32.exe"))
+        or (ProcessCommandLine has_any ("runas", "/netonly", "klist", "kinit") and ProcessCommandLine contains "/user:")
+        or (ActionType == "LogonSuccess" and LogonType == 9 and AccountName != InitiatingProcessAccountName)
+        | extend ThreatIndicator = case(
+            ProcessCommandLine has "sekurlsa", "LSASS_Memory_Dump",
+            ProcessCommandLine has "dcsync", "DCSync_Attack",
+            ProcessCommandLine has "kerberos", "Kerberos_Manipulation",
+            LogonType == 9, "Token_Impersonation",
+            "Credential_Access"
+        )
+        | project Timestamp, DeviceName, AccountName, ProcessCommandLine, ThreatIndicator, InitiatingProcessFileName
+
+    - id: "rule-005-backdoor-account-creation"
+      name: "Backdoor Account Creation and Modification"
+      format: "wazuh"
+      platform: "Entra"
+      mitre:
+        - T1136.002
+        - T1098
+      severity: "critical"
+      query: |
+        <rule id="100001" level="12">
+          <if_group>authentication_success,authentication_failed</if_group>
+          <field name="win.eventdata.targetUserName">.*\$|.*admin.*|.*service.*</field>
+          <field name="win.system.eventID">4720|4722|4724|4738</field>
+          <description>Suspicious account creation or modification detected</description>
+          <mitre>
+            <id>T1136.002</id>
+            <id>T1098</id>
+          </mitre>
+        </rule>
+        
+        <rule id="100002" level="15">
+          <if_sid>100001</if_sid>
+          <field name="win.eventdata.privilegeList">.*SeDebugPrivilege.*|.*SeTcbPrivilege.*|.*SeBackupPrivilege.*</field>
+          <description>High privilege account creation with dangerous privileges</description>
+          <mitre>
+            <id>T1136.002</id>
+            <id>T1098</id>
+          </mitre>
+        </rule>
+
+    - id: "rule-006-tool-deployment-staging"
+      name: "Malicious Tool Deployment and Obfuscation"
+      format: "sigma"
+      platform: "Endpoint"
+      mitre:
+        - T1105
+        - T1027
+      severity: "medium"
+      query: |
+        title: Suspicious File Download and Obfuscation
+        id: 7e1d8c3a-2b4f-5a6e-8c9d-1e2f3a4b5c6d
+        status: experimental
+        description: Detects file downloads followed by obfuscation techniques
+        logsource:
+          category: process_creation
+          product: windows
+        detection:
+          download_tools:
+            Image|endswith:
+              - '\powershell.exe'
+              - '\certutil.exe'
+              - '\bitsadmin.exe'
+              - '\curl.exe'
+            CommandLine|contains:
+              - 'DownloadFile'
+              - '-outfile'
+              - '/transfer'
+              - 'Invoke-WebRequest'
+          obfuscation:
+            CommandLine|contains:
+              - '-EncodedCommand'
+              - 'FromBase64String'
+              - '-enc'
+              - 'iex'
+              - 'Invoke-Expression'
+          condition: download_tools or obfuscation
+        falsepositives:
+          - Legitimate software updates
+          - Administrative scripts
+        level: medium
+
+  test_cases:
+    - name: "RDP Configuration Modification Test"
+      description: "Simulate RDP configuration changes for lateral movement"
+      input:
+        event_type: "DeviceRegistryEvents"
+        registry_key: "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Terminal Server"
+        registry_value: "fDenyTSConnections"
+        registry_data: "0"
+        process: "reg.exe"
+      expected_result: "Alert triggered for RDP configuration modification"
+      
+    - name: "AD Reconnaissance LDAP Query Test"
+      description: "Simulate suspicious LDAP queries for AD enumeration"
+      input:
+        event_type: "Network"
+        protocol: "LDAP"
+        query: "(&(objectClass=user)(adminCount=1))"
+        source_ip: "10.1.1.100"
+        destination_ip: "10.1.1.10"
+      expected_result: "High severity alert for AD reconnaissance activity"
+      
+    - name: "Network Tunnel Establishment Test"
+      description: "Simulate reverse tunnel creation through suspicious ports"
+      input:
+        event_type: "Network"
+        source_ip: "192.168.1.50"
+        destination_port: "1080"
+        bytes_out: "15000000"
+        bytes_in: "12000000"
+        connection_count: "25"
+      expected_result: "High risk score alert for potential network tunneling"

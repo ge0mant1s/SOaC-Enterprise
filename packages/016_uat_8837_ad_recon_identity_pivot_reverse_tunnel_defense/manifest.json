@@ -1,0 +1,333 @@
+{
+  "package_id": "pkg-016",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "UAT-8837: AD Recon, Identity Pivot & Reverse Tunnel Defense",
+  "description": "UAT-8837, a China-nexus APT group, targets critical infrastructure sectors in North America using zero-day and n-day vulnerabilities for initial access. The group deploys various open-source tools including Earthworm, SharpHound, and Certipy to harvest credentials and establish persistence. Their operations focus on obtaining initial access to high-value organizations and creating multiple channels of access through credential theft and backdoor accounts.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "category": "Endpoint",
+  "categories": [
+    "Endpoint",
+    "Identity",
+    "Network"
+  ],
+  "primary_category": "Endpoint",
+  "secondary_categories": [
+    "Identity",
+    "Network"
+  ],
+  "tags": [
+    "saas",
+    "endpoint",
+    "network",
+    "entra",
+    "endpoint",
+    "identity",
+    "network",
+    "red_team",
+    "blue_team",
+    "soc_manager"
+  ],
+  "threat_actor": "UAT-8837",
+  "github_path": "packages/016_uat_8837_ad_recon_identity_pivot_reverse_tunnel_defense",
+  "slug": "016_uat_8837_ad_recon_identity_pivot_reverse_tunnel_defense",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1190",
+    "T1078",
+    "T1082",
+    "T1033",
+    "T1049",
+    "T1112",
+    "T1021.001",
+    "T1105",
+    "T1027",
+    "T1090",
+    "T1572",
+    "T1087.002",
+    "T1069.002",
+    "T1018",
+    "T1134",
+    "T1558",
+    "T1550",
+    "T1136.002",
+    "T1098",
+    "T1560",
+    "T1556",
+    "T1005"
+  ],
+  "mitre_techniques": [
+    "T1190",
+    "T1078",
+    "T1082",
+    "T1033",
+    "T1049",
+    "T1112",
+    "T1021.001",
+    "T1105",
+    "T1027",
+    "T1090",
+    "T1572",
+    "T1087.002",
+    "T1069.002",
+    "T1018",
+    "T1134",
+    "T1558",
+    "T1550",
+    "T1136.002",
+    "T1098",
+    "T1560",
+    "T1556",
+    "T1005"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "SaaS",
+    "Endpoint",
+    "Network",
+    "Entra"
+  ],
+  "platform_targets": [
+    "SaaS",
+    "Endpoint",
+    "Network",
+    "Entra"
+  ],
+  "simulation_steps": [
+    {
+      "role": "red_team",
+      "mitre": [
+        "T1190",
+        "T1078"
+      ],
+      "phase": "Initial Access",
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ],
+      "title": "Initial access via vulnerability exploitation",
+      "pillar": "Offense",
+      "step_index": 1,
+      "description": "UAT-8837 exploits zero-day vulnerabilities like CVE-2025-53690 (ViewState Deserialization in SiteCore) or uses compromised credentials to gain initial access to target environments.",
+      "mitre_techniques": [
+        "T1190",
+        "T1078"
+      ]
+    },
+    {
+      "role": "blue_team",
+      "mitre": [
+        "T1082",
+        "T1033",
+        "T1049"
+      ],
+      "phase": "Discovery",
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ],
+      "title": "System reconnaissance and discovery",
+      "pillar": "Detect",
+      "step_index": 2,
+      "description": "Conducts preliminary reconnaissance using commands like ping, tasklist, netstat, whoami, quser, and hostname to understand the compromised environment.",
+      "mitre_techniques": [
+        "T1082",
+        "T1033",
+        "T1049"
+      ]
+    },
+    {
+      "role": "soc_team",
+      "mitre": [
+        "T1112",
+        "T1021.001"
+      ],
+      "phase": "Lateral Movement",
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        },
+        {
+          "role": "ciso",
+          "primary": false
+        }
+      ],
+      "title": "RDP configuration modification",
+      "pillar": "Respond",
+      "step_index": 3,
+      "description": "Disables RestrictedAdmin for Remote Desktop Protocol to facilitate credential harvesting and lateral movement by modifying registry settings.",
+      "mitre_techniques": [
+        "T1112",
+        "T1021.001"
+      ]
+    },
+    {
+      "role": "soc_team",
+      "mitre": [
+        "T1105",
+        "T1027"
+      ],
+      "phase": "Command and Control",
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        },
+        {
+          "role": "ciso",
+          "primary": false
+        }
+      ],
+      "title": "Tool deployment and staging",
+      "pillar": "Respond",
+      "step_index": 4,
+      "description": "Downloads and stages multiple tools including GoTokenTheft, Earthworm, DWAgent, and SharpHound to various directories for post-compromise activities.",
+      "mitre_techniques": [
+        "T1105",
+        "T1027"
+      ]
+    },
+    {
+      "role": "red_team",
+      "mitre": [
+        "T1090",
+        "T1572"
+      ],
+      "phase": "Execution",
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ],
+      "title": "Network tunneling establishment",
+      "pillar": "Offense",
+      "step_index": 5,
+      "description": "Deploys Earthworm network tunneling tool to create reverse tunnels to attacker-controlled infrastructure, enabling persistent access and command execution.",
+      "mitre_techniques": [
+        "T1090",
+        "T1572"
+      ]
+    },
+    {
+      "role": "blue_team",
+      "mitre": [
+        "T1087.002",
+        "T1069.002",
+        "T1018"
+      ],
+      "phase": "Discovery",
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ],
+      "title": "Active Directory reconnaissance",
+      "pillar": "Detect",
+      "step_index": 6,
+      "description": "Uses SharpHound, Certipy, and native Windows tools like dsquery/dsget to enumerate Active Directory structure, users, groups, and service principal names.",
+      "mitre_techniques": [
+        "T1087.002",
+        "T1069.002",
+        "T1018"
+      ]
+    },
+    {
+      "role": "red_team",
+      "mitre": [
+        "T1134",
+        "T1558",
+        "T1550"
+      ],
+      "phase": "Defense Evasion",
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ],
+      "title": "Credential harvesting and privilege escalation",
+      "pillar": "Offense",
+      "step_index": 7,
+      "description": "Deploys GoTokenTheft, Rubeus, and Impacket tools to steal access tokens, abuse Kerberos, and execute commands with elevated privileges across the network.",
+      "mitre_techniques": [
+        "T1134",
+        "T1558",
+        "T1550"
+      ]
+    },
+    {
+      "role": "red_team",
+      "mitre": [
+        "T1136.002",
+        "T1098",
+        "T1560",
+        "T1556",
+        "T1005"
+      ],
+      "phase": "Persistence",
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ],
+      "title": "Persistence through backdoor accounts",
+      "pillar": "Offense",
+      "step_index": 8,
+      "description": "Creates new user accounts and adds existing accounts to privileged groups to maintain persistent access to the compromised environment.",
+      "mitre_techniques": [
+        "T1136.002",
+        "T1098",
+        "T1560",
+        "T1556",
+        "T1005"
+      ]
+    }
+  ],
+  "difficulty_label": "Advanced"
+}
