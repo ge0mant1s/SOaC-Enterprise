@@ -1,0 +1,141 @@
+{
+  "package_id": "pkg-016",
+  "title": "UAT-8837: AD Recon, Identity Pivot & Reverse Tunnel Defense",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Initial access via vulnerability exploitation",
+      "text": "UAT-8837 exploits zero-day vulnerabilities like CVE-2025-53690 (ViewState Deserialization in SiteCore) or uses compromised credentials to gain initial access to target environments.",
+      "description": "UAT-8837 exploits zero-day vulnerabilities like CVE-2025-53690 (ViewState Deserialization in SiteCore) or uses compromised credentials to gain initial access to target environments.",
+      "mitre": [
+        "T1190",
+        "T1078"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1190, T1078 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Blue Team",
+      "phase": "Discovery",
+      "pillar": "Detect",
+      "title": "System reconnaissance and discovery",
+      "text": "Conducts preliminary reconnaissance using commands like ping, tasklist, netstat, whoami, quser, and hostname to understand the compromised environment.",
+      "description": "Conducts preliminary reconnaissance using commands like ping, tasklist, netstat, whoami, quser, and hostname to understand the compromised environment.",
+      "mitre": [
+        "T1082",
+        "T1033",
+        "T1049"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1082, T1033, T1049 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "SOC Team",
+      "phase": "Lateral Movement",
+      "pillar": "Respond",
+      "title": "RDP configuration modification",
+      "text": "Disables RestrictedAdmin for Remote Desktop Protocol to facilitate credential harvesting and lateral movement by modifying registry settings.",
+      "description": "Disables RestrictedAdmin for Remote Desktop Protocol to facilitate credential harvesting and lateral movement by modifying registry settings.",
+      "mitre": [
+        "T1112",
+        "T1021.001"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1112, T1021.001 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "SOC Team",
+      "phase": "Command and Control",
+      "pillar": "Respond",
+      "title": "Tool deployment and staging",
+      "text": "Downloads and stages multiple tools including GoTokenTheft, Earthworm, DWAgent, and SharpHound to various directories for post-compromise activities.",
+      "description": "Downloads and stages multiple tools including GoTokenTheft, Earthworm, DWAgent, and SharpHound to various directories for post-compromise activities.",
+      "mitre": [
+        "T1105",
+        "T1027"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1105, T1027 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Network tunneling establishment",
+      "text": "Deploys Earthworm network tunneling tool to create reverse tunnels to attacker-controlled infrastructure, enabling persistent access and command execution.",
+      "description": "Deploys Earthworm network tunneling tool to create reverse tunnels to attacker-controlled infrastructure, enabling persistent access and command execution.",
+      "mitre": [
+        "T1090",
+        "T1572"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1090, T1572 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "Blue Team",
+      "phase": "Discovery",
+      "pillar": "Detect",
+      "title": "Active Directory reconnaissance",
+      "text": "Uses SharpHound, Certipy, and native Windows tools like dsquery/dsget to enumerate Active Directory structure, users, groups, and service principal names.",
+      "description": "Uses SharpHound, Certipy, and native Windows tools like dsquery/dsget to enumerate Active Directory structure, users, groups, and service principal names.",
+      "mitre": [
+        "T1087.002",
+        "T1069.002",
+        "T1018"
+      ],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Monitor for T1087.002, T1069.002, T1018 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 7,
+      "role": "Red Team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "title": "Credential harvesting and privilege escalation",
+      "text": "Deploys GoTokenTheft, Rubeus, and Impacket tools to steal access tokens, abuse Kerberos, and execute commands with elevated privileges across the network.",
+      "description": "Deploys GoTokenTheft, Rubeus, and Impacket tools to steal access tokens, abuse Kerberos, and execute commands with elevated privileges across the network.",
+      "mitre": [
+        "T1134",
+        "T1558",
+        "T1550"
+      ],
+      "expectedOutcome": "Step 7 completes successfully",
+      "detectionHints": "Monitor for T1134, T1558, T1550 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 8,
+      "role": "Red Team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "title": "Persistence through backdoor accounts",
+      "text": "Creates new user accounts and adds existing accounts to privileged groups to maintain persistent access to the compromised environment.",
+      "description": "Creates new user accounts and adds existing accounts to privileged groups to maintain persistent access to the compromised environment.",
+      "mitre": [
+        "T1136.002",
+        "T1098",
+        "T1560",
+        "T1556",
+        "T1005"
+      ],
+      "expectedOutcome": "Step 8 completes successfully",
+      "detectionHints": "Monitor for T1136.002, T1098, T1560, T1556, T1005 indicators",
+      "playbookRefs": []
+    }
+  ]
+}

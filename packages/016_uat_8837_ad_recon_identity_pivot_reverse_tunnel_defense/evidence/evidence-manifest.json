@@ -1,0 +1,1097 @@
+{
+  "schema_version": "2.0.0",
+  "harness_level": 3,
+  "package_id": "pkg-016",
+  "package_name": "UAT-8837: AD Recon, Identity Pivot & Reverse Tunnel Defense",
+  "scenario_id": "pkg-016",
+  "scenario_title": "UAT-8837: AD Recon, Identity Pivot & Reverse Tunnel Defense",
+  "generated_at": "2026-04-04T08:23:06.838Z",
+  "summary": {
+    "total_steps": 80,
+    "body_steps": 20,
+    "brain_steps": 20,
+    "purpose_steps": 20,
+    "edge_steps": 20,
+    "detection_triggers": 7,
+    "playbook_actions": 4,
+    "mitre_techniques_declared": 22,
+    "mitre_techniques_exercised": 5,
+    "coverage_pct": 23
+  },
+  "source_counts": {
+    "detection_files": 7,
+    "playbook_files": 4,
+    "policy_files": 2,
+    "doc_files": 3,
+    "scenario_steps": 8,
+    "mitre_techniques": 22,
+    "platform_targets": [
+      "SaaS",
+      "Endpoint",
+      "Network",
+      "Entra"
+    ]
+  },
+  "mitre_coverage": [
+    {
+      "technique_id": "T1190",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1078",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1082",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1033",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1049",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1112",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1021.001",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1105",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1027",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1090",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1572",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1087.002",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1069.002",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1018",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1134",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1558",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1550",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1136.002",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1098",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1560",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1556",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1005",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    }
+  ],
+  "replay_status": "PASS",
+  "verdict": "PASS",
+  "replay_timeline": [
+    {
+      "step": 1,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "body_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "brain_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "edge_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "body_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "brain_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "edge_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "body_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "brain_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "edge_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "body_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "brain_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "edge_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "body_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "brain_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "edge_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1082"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "body_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "brain_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "edge_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "body_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "brain_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "edge_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "body_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "brain_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1112"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "edge_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "body_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "brain_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "edge_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "body_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "brain_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "edge_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1105"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "body_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "brain_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "edge_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "body_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "brain_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "edge_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "body_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "brain_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1090"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "edge_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "body_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "brain_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "edge_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "body_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "brain_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "edge_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1087.002"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "body_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "brain_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "edge_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "body_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "brain_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "edge_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "body_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "brain_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1134"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_1",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "edge_action_2",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "body_action_3",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "brain_action_4",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_5",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "edge_action_6",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "body_action_7",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "brain_action_8",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "purpose_action_9",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "edge_action_10",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1136.002"
+      ]
+    }
+  ]
+}

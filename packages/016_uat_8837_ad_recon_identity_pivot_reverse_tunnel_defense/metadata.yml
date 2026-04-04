@@ -1,0 +1,43 @@
+package_id: pkg-016
+title: 'UAT-8837: AD Recon, Identity Pivot & Reverse Tunnel Defense'
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 3
+tier: Advanced
+category: Endpoint
+categories:
+  - Endpoint
+  - Identity
+  - Network
+primary_category: Endpoint
+mitre_techniques:
+  - T1190
+  - T1078
+  - T1082
+  - T1033
+  - T1049
+  - T1112
+  - T1021.001
+  - T1105
+  - T1027
+  - T1090
+  - T1572
+  - T1087.002
+  - T1069.002
+  - T1018
+  - T1134
+  - T1558
+  - T1550
+  - T1136.002
+  - T1098
+  - T1560
+  - T1556
+  - T1005
+platform_targets:
+  - SaaS
+  - Endpoint
+  - Network
+  - Entra
+author: SOaC Community
+created: '2026-04-04T08:23:06.838Z'
+generated_by: soac-wizard-finalizer

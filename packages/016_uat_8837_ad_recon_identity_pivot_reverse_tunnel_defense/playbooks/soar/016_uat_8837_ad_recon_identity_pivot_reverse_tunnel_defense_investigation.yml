@@ -1,0 +1,100 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: uac-8837-ad-recon-identity-pivot-reverse-tunnel-defense
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2024-01-15T10:30:00Z'
+  tags:
+    - active-directory
+    - lateral-movement
+    - tunneling
+    - credential-harvesting
+    - persistence
+    - uac-8837
+  mitre_attack:
+    - T1190
+    - T1078
+    - T1082
+    - T1033
+    - T1049
+    - T1112
+    - T1021.001
+    - T1105
+    - T1027
+    - T1090
+    - T1572
+    - T1087.002
+    - T1069.002
+    - T1018
+    - T1134
+    - T1558
+    - T1550
+    - T1136.002
+    - T1098
+    - T1560
+    - T1556
+    - T1005
+  severity: critical
+  package_id: pkg-016
+spec:
+  steps:
+    - name: reset_rdp_configurations
+      action: endpoint.remediate_registry
+      target: '{{ inputs.affected_hosts }}'
+      parameters:
+        registry_keys:
+          - HKLM\System\CurrentControlSet\Control\Terminal Server
+          - >-
+            HKLM\System\CurrentControlSet\Control\Terminal
+            Server\WinStations\RDP-Tcp
+        action_type: restore_baseline
+        backup_before_change: true
+      timeout: 300
+      retry: 2
+      on_failure: continue
+    - name: revoke_kerberos_tickets
+      action: identity.revoke_tickets
+      target: domain_controller
+      parameters:
+        accounts: '{{ inputs.suspicious_accounts }}'
+        ticket_types:
+          - tgt
+          - service_tickets
+        force_reauth: true
+      timeout: 240
+      retry: 3
+      on_failure: escalate
+    - name: deploy_enhanced_monitoring
+      action: monitoring.deploy_sensors
+      target: '{{ inputs.affected_hosts }}'
+      parameters:
+        sensor_types:
+          - process_monitoring
+          - network_monitoring
+          - file_integrity
+        monitoring_duration: 72h
+        alert_threshold: low
+        focus_behaviors:
+          - credential_access
+          - lateral_movement
+          - tunneling
+      timeout: 180
+      retry: 2
+      on_failure: continue
+    - name: generate_incident_report
+      action: reporting.create_incident
+      target: soar_platform
+      parameters:
+        incident_type: advanced_persistent_threat
+        threat_actor: UAT-8837
+        affected_assets: '{{ inputs.affected_hosts + inputs.suspicious_accounts }}'
+        attack_phases:
+          - initial_access
+          - discovery
+          - lateral_movement
+          - persistence
+        recommendations: immediate_containment
+      timeout: 120
+      retry: 1
+      on_failure: continue

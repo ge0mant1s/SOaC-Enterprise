@@ -1,0 +1,15 @@
+title: Active Directory Reconnaissance Activities
+id: rule-002-ad-recon-activities
+status: production
+description: Active Directory Reconnaissance Activities
+logsource:
+  product: saas
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1087.002
+  - T1069.002
+  - T1018
+level: high

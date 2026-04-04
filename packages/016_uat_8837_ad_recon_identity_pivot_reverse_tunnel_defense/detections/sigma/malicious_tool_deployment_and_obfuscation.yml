@@ -1,0 +1,14 @@
+title: Malicious Tool Deployment and Obfuscation
+id: rule-006-tool-deployment-staging
+status: production
+description: Malicious Tool Deployment and Obfuscation
+logsource:
+  product: saas
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1105
+  - T1027
+level: medium

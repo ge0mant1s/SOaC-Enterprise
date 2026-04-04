@@ -1,0 +1,17 @@
+index=network sourcetype=firewall OR sourcetype=proxy
+| eval suspicious_ports=if(match(dest_port, "^(1080|3128|8080|9050|9150)$"), "SOCKS/HTTP_Proxy", "")
+| eval tunnel_indicators=case(
+    match(url, ".*tunnel.*|.*proxy.*|.*socks.*"), "URL_Tunnel_Keywords",
+    match(user_agent, ".*curl.*|.*wget.*|.*python.*"), "Suspicious_User_Agent",
+    bytes_out > 1000000 AND bytes_in > 1000000, "High_Bidirectional_Traffic",
+    1==1, ""
+)
+| where suspicious_ports!="" OR tunnel_indicators!=""
+| stats count, values(dest_port) as ports, values(url) as urls, sum(bytes_out) as total_out, sum(bytes_in) as total_in by src_ip, dest_ip
+| where count > 10 OR total_out > 5000000
+| eval risk_score=case(
+    count > 50, 90,
+    total_out > 10000000, 85,
+    count > 20, 70,
+    1==1, 60
+)
