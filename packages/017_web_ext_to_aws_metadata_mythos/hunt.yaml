@@ -1,0 +1,145 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: exploit-chain-disruption-pkg-017
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: "2026-04-11T10:08:58.659Z"
+  package_id: pkg-017
+  mitre_attack:
+    - T1190
+    - T1055
+    - T1552.005
+    - T1190
+    - T1055
+    - T1552.005
+  severity: HIGH
+  data_sources:
+    - EDR
+    - Cloud
+    - Network
+    - Web Application Logs
+  tags:
+    - exploit-chain
+    - web-exploitation
+    - process-injection
+    - credential-access
+    - aws-metadata
+    - multi-stage
+spec:
+  description: >-
+    Proactive hunt for multi-stage exploit chain targeting web applications with progression through process injection
+    and AWS credential harvesting
+  hypothesis: >-
+    Threat actors are executing a coordinated 3-stage exploit chain: initial web application compromise, process
+    injection for sandbox escape, followed by AWS metadata credential harvesting
+  hunt_type: proactive
+  telemetry_sources:
+    - edr
+    - cloud
+    - network
+    - logs
+  queries:
+    - id: stage1-web-exploit
+      name: Web Application Exploitation Indicators
+      platform: kql
+      query: >-
+        W3CIISLog | where TimeGenerated >= ago(7d) | where scStatus in (200, 302, 500) | where csUriStem contains "/"
+        and (csUriQuery contains "../" or csUriQuery contains "%2e%2e" or csUriQuery contains "union" or csUriQuery
+        contains "select" or csUriQuery contains "<script" or csUriQuery contains "javascript:") | where csUserAgent
+        !contains "scanner" | summarize count() by cIP, csUriStem, csUriQuery, scStatus | where count_ > 3
+      expected_results: >-
+        HTTP requests with exploitation patterns, SQL injection attempts, XSS payloads, or directory traversal from same
+        source IP
+    - id: stage2-process-injection
+      name: Process Injection and Sandbox Escape
+      platform: kql
+      query: >-
+        DeviceProcessEvents | where TimeGenerated >= ago(7d) | where ProcessCommandLine has_any ("CreateRemoteThread",
+        "WriteProcessMemory", "VirtualAllocEx", "SetWindowsHookEx", "QueueUserAPC") or FileName in~ ("rundll32.exe",
+        "regsvr32.exe", "mshta.exe") | where ProcessCommandLine has_any ("javascript:", "vbscript:", "data:", "http") |
+        extend ParentProcessName = tostring(split(InitiatingProcessFileName, '\\')[-1]) | where ParentProcessName in~
+        ("w3wp.exe", "httpd.exe", "nginx.exe", "tomcat.exe")
+      expected_results: Process injection techniques executed by web server child processes, indicating post-exploitation activity
+    - id: stage3-aws-metadata-access
+      name: AWS Metadata Service Credential Harvesting
+      platform: kql
+      query: >-
+        DeviceNetworkEvents | where TimeGenerated >= ago(7d) | where RemoteIP == "169.254.169.254" | where RemoteUrl
+        has_any ("iam/security-credentials", "identity-credentials", "meta-data/iam") | join kind=inner
+        (DeviceProcessEvents | where TimeGenerated >= ago(7d) | where ProcessCommandLine has_any ("curl", "wget",
+        "Invoke-WebRequest", "HttpWebRequest")) on DeviceId, $left.InitiatingProcessId == $right.ProcessId | project
+        TimeGenerated, DeviceId, InitiatingProcessFileName, ProcessCommandLine, RemoteUrl
+      expected_results: Network connections to AWS metadata service requesting IAM credentials from compromised processes
+    - id: chain-correlation
+      name: Multi-Stage Chain Correlation
+      platform: kql
+      query: >-
+        let WebExploit = W3CIISLog | where TimeGenerated >= ago(7d) | where scStatus == 200 and (csUriQuery contains
+        "../" or csUriQuery contains "union" or csUriQuery contains "<script") | project TimeGenerated, SourceIP=cIP,
+        WebExploitTime=TimeGenerated; let ProcessInject = DeviceProcessEvents | where TimeGenerated >= ago(7d) | where
+        ProcessCommandLine has_any ("CreateRemoteThread", "WriteProcessMemory") | project TimeGenerated, DeviceId,
+        ProcessInjectTime=TimeGenerated; let MetadataAccess = DeviceNetworkEvents | where TimeGenerated >= ago(7d) |
+        where RemoteIP == "169.254.169.254" | project TimeGenerated, DeviceId, MetadataTime=TimeGenerated; WebExploit |
+        join kind=inner ProcessInject on $left.SourceIP == $right.DeviceId | join kind=inner MetadataAccess on DeviceId
+        | where ProcessInjectTime > WebExploitTime and MetadataTime > ProcessInjectTime | where datetime_diff('hour',
+        MetadataTime, WebExploitTime) <= 24
+      expected_results: Correlated events showing progression through all three exploit chain stages within 24-hour window
+    - id: historical-exploitation
+      name: Historical Exploitation Pattern Analysis
+      platform: kql
+      query: >-
+        union (W3CIISLog | where TimeGenerated >= ago(30d) | where scStatus == 200 | where csUriQuery has_any ("../",
+        "union", "select", "<script") | summarize WebAttacks=count() by bin(TimeGenerated, 1h), cIP),
+        (DeviceProcessEvents | where TimeGenerated >= ago(30d) | where ProcessCommandLine has_any ("CreateRemoteThread",
+        "WriteProcessMemory") | summarize ProcessInjections=count() by bin(TimeGenerated, 1h), DeviceId),
+        (DeviceNetworkEvents | where TimeGenerated >= ago(30d) | where RemoteIP == "169.254.169.254" | summarize
+        MetadataRequests=count() by bin(TimeGenerated, 1h), DeviceId) | summarize TotalEvents=sum(coalesce(WebAttacks,
+        ProcessInjections, MetadataRequests)) by TimeGenerated | where TotalEvents > 5
+      expected_results: Time-based clustering of exploitation activities indicating coordinated attack campaigns over 30-day period
+  analysis_steps:
+    - id: step-1
+      name: Initial Web Exploitation Triage
+      description: >-
+        Analyze web exploitation indicators to identify successful compromise attempts and validate initial attack
+        vector
+      tools:
+        - KQL
+        - Log Analysis Platform
+    - id: step-2
+      name: Process Injection Investigation
+      description: Examine process injection events for sandbox escape techniques and correlate with web server processes
+      tools:
+        - EDR Console
+        - Process Tree Analysis
+    - id: step-3
+      name: Credential Harvesting Assessment
+      description: Investigate AWS metadata service access patterns and identify potential credential theft
+      tools:
+        - Network Analysis
+        - AWS CloudTrail
+    - id: step-4
+      name: Chain Correlation Analysis
+      description: Correlate events across all three stages to confirm exploit chain progression and identify affected systems
+      tools:
+        - SIEM Platform
+        - Timeline Analysis
+    - id: step-5
+      name: Historical Pattern Review
+      description: Review historical data for similar attack patterns and assess campaign scope and duration
+      tools:
+        - Threat Intelligence Platform
+        - Statistical Analysis
+  success_criteria:
+    - Identification of successful web application exploitation attempts with suspicious URI patterns
+    - Detection of process injection techniques executed by web server child processes
+    - Evidence of AWS metadata service access for credential harvesting
+    - Temporal correlation showing progression through all three exploit chain stages
+    - Historical pattern analysis revealing coordinated attack campaigns
+  escalation:
+    on_confirmed: >-
+      Immediately escalate to incident response team, isolate affected systems, revoke compromised AWS credentials, and
+      implement emergency web application patches
+    on_inconclusive: >-
+      Continue monitoring with enhanced logging, implement additional detection rules for identified IOCs, and schedule
+      follow-up hunt in 48 hours

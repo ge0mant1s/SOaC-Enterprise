@@ -1,0 +1,52 @@
+{
+  "package_id": "pkg-017",
+  "title": "Exploit Chain Disruption: Web Exploit \u2192 Sandbox Escape \u2192 AWS Metadata (Mythos Pattern)",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Web Application Exploitation (T1190)",
+      "text": "Web Application Exploitation (T1190)",
+      "description": "Web Application Exploitation (T1190)",
+      "mitre": [
+        "T1190"
+      ],
+      "expectedOutcome": "Initial foothold established via web application vulnerability exploitation",
+      "detectionHints": "Monitor for T1190 indicators \u2014 web shell deployment, suspicious HTTP POST payloads",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "title": "Process Injection / Sandbox Escape (T1055)",
+      "text": "[BREAKPOINT] Process Injection / Sandbox Escape (T1055)",
+      "description": "[BREAKPOINT] Process Injection / Sandbox Escape (T1055)",
+      "mitre": [
+        "T1055"
+      ],
+      "expectedOutcome": "Attacker evades endpoint sandbox via process injection technique",
+      "detectionHints": "Monitor for T1055 indicators \u2014 process hollowing, DLL injection, sandbox escape artifacts",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "title": "Credential Access from AWS Metadata (T1552.005)",
+      "text": "[BREAKPOINT] Credential Access from AWS Metadata (T1552.005)",
+      "description": "[BREAKPOINT] Credential Access from AWS Metadata (T1552.005)",
+      "mitre": [
+        "T1552.005"
+      ],
+      "expectedOutcome": "Cloud identity pivot via AWS metadata service credential theft",
+      "detectionHints": "Monitor for T1552.005 indicators \u2014 IMDS requests, AWS credential harvesting from metadata service",
+      "playbookRefs": []
+    }
+  ]
+}

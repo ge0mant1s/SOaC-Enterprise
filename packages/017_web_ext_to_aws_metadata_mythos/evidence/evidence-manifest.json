@@ -1,0 +1,412 @@
+{
+  "schema_version": "2.0.0",
+  "harness_level": 3,
+  "package_id": "pkg-017",
+  "package_name": "Exploit Chain Disruption: Web Exploit \u2192 Sandbox Escape \u2192 AWS Metadata (Mythos Pattern)",
+  "scenario_id": "pkg-017",
+  "scenario_title": "Exploit Chain Disruption: Web Exploit \u2192 Sandbox Escape \u2192 AWS Metadata (Mythos Pattern)",
+  "generated_at": "2026-04-12T12:45:58.000Z",
+  "summary": {
+    "total_steps": 30,
+    "body_steps": 9,
+    "brain_steps": 9,
+    "purpose_steps": 6,
+    "edge_steps": 6,
+    "detection_triggers": 8,
+    "playbook_actions": 4,
+    "mitre_techniques_declared": 3,
+    "mitre_techniques_exercised": 3,
+    "coverage_pct": 100
+  },
+  "source_counts": {
+    "detection_files": 8,
+    "playbook_files": 4,
+    "policy_files": 2,
+    "doc_files": 3,
+    "scenario_steps": 3,
+    "mitre_techniques": 3,
+    "platform_targets": [
+      "MDE",
+      "CrowdStrike",
+      "Sentinel",
+      "AWS"
+    ]
+  },
+  "mitre_coverage": [
+    {
+      "technique_id": "T1190",
+      "tactic": "Initial Access",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1055",
+      "tactic": "Defense Evasion",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-002"
+      ]
+    },
+    {
+      "technique_id": "T1552.005",
+      "tactic": "Credential Access",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-003"
+      ]
+    }
+  ],
+  "replay_status": "PASS",
+  "verdict": "PASS",
+  "correlation_analysis": {
+    "strategy": "Mythos Defense Strategy",
+    "detail": "Disrupted autonomous chain at 2 critical breakpoints. Linked Endpoint Process telemetry (T1055) to AWS Identity pivots (T1552.005) via Hybrid Entity Correlation.",
+    "breakpoints_disrupted": 2,
+    "cross_domain_links": [
+      {
+        "from": "Endpoint Process (T1055)",
+        "to": "AWS Identity (T1552.005)",
+        "correlation_method": "Hybrid Entity Correlation"
+      },
+      {
+        "from": "Web Application (T1190)",
+        "to": "Endpoint Process (T1055)",
+        "correlation_method": "Sequential Chain Analysis"
+      }
+    ]
+  },
+  "replay_timeline": [
+    {
+      "step": 1,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "web_exploit_entry",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 2,
+      "pillar": "BODY",
+      "action": "endpoint_telemetry_ingest",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "web_shell_artifact_capture",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "exploit_pattern_correlation",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 5,
+      "pillar": "BRAIN",
+      "action": "initial_access_classification",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "threat_score_computation",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "waf_virtual_patch_deploy",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 8,
+      "pillar": "PURPOSE",
+      "action": "exploit_containment_playbook",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 9,
+      "pillar": "EDGE",
+      "action": "perimeter_block_enforcement",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "network_segment_isolation",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "sandbox_escape_detection",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 2,
+      "pillar": "BODY",
+      "action": "process_hollowing_telemetry",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "dll_injection_artifact",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "sandbox_escape_execution",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 5,
+      "pillar": "BRAIN",
+      "action": "injection_technique_classification",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "evasion_confidence_score",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "process_kill_playbook",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 8,
+      "pillar": "PURPOSE",
+      "action": "host_isolation_containment",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 9,
+      "pillar": "EDGE",
+      "action": "endpoint_quarantine_enforcement",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "lateral_movement_block",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1055"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "cloud_metadata_pivot",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 2,
+      "pillar": "BODY",
+      "action": "imds_request_telemetry",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "aws_credential_harvest_detect",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "identity_pivot_correlation",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 5,
+      "pillar": "BRAIN",
+      "action": "cross_domain_chain_analysis",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "credential_theft_classification",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "credential_rotation_playbook",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 8,
+      "pillar": "PURPOSE",
+      "action": "iam_policy_lockdown",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 9,
+      "pillar": "EDGE",
+      "action": "cloud_api_block_enforcement",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "identity_session_revocation",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1552.005"
+      ]
+    }
+  ]
+}

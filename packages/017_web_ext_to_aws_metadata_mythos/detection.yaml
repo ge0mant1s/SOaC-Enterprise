@@ -1,0 +1,88 @@
+kind: DetectionRule
+metadata:
+  name: web-application-exploitation-detection
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: "2026-04-11T10:08:13Z"
+  package_id: pkg-017
+  mitre_attack:
+    - T1190
+    - T1190
+    - T1055
+    - T1552.005
+  severity: HIGH
+  data_sources:
+    - Network
+    - Web Application Logs
+spec:
+  description: >-
+    Detects web application exploitation attempts including SQL injection, command injection, and file upload attacks
+    that could lead to initial access
+  platforms:
+    - Sentinel
+    - AWS
+  inline_rules:
+    - id: rule-017-001
+      name: Web Application Exploitation Indicators
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1190
+      severity: HIGH
+      query: >-
+        CommonSecurityLog | where DeviceVendor == "WAF" | where Activity contains "SQL" or Activity contains "../" or
+        Activity contains "<script" or Activity contains "cmd.exe" | where RequestURL contains ".php" or RequestURL
+        contains ".jsp" or RequestURL contains ".asp" | where LogSeverity >= 7 | project TimeGenerated, SourceIP,
+        RequestURL, Activity, RequestMethod
+    - id: rule-017-002
+      name: Process Injection Detection
+      format: kql
+      platform: MDE
+      mitre:
+        - T1055
+      severity: CRITICAL
+      query: >-
+        DeviceProcessEvents | where ProcessCommandLine contains "CreateRemoteThread" or ProcessCommandLine contains
+        "WriteProcessMemory" or ProcessCommandLine contains "VirtualAllocEx" | where InitiatingProcessFileName in~
+        ("w3wp.exe", "httpd.exe", "nginx.exe", "tomcat.exe") | project Timestamp, DeviceName, ProcessCommandLine,
+        InitiatingProcessFileName, AccountName
+    - id: rule-017-003
+      name: AWS Metadata Service Access
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1552.005
+      severity: CRITICAL
+      query: >-
+        AWSCloudTrail | where EventName == "GetMetadata" or RequestURI contains "169.254.169.254" | where UserAgent
+        contains "curl" or UserAgent contains "wget" or UserAgent contains "python" | where SourceIPAddress !=
+        "169.254.169.254" | project TimeGenerated, SourceIPAddress, UserAgent, RequestURI, UserIdentityType
+    - id: rule-017-004
+      name: Multi-Stage Attack Chain Correlation
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1190
+        - T1055
+        - T1552.005
+      severity: CRITICAL
+      query: >-
+        let WebExploit = CommonSecurityLog | where TimeGenerated > ago(1h) | where DeviceVendor == "WAF" | where
+        LogSeverity >= 7; let ProcessInject = DeviceProcessEvents | where Timestamp > ago(1h) | where ProcessCommandLine
+        contains "CreateRemoteThread"; let MetadataAccess = AWSCloudTrail | where TimeGenerated > ago(1h) | where
+        RequestURI contains "169.254.169.254"; WebExploit | join kind=inner (ProcessInject) on $left.SourceIP ==
+        $right.RemoteIP | join kind=inner (MetadataAccess) on $left.SourceIP == $right.SourceIPAddress
+  test_cases:
+    - id: tc-017-001
+      name: SQL Injection Attack Detection
+      type: true_positive
+      expected_result: Alert triggered for SQL injection attempt
+    - id: tc-017-002
+      name: Legitimate Web Traffic
+      type: true_negative
+      expected_result: No alert for normal web requests
+    - id: tc-017-003
+      name: Process Injection False Positive
+      type: false_positive
+      expected_result: Alert for legitimate debugging activity
+apiVersion: soac.io/v1

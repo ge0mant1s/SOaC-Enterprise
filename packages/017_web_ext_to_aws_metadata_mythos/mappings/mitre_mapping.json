@@ -1,0 +1,45 @@
+{
+  "package_id": "pkg-017",
+  "mappings": [
+    {
+      "technique_id": "T1190",
+      "tactic": "Initial Access",
+      "detection_rules": [
+        "rule-017-001"
+      ],
+      "playbook_refs": [
+        "step-1"
+      ],
+      "hunt_queries": [
+        "web_application_exploitation_indicators.kql"
+      ]
+    },
+    {
+      "technique_id": "T1055",
+      "tactic": "Defense Evasion",
+      "detection_rules": [
+        "rule-017-002"
+      ],
+      "playbook_refs": [
+        "step-2"
+      ],
+      "hunt_queries": [
+        "process_injection_and_sandbox_escape.kql"
+      ]
+    },
+    {
+      "technique_id": "T1552.005",
+      "tactic": "Credential Access",
+      "detection_rules": [
+        "rule-017-003"
+      ],
+      "playbook_refs": [
+        "step-3"
+      ],
+      "hunt_queries": [
+        "aws_metadata_service_credential_harvesting.kql"
+      ]
+    }
+  ],
+  "package_name": "Exploit Chain Disruption: Web Exploit \u2192 Sandbox Escape \u2192 AWS Metadata (Mythos Pattern)"
+}

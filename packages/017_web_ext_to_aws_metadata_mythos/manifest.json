@@ -1,0 +1,169 @@
+{
+  "package_id": "pkg-017",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "Exploit Chain Disruption: Web Exploit \u2192 Sandbox Escape \u2192 AWS Metadata (Mythos Pattern)",
+  "description": "Instance-level exploit chain package: Web application exploitation (T1190) chains to process injection sandbox escape (T1055), pivoting to AWS metadata credential theft (T1552.005). Implements the Mythos autonomous chain pattern with 2 defensive breakpoints and cross-domain correlation.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "package_family": "exploit_chain_disruption",
+  "source_type": null,
+  "confidence": 0.7,
+  "human_review_required": false,
+  "deployment_mode": "detect-and-respond",
+  "category": "Endpoint",
+  "categories": [
+    "Endpoint"
+  ],
+  "primary_category": "Endpoint",
+  "secondary_categories": [],
+  "tags": [
+    "mde",
+    "crowdstrike",
+    "sentinel",
+    "aws",
+    "endpoint",
+    "red_team",
+    "blue_team",
+    "soc_manager",
+    "exploit-chain-disruption"
+  ],
+  "threat_actor": "Multi-stage Threat Actor",
+  "github_path": "packages/017_web_ext_to_aws_metadata_mythos",
+  "slug": "017_web_ext_to_aws_metadata_mythos",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1190",
+    "T1055",
+    "T1552.005"
+  ],
+  "mitre_techniques": [
+    "T1190",
+    "T1055",
+    "T1552.005"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "MDE",
+    "CrowdStrike",
+    "Sentinel",
+    "AWS"
+  ],
+  "platform_targets": [
+    "MDE",
+    "CrowdStrike",
+    "Sentinel",
+    "AWS"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Web Application Exploitation (T1190)",
+      "description": "Web Application Exploitation (T1190)",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "Process Injection / Sandbox Escape (T1055)",
+      "description": "[BREAKPOINT] Process Injection / Sandbox Escape (T1055)",
+      "role": "red_team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1055"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Credential Access from AWS Metadata (T1552.005)",
+      "description": "[BREAKPOINT] Credential Access from AWS Metadata (T1552.005)",
+      "role": "red_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1552.005"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Advanced",
+  "family_metadata": {
+    "initial_vector": "exploit_public",
+    "stages": [
+      {
+        "title": "Web Application Exploitation (T1190)",
+        "techniques": "T1190",
+        "is_breakpoint": false
+      },
+      {
+        "title": "Process Injection / Sandbox Escape (T1055)",
+        "techniques": "T1055",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Credential Access from AWS Metadata (T1552.005)",
+        "techniques": "T1552.005",
+        "is_breakpoint": true
+      }
+    ],
+    "telemetry_sources": [
+      "EDR",
+      "Cloud",
+      "Network"
+    ],
+    "target_stacks": [
+      "MDE",
+      "CrowdStrike",
+      "Sentinel",
+      "AWS"
+    ],
+    "correlation_strategy": "hybrid"
+  },
+  "package_type": "instance",
+  "framework_parent": "mythos_disruption_framework",
+  "attack_intent": {
+    "entry": "web_exploit",
+    "pivot": "sandbox_escape",
+    "objective": "cloud_credential_access",
+    "pattern": "mythos_autonomous_chain"
+  }
+}

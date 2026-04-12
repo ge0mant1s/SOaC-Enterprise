@@ -1,0 +1,145 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: exploit-chain-disruption-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: "2026-04-11T10:08:30.341Z"
+  tags:
+    - exploit-chain
+    - web-exploitation
+    - process-injection
+    - credential-access
+    - aws-metadata
+    - multi-stage-attack
+  mitre_attack:
+    - T1190
+    - T1055
+    - T1552.005
+    - T1190
+    - T1055
+    - T1552.005
+  severity: CRITICAL
+  package_id: pkg-017
+spec:
+  description: >-
+    Automated response playbook for disrupting multi-stage exploit chains involving web application exploitation,
+    process injection, and AWS metadata credential access
+  trigger:
+    source: BRAIN
+    conditions:
+      - field: attack_stage_count
+        operator: gte
+        value: "2"
+      - field: exploit_chain_confidence
+        operator: gte
+        value: "0.8"
+    cooldown: 10m
+  inputs:
+    - name: source_ip
+      type: string
+      required: true
+      description: Source IP address of the exploit attempt
+    - name: target_host
+      type: string
+      required: true
+      description: Target host under attack
+    - name: process_id
+      type: number
+      required: false
+      description: Process ID involved in injection
+    - name: aws_instance_id
+      type: string
+      required: false
+      description: AWS instance ID accessing metadata service
+  steps:
+    - id: step-1
+      name: isolate-compromised-host
+      action: api_call
+      target: edr_isolation_service
+      parameters:
+        host: "{{target_host}}"
+        isolation_type: network
+      timeout: 30s
+      on_failure: escalate
+    - id: step-2
+      name: block-source-ip
+      action: api_call
+      target: firewall_service
+      parameters:
+        ip: "{{source_ip}}"
+        action: block
+        duration: 24h
+      timeout: 15s
+      on_failure: continue
+    - id: step-3
+      name: terminate-malicious-process
+      action: api_call
+      target: edr_process_service
+      parameters:
+        host: "{{target_host}}"
+        process_id: "{{process_id}}"
+        action: terminate
+      timeout: 20s
+      on_failure: continue
+    - id: step-4
+      name: disable-aws-metadata-access
+      action: api_call
+      target: aws_security_service
+      parameters:
+        instance_id: "{{aws_instance_id}}"
+        metadata_service: disabled
+      timeout: 45s
+      on_failure: escalate
+    - id: step-5
+      name: collect-forensic-artifacts
+      action: script
+      target: forensics_collector
+      parameters:
+        host: "{{target_host}}"
+        artifacts:
+          - memory_dump
+          - process_tree
+          - network_connections
+      timeout: 120s
+      on_failure: continue
+    - id: step-6
+      name: rotate-aws-credentials
+      action: api_call
+      target: aws_iam_service
+      parameters:
+        instance_id: "{{aws_instance_id}}"
+        action: rotate_credentials
+      timeout: 60s
+      on_failure: escalate
+    - id: step-7
+      name: notify-security-team
+      action: notify
+      target: security_operations
+      parameters:
+        severity: critical
+        message: Multi-stage exploit chain disrupted on {{target_host}}
+        channels:
+          - slack
+          - email
+          - sms
+      timeout: 10s
+      on_failure: continue
+  outputs:
+    - name: containment_status
+      type: string
+      description: Status of containment actions performed
+    - name: artifacts_collected
+      type: array
+      description: List of forensic artifacts successfully collected
+    - name: response_duration
+      type: number
+      description: Total time taken for response in seconds
+  rollback:
+    steps:
+      - id: rb-1
+        name: restore-host-connectivity
+        action: api_call
+      - id: rb-2
+        name: re-enable-aws-metadata
+        action: api_call

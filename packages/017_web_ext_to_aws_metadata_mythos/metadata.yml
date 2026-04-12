@@ -1,0 +1,34 @@
+package_id: pkg-017
+title: 'Exploit Chain Disruption: Web Exploit → Sandbox Escape → AWS Metadata (Mythos Pattern)'
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 3
+tier: Advanced
+package_family: exploit_chain_disruption
+package_type: instance
+framework_parent: mythos_disruption_framework
+category: Endpoint
+categories:
+  - Endpoint
+primary_category: Endpoint
+mitre_techniques:
+  - T1190
+  - T1055
+  - T1552.005
+platform_targets:
+  - MDE
+  - CrowdStrike
+  - Sentinel
+  - AWS
+source_type: null
+source_urls: []
+confidence: 0.7
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-04-11T10:09:34.697Z'
+generated_by: soac-wizard-finalizer
+attack_intent:
+  entry: web_exploit
+  pivot: sandbox_escape
+  objective: cloud_credential_access
+  pattern: mythos_autonomous_chain
