@@ -1,0 +1,82 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: ai-agent-prompt-injection-lateral-pivot-governance
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: "2026-04-13T16:12:55.437Z"
+  package_id: pkg-018
+  scope: package
+  tags:
+    - ai-governance
+    - prompt-injection
+    - lateral-movement
+    - coding-agent
+    - critical-risk
+spec:
+  description: >-
+    Comprehensive governance policy for AI coding agents to prevent prompt injection attacks and lateral pivot
+    disruption across multi-domain environments with enforceable boundaries and full audit trails
+  environments:
+    - name: lab
+      mode: testing
+      data_handling: relaxed
+    - name: staging
+      mode: staging
+      data_handling: standard
+    - name: production
+      mode: production
+      data_handling: strict
+  access_control:
+    required_roles:
+      - ai-governance-admin
+      - security-engineer
+      - devops-lead
+    approval_workflow: true
+  compliance_frameworks:
+    - SOC2
+    - ISO27001
+    - NIST-CSF
+  controls:
+    - name: shell-execution-restriction
+      description: Prevent AI agents from executing shell commands without explicit human approval and audit logging
+      enforcement: strict
+      evidence: command_execution_logs
+    - name: denylisted-command-blocking
+      description: >-
+        Block AI agents from executing high-risk command classes including system modification, network tools, and
+        credential access
+      enforcement: strict
+      evidence: blocked_command_audit
+    - name: file-path-access-governance
+      description: Restrict AI agent file system access to approved project directories with read-only enforcement outside scope
+      enforcement: strict
+      evidence: file_access_logs
+    - name: secret-access-prevention
+      description: Prevent AI agents from accessing environment variables, credential files, or secret management systems
+      enforcement: strict
+      evidence: secret_access_attempts
+    - name: repo-modification-guardrails
+      description: Enforce human review for all repository modifications with automated rollback capabilities
+      enforcement: strict
+      evidence: repo_change_approvals
+    - name: network-egress-restriction
+      description: Block AI agent network access except to approved code repositories and package managers
+      enforcement: strict
+      evidence: network_connection_logs
+    - name: merge-deploy-approval-workflow
+      description: Require human approval for all merge requests and deployment actions initiated by AI agents
+      enforcement: strict
+      evidence: approval_workflow_logs
+    - name: comprehensive-audit-logging
+      description: Log all AI agent actions, prompts, responses, and system interactions with tamper-proof storage
+      enforcement: strict
+      evidence: complete_audit_trail
+    - name: prompt-injection-detection
+      description: Monitor for suspicious prompt patterns indicating injection attempts or lateral movement commands
+      enforcement: strict
+      evidence: prompt_analysis_logs
+    - name: agent-session-isolation
+      description: Isolate AI agent sessions with limited privilege escalation and cross-domain access prevention
+      enforcement: strict
+      evidence: session_isolation_metrics

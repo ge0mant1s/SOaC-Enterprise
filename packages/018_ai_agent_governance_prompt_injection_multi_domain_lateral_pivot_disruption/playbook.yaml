@@ -1,0 +1,184 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: ai-agent-prompt-injection-lateral-pivot-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: "2026-04-13T16:12:29.863Z"
+  tags:
+    - ai-governance
+    - prompt-injection
+    - lateral-movement
+    - coding-agent
+    - ide-security
+  mitre_attack:
+    - T1059
+    - T1059.004
+    - T1083
+    - T1565
+    - T1528
+    - T1071
+    - T1567
+  severity: CRITICAL
+  package_id: pkg-018
+spec:
+  description: >-
+    Automated response playbook for AI coding agent prompt injection attacks and multi-domain lateral pivot attempts.
+    Immediately suspends agent operations, investigates unauthorized actions, and implements governance controls.
+  trigger:
+    source: BRAIN
+    conditions:
+      - field: agent.behavior.anomaly_score
+        operator: gt
+        value: "0.8"
+      - field: governance.policy_violation
+        operator: eq
+        value: "true"
+      - field: agent.execution_mode
+        operator: eq
+        value: autonomous
+    cooldown: 2m
+  inputs:
+    - name: agent_id
+      type: string
+      required: true
+      description: Unique identifier of the AI coding agent
+    - name: violation_type
+      type: string
+      required: true
+      description: Type of governance policy violation detected
+    - name: session_context
+      type: object
+      required: true
+      description: Current agent session and environment context
+    - name: risk_score
+      type: number
+      required: true
+      description: Calculated risk score for the detected activity
+  steps:
+    - id: step-1
+      name: immediate-agent-suspension
+      action: api_call
+      target: ai_governance_controller
+      parameters:
+        action: suspend_agent
+        agent_id: "{{inputs.agent_id}}"
+        reason: prompt_injection_detected
+        preserve_session: true
+      timeout: 10s
+      on_failure: escalate
+    - id: step-2
+      name: capture-session-artifacts
+      action: script
+      target: forensics_collector
+      parameters:
+        collect_prompts: true
+        collect_commands: true
+        collect_file_access: true
+        session_id: "{{inputs.session_context.session_id}}"
+      timeout: 30s
+      on_failure: continue
+    - id: step-3
+      name: analyze-command-chain
+      action: api_call
+      target: threat_analyzer
+      parameters:
+        analysis_type: command_sequence
+        data_source: agent_session
+        lookback_window: 1h
+        focus: lateral_movement_indicators
+      timeout: 45s
+      on_failure: continue
+    - id: step-4
+      name: check-repository-integrity
+      action: api_call
+      target: repo_security_scanner
+      parameters:
+        scan_type: integrity_check
+        compare_baseline: true
+        check_unauthorized_changes: true
+        agent_id: "{{inputs.agent_id}}"
+      timeout: 60s
+      on_failure: continue
+    - id: step-5
+      name: credential-exposure-assessment
+      action: script
+      target: secret_scanner
+      parameters:
+        scan_agent_memory: true
+        scan_recent_files: true
+        check_env_variables: true
+        session_context: "{{inputs.session_context}}"
+      timeout: 30s
+      on_failure: continue
+    - id: step-6
+      name: network-egress-investigation
+      action: api_call
+      target: network_monitor
+      parameters:
+        query_type: agent_connections
+        agent_id: "{{inputs.agent_id}}"
+        time_range: last_2h
+        include_dns: true
+      timeout: 20s
+      on_failure: continue
+    - id: step-7
+      name: governance-policy-enforcement
+      action: api_call
+      target: policy_engine
+      parameters:
+        action: apply_emergency_restrictions
+        agent_id: "{{inputs.agent_id}}"
+        restriction_level: maximum
+        require_human_approval: true
+      timeout: 15s
+      on_failure: abort
+    - id: step-8
+      name: incident-escalation
+      action: notify
+      target: security_team
+      parameters:
+        priority: critical
+        incident_type: ai_agent_compromise
+        agent_details: "{{inputs.agent_id}}"
+        violation_summary: "{{inputs.violation_type}}"
+        risk_score: "{{inputs.risk_score}}"
+      timeout: 10s
+      on_failure: continue
+  outputs:
+    - name: suspension_status
+      type: boolean
+      description: Whether agent was successfully suspended
+    - name: forensic_artifacts
+      type: object
+      description: Collected session artifacts and evidence
+    - name: integrity_report
+      type: object
+      description: Repository integrity assessment results
+    - name: incident_id
+      type: string
+      description: Generated incident tracking identifier
+  rollback:
+    steps:
+      - id: rb-1
+        name: revert-unauthorized-changes
+        action: api_call
+        target: repo_manager
+        parameters:
+          action: revert_agent_changes
+          agent_id: "{{inputs.agent_id}}"
+          time_window: last_session
+      - id: rb-2
+        name: rotate-exposed-credentials
+        action: script
+        target: credential_manager
+        parameters:
+          action: emergency_rotation
+          scope: agent_accessible
+      - id: rb-3
+        name: restore-baseline-policies
+        action: api_call
+        target: policy_engine
+        parameters:
+          action: restore_baseline
+          agent_id: "{{inputs.agent_id}}"

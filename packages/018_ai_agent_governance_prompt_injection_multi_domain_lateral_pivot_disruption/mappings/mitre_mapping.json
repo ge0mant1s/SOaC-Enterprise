@@ -1,0 +1,91 @@
+{
+  "package_id": "pkg-018",
+  "mappings": [
+    {
+      "technique_id": "T1059",
+      "detection_rules": [
+        "ai-agent-suspicious-command-chain",
+        "ai-agent-prompt-injection-indicators"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1059.004",
+      "detection_rules": [
+        "ai-agent-suspicious-command-chain"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1083",
+      "detection_rules": [
+        "ai-agent-forbidden-path-access"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1565",
+      "detection_rules": [
+        "ai-agent-forbidden-path-access",
+        "ai-agent-governance-bypass-attempt"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1528",
+      "detection_rules": [
+        "ai-agent-governance-bypass-attempt"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1071",
+      "detection_rules": [
+        "ai-agent-external-network-communication"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1567",
+      "detection_rules": [
+        "ai-agent-external-network-communication"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    }
+  ]
+}

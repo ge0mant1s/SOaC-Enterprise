@@ -1,0 +1,7 @@
+DeviceNetworkEvents
+| where ProcessCommandLine contains_any ('cursor', 'code', 'claude')
+| where RemoteIPType == 'Public'
+| where RemotePort in (22, 443, 80, 21, 3389)
+| where not(RemoteUrl has_any ('github.com', 'gitlab.com', 'bitbucket.org', 'anthropic.com', 'openai.com'))
+| summarize NetworkConnections=count(), UniqueDestinations=dcount(RemoteIP) by DeviceName, ProcessCommandLine, bin(TimeGenerated, 5m)
+| where NetworkConnections > 5 or UniqueDestinations > 3

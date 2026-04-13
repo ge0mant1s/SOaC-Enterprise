@@ -1,0 +1,31 @@
+package_id: pkg-018
+title: 'AI Agent Governance: Prompt Injection & Multi-Domain Lateral Pivot Disruption'
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: ai_coding_agent_governance
+category: Identity
+categories:
+  - Identity
+  - Endpoint
+  - CI/CD
+primary_category: Identity
+mitre_techniques:
+  - T1059
+  - T1059.004
+  - T1083
+  - T1565
+  - T1528
+  - T1071
+  - T1567
+platform_targets:
+  - Sigma
+  - Sentinel
+source_type: null
+source_urls: []
+confidence: 0.7
+deployment_mode: governance
+author: SOaC Community
+created: '2026-04-13T16:13:08.928Z'
+generated_by: soac-wizard-finalizer

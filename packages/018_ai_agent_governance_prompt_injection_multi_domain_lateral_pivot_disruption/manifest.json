@@ -1,0 +1,214 @@
+{
+  "package_id": "pkg-018",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "AI Agent Governance: Prompt Injection & Multi-Domain Lateral Pivot Disruption",
+  "description": "AI coding agent governance package for AI Coding Agent (Claude Code / Cursor): interactive mode, critical risk",
+  "difficulty": 4,
+  "tier": "Elite",
+  "package_family": "ai_coding_agent_governance",
+  "package_type": "instance",
+  "source_type": null,
+  "confidence": 0.7,
+  "human_review_required": false,
+  "deployment_mode": "governance",
+  "category": "Identity",
+  "categories": [
+    "Identity",
+    "Endpoint",
+    "CI/CD"
+  ],
+  "primary_category": "Identity",
+  "secondary_categories": [
+    "Endpoint",
+    "CI/CD"
+  ],
+  "tags": [
+    "sigma",
+    "sentinel",
+    "identity",
+    "endpoint",
+    "ci/cd",
+    "red_team",
+    "blue_team",
+    "soc_manager",
+    "ai-coding-agent-governance"
+  ],
+  "threat_actor": "AI Coding Agent (Claude Code / Cursor) (Autonomous)",
+  "github_path": "packages/018_ai_agent_governance_prompt_injection_multi_domain_lateral_pivot_disruption",
+  "slug": "018_ai_agent_governance_prompt_injection_multi_domain_lateral_pivot_disruption",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1059",
+    "T1059.004",
+    "T1083",
+    "T1565",
+    "T1528",
+    "T1071",
+    "T1567"
+  ],
+  "mitre_techniques": [
+    "T1059",
+    "T1059.004",
+    "T1083",
+    "T1565",
+    "T1528",
+    "T1071",
+    "T1567"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "Sigma",
+    "Sentinel"
+  ],
+  "platform_targets": [
+    "Sigma",
+    "Sentinel"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Agent Task Prompt",
+      "description": "AI agent receives a task",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "Code Execution",
+      "description": "Agent runs commands or modifies code",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1059",
+        "T1059.004"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Repository Access",
+      "description": "Agent reads/modifies files",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1083",
+        "T1565",
+        "T1528"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 4,
+      "title": "External Resource Access",
+      "description": "Agent contacts APIs or downloads packages",
+      "role": "soc_team",
+      "phase": "Command and Control",
+      "pillar": "Respond",
+      "mitre_techniques": [
+        "T1071",
+        "T1567"
+      ],
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        },
+        {
+          "role": "ciso",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 5,
+      "title": "Governance Review",
+      "description": "Actions reviewed and audit logged",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Elite",
+  "family_metadata": {
+    "environment_type": "ide",
+    "execution_mode": "interactive",
+    "repo_access": "read_only",
+    "approval_mode": "human_review",
+    "agent_name": "AI Coding Agent (Claude Code / Cursor)",
+    "risk_level": "critical",
+    "allowed_behaviors": [
+      "code_generation",
+      "code_review",
+      "branch_creation",
+      "pr_creation"
+    ],
+    "blocked_behaviors": [
+      "command_execution",
+      "secret_access",
+      "deployment_trigger",
+      "database_query",
+      "repo_clone",
+      "dependency_install",
+      "api_call"
+    ]
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://www.bugcrowd.com/blog/a-guide-to-the-hidden-threat-of-prompt-injection/, https://www-cdn.anthropic.com/08ab9158070959f88f296514c21b7facce6f52bc.pdf, https://red.anthropic.com/2026/mythos-preview/",
+    "analysis_date": "2026-04-13"
+  }
+}
