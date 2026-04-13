@@ -1,0 +1,11 @@
+title: Lateral Movement via Remote Services
+id: query-003
+status: hunt
+description: Unusual NTLM authentication patterns indicating lateral movement with compromised credentials
+logsource:
+  product: aws
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+level: high

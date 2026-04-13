@@ -1,0 +1,121 @@
+{
+  "test_id": "019-L3-001",
+  "package_id": "pkg-019",
+  "description": "Synthetic telemetry for Storm-1175 High-Velocity Medusa Ransomware Campaign Defense",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-13T20:15:16.277Z",
+      "provider": "AWS",
+      "event_name": "Exploit Attempt",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "Initial exploitation of disclosed vulnerability"
+      },
+      "expected_detection": "storm-1175-exploit-attempt",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-13T20:17:16.277Z",
+      "provider": "AWS",
+      "event_name": "Post-Exploitation Foothold",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1059",
+          "T1053"
+        ],
+        "description": "Establish persistence after exploitation"
+      },
+      "expected_detection": "storm-1175-post-exploit-execution",
+      "mitre": [
+        "T1059",
+        "T1053"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-13T20:19:16.277Z",
+      "provider": "AWS",
+      "event_name": "Credential Harvesting",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1003",
+          "T1552"
+        ],
+        "description": "Dump credentials for lateral movement"
+      },
+      "expected_detection": "storm-1175-credential-harvesting",
+      "mitre": [
+        "T1003",
+        "T1552"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-13T20:21:16.277Z",
+      "provider": "AWS",
+      "event_name": "Lateral Movement",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1021",
+          "T1570"
+        ],
+        "description": "Move to high-value targets"
+      },
+      "expected_detection": "storm-1175-exploit-attempt",
+      "mitre": [
+        "T1021",
+        "T1570"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-13T20:23:16.277Z",
+      "provider": "AWS",
+      "event_name": "Objective Achievement",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1005",
+          "T1486"
+        ],
+        "description": "Data exfiltration or ransomware deployment"
+      },
+      "expected_detection": "storm-1175-post-exploit-execution",
+      "mitre": [
+        "T1005",
+        "T1486"
+      ]
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "storm-1175-exploit-attempt",
+      "file": "detection.yaml",
+      "platform": "mde",
+      "description": "Storm-1175 N-Day Exploit Attempt Detection"
+    },
+    {
+      "detection_id": "storm-1175-post-exploit-execution",
+      "file": "detection.yaml",
+      "platform": "mde",
+      "description": "Storm-1175 Post-Exploitation Process Execution"
+    },
+    {
+      "detection_id": "storm-1175-credential-harvesting",
+      "file": "detection.yaml",
+      "platform": "mde",
+      "description": "Storm-1175 Credential Access Patterns"
+    }
+  ]
+}

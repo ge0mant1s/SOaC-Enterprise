@@ -1,0 +1,1 @@
+DeviceFileEvents | where Timestamp > ago(7d) | where ActionType == "FileCreated" | where FileName endswith_any (".medusa", ".encrypted", ".locked") or FileName contains "README" or FileName contains "RECOVER" | summarize FileCount = count(), UniqueFiles = dcount(FileName) by DeviceName, bin(Timestamp, 1h) | where FileCount > 50

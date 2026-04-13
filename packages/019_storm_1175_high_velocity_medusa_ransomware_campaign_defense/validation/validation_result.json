@@ -1,0 +1,29 @@
+{
+  "package_id": "pkg-019",
+  "schema_version": "3.0",
+  "validation_date": "2026-04-13T20:15:16.272Z",
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "manifest_valid",
+      "status": "PASS"
+    },
+    {
+      "check": "detection_valid",
+      "status": "PASS"
+    },
+    {
+      "check": "playbook_valid",
+      "status": "PASS"
+    },
+    {
+      "check": "policy_valid",
+      "status": "PASS"
+    },
+    {
+      "check": "mitre_coverage",
+      "status": "PASS",
+      "count": 9
+    }
+  ]
+}

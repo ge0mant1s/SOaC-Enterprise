@@ -1,0 +1,70 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: storm-1175-medusa-ransomware-defense-governance
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: "2026-04-13T20:14:36.214Z"
+  package_id: pkg-019
+  scope: package
+  tags:
+    - storm-1175
+    - medusa-ransomware
+    - n-day-weaponization
+    - high-velocity-campaign
+    - internet-facing
+    - elite-difficulty
+spec:
+  description: >-
+    Governance policy for Storm-1175 High-Velocity Medusa Ransomware Campaign Defense package, establishing controls for
+    N-day weaponization defense across internet-facing enterprise applications during patch-lag windows
+  environments:
+    - name: lab
+      mode: testing
+      data_handling: relaxed
+    - name: staging
+      mode: staging
+      data_handling: standard
+    - name: production
+      mode: production
+      data_handling: strict
+  access_control:
+    required_roles:
+      - security-engineer
+      - threat-hunter
+      - incident-responder
+      - security-architect
+    approval_workflow: true
+  compliance_frameworks:
+    - NIST-CSF
+    - ISO-27001
+    - CIS-Controls
+  controls:
+    - name: emergency-containment-authority
+      description: >-
+        Authorize immediate isolation of internet-facing assets showing exploit indicators without standard change
+        approval
+      enforcement: mandatory
+      evidence: containment-logs
+    - name: compensating-control-deployment
+      description: >-
+        Require deployment of WAF rules, network segmentation, and access restrictions for vulnerable internet-facing
+        services
+      enforcement: mandatory
+      evidence: control-deployment-records
+    - name: patch-prioritization-override
+      description: Escalate patching priority for affected products to emergency status with 72-hour SLA
+      enforcement: mandatory
+      evidence: patch-deployment-timeline
+    - name: detection-coverage-validation
+      description: >-
+        Verify detection rules for exploit attempts, abnormal process activity, and post-exploitation behaviors are
+        active across all monitoring platforms
+      enforcement: mandatory
+      evidence: detection-coverage-report
+    - name: blast-radius-reduction
+      description: >-
+        Implement temporary service isolation and privilege reduction for internet-facing applications until patching
+        completion
+      enforcement: mandatory
+      evidence: isolation-configuration

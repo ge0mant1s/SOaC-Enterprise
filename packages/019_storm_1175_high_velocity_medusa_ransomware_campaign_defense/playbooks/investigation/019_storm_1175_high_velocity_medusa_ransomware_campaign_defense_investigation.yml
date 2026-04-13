@@ -1,0 +1,79 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: storm-1175-medusa-ransomware-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-13T20:14:13.041Z'
+  tags:
+    - ransomware
+    - storm-1175
+    - medusa
+    - n-day-exploitation
+    - high-velocity
+    - exchange
+    - papercut
+    - ivanti
+  mitre_attack:
+    - T1190
+    - T1059
+    - T1053
+    - T1003
+    - T1552
+    - T1021
+    - T1570
+    - T1005
+    - T1486
+  severity: CRITICAL
+  package_id: pkg-019
+spec:
+  steps:
+    - id: step-5
+      name: ransomware-artifact-hunt
+      action: script
+      target: edr_platform
+      parameters:
+        hunt_type: medusa_ransomware
+        scope: enterprise_wide
+        indicators:
+          - file_encryption_patterns
+          - ransom_notes
+          - suspicious_processes
+      timeout: 120s
+      on_failure: continue
+    - id: step-6
+      name: backup-integrity-verification
+      action: api_call
+      target: backup_system
+      parameters:
+        action: verify_integrity
+        isolate_clean_copies: true
+        test_restore_capability: true
+      timeout: 180s
+      on_failure: escalate
+    - id: step-7
+      name: stakeholder-notification
+      action: notify
+      target: incident_response_team
+      parameters:
+        urgency: critical
+        channels:
+          - email
+          - sms
+          - teams
+        include_iocs: true
+        attach_forensic_summary: true
+      timeout: 15s
+      on_failure: continue
+    - id: step-8
+      name: remediation-prioritization
+      action: decision
+      target: risk_engine
+      parameters:
+        criteria:
+          - business_impact
+          - data_sensitivity
+          - recovery_complexity
+        output: prioritized_recovery_plan
+      timeout: 60s
+      on_failure: continue

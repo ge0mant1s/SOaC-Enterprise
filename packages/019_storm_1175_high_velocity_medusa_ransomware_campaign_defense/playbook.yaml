@@ -1,0 +1,170 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: storm-1175-medusa-ransomware-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: "2026-04-13T20:14:13.041Z"
+  tags:
+    - ransomware
+    - storm-1175
+    - medusa
+    - n-day-exploitation
+    - high-velocity
+    - exchange
+    - papercut
+    - ivanti
+  mitre_attack:
+    - T1190
+    - T1059
+    - T1053
+    - T1003
+    - T1552
+    - T1021
+    - T1570
+    - T1005
+    - T1486
+  severity: CRITICAL
+  package_id: pkg-019
+spec:
+  description: >-
+    Automated response playbook for Storm-1175 high-velocity Medusa ransomware campaign targeting N-day vulnerabilities
+    in internet-facing applications including Exchange, Papercut, Ivanti, and other enterprise services
+  trigger:
+    source: BRAIN
+    conditions:
+      - field: threat_actor
+        operator: equals
+        value: storm-1175
+      - field: malware_family
+        operator: equals
+        value: medusa
+      - field: exploit_type
+        operator: equals
+        value: n-day
+    cooldown: 5m
+  inputs:
+    - name: affected_assets
+      type: array
+      required: true
+      description: List of compromised or potentially compromised assets
+    - name: exploit_indicators
+      type: object
+      required: true
+      description: IOCs and exploit attempt patterns detected
+    - name: severity_level
+      type: string
+      required: true
+      description: Incident severity classification
+  steps:
+    - id: step-1
+      name: validate-exposed-assets
+      action: api_call
+      target: asset_inventory
+      parameters:
+        query: >-
+          internet_facing AND (exchange OR papercut OR ivanti OR connectwise OR teamcity OR simplehelp OR crushftp OR
+          goanywhere OR smartermail OR beyondtrust OR netweaver OR weblogic OR veeam)
+        include_patch_status: true
+      timeout: 45s
+      on_failure: continue
+    - id: step-2
+      name: emergency-containment
+      action: script
+      target: containment_engine
+      parameters:
+        action: isolate_affected_systems
+        preserve_evidence: true
+        block_lateral_movement: true
+      timeout: 60s
+      on_failure: escalate
+    - id: step-3
+      name: deploy-compensating-controls
+      action: api_call
+      target: waf_firewall
+      parameters:
+        rules:
+          - block_exploit_patterns
+          - rate_limit_vulnerable_endpoints
+        scope: internet_facing_services
+        emergency_mode: true
+      timeout: 30s
+      on_failure: continue
+    - id: step-4
+      name: credential-reset-enforcement
+      action: api_call
+      target: entra_id
+      parameters:
+        action: force_password_reset
+        scope: affected_users
+        revoke_sessions: true
+        require_mfa: true
+      timeout: 90s
+      on_failure: continue
+    - id: step-5
+      name: ransomware-artifact-hunt
+      action: script
+      target: edr_platform
+      parameters:
+        hunt_type: medusa_ransomware
+        scope: enterprise_wide
+        indicators:
+          - file_encryption_patterns
+          - ransom_notes
+          - suspicious_processes
+      timeout: 120s
+      on_failure: continue
+    - id: step-6
+      name: backup-integrity-verification
+      action: api_call
+      target: backup_system
+      parameters:
+        action: verify_integrity
+        isolate_clean_copies: true
+        test_restore_capability: true
+      timeout: 180s
+      on_failure: escalate
+    - id: step-7
+      name: stakeholder-notification
+      action: notify
+      target: incident_response_team
+      parameters:
+        urgency: critical
+        channels:
+          - email
+          - sms
+          - teams
+        include_iocs: true
+        attach_forensic_summary: true
+      timeout: 15s
+      on_failure: continue
+    - id: step-8
+      name: remediation-prioritization
+      action: decision
+      target: risk_engine
+      parameters:
+        criteria:
+          - business_impact
+          - data_sensitivity
+          - recovery_complexity
+        output: prioritized_recovery_plan
+      timeout: 60s
+      on_failure: continue
+  outputs:
+    - name: containment_status
+      type: object
+      description: Status of emergency containment actions
+    - name: affected_systems_count
+      type: number
+      description: Number of systems impacted by the attack
+    - name: recovery_timeline
+      type: object
+      description: Estimated recovery timeline and priorities
+  rollback:
+    steps:
+      - id: rb-1
+        name: restore-network-access
+        action: api_call
+      - id: rb-2
+        name: remove-emergency-controls
+        action: script

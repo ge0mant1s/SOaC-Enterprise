@@ -1,0 +1,113 @@
+{
+  "package_id": "pkg-019",
+  "mappings": [
+    {
+      "technique_id": "T1190",
+      "detection_rules": [
+        "storm-1175-exploit-attempt",
+        "storm-1175-sigma-exploit-detection"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1059",
+      "detection_rules": [
+        "storm-1175-post-exploit-execution",
+        "storm-1175-wazuh-process-monitoring"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1053",
+      "detection_rules": [
+        "storm-1175-post-exploit-execution"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1003",
+      "detection_rules": [
+        "storm-1175-credential-harvesting"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1552",
+      "detection_rules": [
+        "storm-1175-credential-harvesting"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1021",
+      "detection_rules": [
+        "storm-1175-lateral-movement"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1570",
+      "detection_rules": [
+        "storm-1175-lateral-movement"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1005",
+      "detection_rules": [],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1486",
+      "detection_rules": [
+        "storm-1175-medusa-ransomware-execution"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+kind: DetectionRule
+metadata:
+  name: storm-1175-medusa-ransomware-exploit-detection
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: "2026-04-13T20:13:33Z"
+  package_id: pkg-019
+  mitre_attack:
+    - T1190
+    - T1059
+    - T1053
+    - T1003
+    - T1552
+    - T1021
+    - T1570
+    - T1005
+    - T1486
+  severity: CRITICAL
+  data_sources:
+    - process_creation
+    - network_traffic
+    - file_system
+    - windows_event_logs
+    - application_logs
+spec:
+  description: >-
+    Detects Storm-1175 high-velocity Medusa ransomware campaign targeting multiple internet-facing applications
+    including Exchange, Papercut, Ivanti, ConnectWise ScreenConnect, and other enterprise services through N-day exploit
+    weaponization
+  platforms:
+    - windows
+    - linux
+  inline_rules:
+    - id: storm-1175-exploit-attempt
+      name: Storm-1175 N-Day Exploit Attempt Detection
+      format: kql
+      platform: mde
+      mitre:
+        - T1190
+      severity: CRITICAL
+      query: >-
+        DeviceNetworkEvents | where Timestamp > ago(1h) | where RemotePort in (443, 80, 8080, 9443, 8443) | where
+        InitiatingProcessFileName in~ ('w3wp.exe', 'java.exe', 'tomcat.exe', 'nginx.exe') | where RemoteUrl contains_any
+        ('papercut', 'ivanti', 'connectwise', 'teamcity', 'simplehelp', 'crushftp', 'goanywhere', 'smartermail',
+        'beyondtrust') or LocalIP in (DeviceNetworkInfo | where ConnectedNetworks contains 'Internet' | project LocalIP)
+        | where ActionType == 'ConnectionSuccess' | summarize ConnectionCount = count(), UniqueRemoteIPs =
+        dcount(RemoteIP) by DeviceName, InitiatingProcessFileName, RemotePort | where ConnectionCount > 10 or
+        UniqueRemoteIPs > 5
+    - id: storm-1175-post-exploit-execution
+      name: Storm-1175 Post-Exploitation Process Execution
+      format: kql
+      platform: mde
+      mitre:
+        - T1059
+        - T1053
+      severity: HIGH
+      query: >-
+        DeviceProcessEvents | where Timestamp > ago(1h) | where InitiatingProcessFileName in~ ('w3wp.exe', 'java.exe',
+        'tomcat.exe', 'nginx.exe', 'httpd.exe') | where FileName in~ ('cmd.exe', 'powershell.exe', 'bash', 'sh',
+        'wscript.exe', 'cscript.exe', 'rundll32.exe', 'regsvr32.exe') | where ProcessCommandLine contains_any ('whoami',
+        'net user', 'net group', 'systeminfo', 'tasklist', 'schtasks', 'at.exe', 'wmic', 'vssadmin delete', 'bcdedit',
+        'wbadmin delete') | project Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName,
+        InitiatingProcessCommandLine
+    - id: storm-1175-credential-harvesting
+      name: Storm-1175 Credential Access Patterns
+      format: kql
+      platform: mde
+      mitre:
+        - T1003
+        - T1552
+      severity: HIGH
+      query: >-
+        DeviceProcessEvents | where Timestamp > ago(1h) | where ProcessCommandLine contains_any ('lsass', 'sam',
+        'security', 'ntds.dit', 'mimikatz', 'procdump', 'comsvcs.dll', 'MiniDump', 'sekurlsa', 'kerberos', 'wdigest',
+        'tspkg') or FileName in~ ('procdump.exe', 'procdump64.exe', 'sqldumper.exe', 'createdump.exe') | where
+        InitiatingProcessFileName in~ ('w3wp.exe', 'java.exe', 'tomcat.exe', 'cmd.exe', 'powershell.exe') | project
+        Timestamp, DeviceName, FileName, ProcessCommandLine, InitiatingProcessFileName
+    - id: storm-1175-lateral-movement
+      name: Storm-1175 Lateral Movement Detection
+      format: kql
+      platform: mde
+      mitre:
+        - T1021
+        - T1570
+      severity: HIGH
+      query: >-
+        DeviceNetworkEvents | where Timestamp > ago(1h) | where RemotePort in (445, 135, 3389, 5985, 5986, 22) | where
+        InitiatingProcessFileName in~ ('cmd.exe', 'powershell.exe', 'psexec.exe', 'wmic.exe', 'schtasks.exe',
+        'winrs.exe', 'ssh.exe') | join kind=inner (DeviceProcessEvents | where ProcessCommandLine contains_any
+        ('psexec', 'wmic /node', 'schtasks /s', 'winrm', 'invoke-command', 'enter-pssession')) on DeviceName | project
+        Timestamp, DeviceName, RemoteIP, RemotePort, InitiatingProcessFileName, ProcessCommandLine
+    - id: storm-1175-medusa-ransomware-execution
+      name: Storm-1175 Medusa Ransomware Deployment
+      format: kql
+      platform: mde
+      mitre:
+        - T1486
+      severity: CRITICAL
+      query: >-
+        DeviceFileEvents | where Timestamp > ago(1h) | where (FileName endswith '.medusa' or FileName endswith
+        '.encrypted' or FileName endswith '.locked') or (FileName contains_any ('ransom', 'decrypt', 'recovery') and
+        FileName endswith_any ('.txt', '.html', '.hta')) | union (DeviceProcessEvents | where ProcessCommandLine
+        contains_any ('vssadmin delete shadows', 'wbadmin delete catalog', 'bcdedit /set recoveryenabled no', 'wmic
+        shadowcopy delete', 'cipher /w:', 'sdelete', 'medusa', 'encrypt', 'ransom') | where Timestamp > ago(1h)) |
+        project Timestamp, DeviceName, ActionType, FileName, FolderPath, ProcessCommandLine
+    - id: storm-1175-sigma-exploit-detection
+      name: Storm-1175 Web Application Exploit Sigma Rule
+      format: sigma
+      platform: linux
+      mitre:
+        - T1190
+      severity: CRITICAL
+      query: |-
+        title: Storm-1175 Web Application Exploit Detection
+        status: experimental
+        logsource:
+          category: webserver
+        detection:
+          selection_exploit:
+            - cs-uri-stem|contains:
+                - '/papercut/'
+                - '/ivanti/'
+                - '/connectwise/'
+                - '/teamcity/'
+                - '/simplehelp/'
+                - '/crushftp/'
+                - '/goanywhere/'
+            - cs-method: 'POST'
+            - sc-status:
+                - 200
+                - 500
+          selection_payload:
+            cs-uri-query|contains:
+                - 'cmd='
+                - 'exec='
+                - 'system='
+                - 'shell='
+                - 'powershell'
+                - 'bash'
+          condition: selection_exploit and selection_payload
+    - id: storm-1175-wazuh-process-monitoring
+      name: Storm-1175 Suspicious Process Execution Wazuh Rule
+      format: wazuh
+      platform: windows
+      mitre:
+        - T1059
+      severity: HIGH
+      query: |-
+        <rule id="100019" level="12">
+          <if_group>sysmon_event1</if_group>
+          <field name="win.eventdata.parentImage">w3wp.exe|java.exe|tomcat.exe|nginx.exe</field>
+          <field name="win.eventdata.image">cmd.exe|powershell.exe|bash|wscript.exe|rundll32.exe</field>
+          <field name="win.eventdata.commandLine">whoami|net user|systeminfo|vssadmin delete|bcdedit|wbadmin delete</field>
+          <description>Storm-1175 suspicious process execution from web application</description>
+          <mitre>
+            <id>T1059</id>
+          </mitre>
+        </rule>
+  test_cases:
+    - id: tc-001
+      name: Storm-1175 Exploit Attempt True Positive
+      type: true_positive
+      expected_result: Alert triggered for multiple connections from w3wp.exe to external IPs on port 443
+    - id: tc-002
+      name: Storm-1175 Post-Exploit Execution True Positive
+      type: true_positive
+      expected_result: Alert triggered for cmd.exe spawned by java.exe with whoami command
+    - id: tc-003
+      name: Normal Web Traffic True Negative
+      type: true_negative
+      expected_result: No alert for legitimate web application traffic without suspicious patterns
+    - id: tc-004
+      name: Medusa Ransomware Execution True Positive
+      type: true_positive
+      expected_result: Alert triggered for file encryption with .medusa extension and shadow copy deletion
+apiVersion: soac.io/v1

@@ -1,0 +1,9 @@
+{
+  "name": "Storm-1175 N-Day Exploit Attempt Detection",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1190"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "storm-1175-exploit-attempt"
+}
