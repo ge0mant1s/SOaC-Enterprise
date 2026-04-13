@@ -1,0 +1,113 @@
+{
+  "test_id": "018-L3-001",
+  "package_id": "pkg-018",
+  "description": "Synthetic telemetry for AI Agent Governance: Prompt Injection & Multi-Domain Lateral Pivot Disruption",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-13T16:13:08.932Z",
+      "provider": "Sigma",
+      "event_name": "Agent Task Prompt",
+      "data": {
+        "step": 1,
+        "mitre": [],
+        "description": "AI agent receives a task"
+      },
+      "expected_detection": "ai-agent-suspicious-command-chain",
+      "mitre": []
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-13T16:15:08.932Z",
+      "provider": "Sigma",
+      "event_name": "Code Execution",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1059",
+          "T1059.004"
+        ],
+        "description": "Agent runs commands or modifies code"
+      },
+      "expected_detection": "ai-agent-forbidden-path-access",
+      "mitre": [
+        "T1059",
+        "T1059.004"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-13T16:17:08.932Z",
+      "provider": "Sigma",
+      "event_name": "Repository Access",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1083",
+          "T1565",
+          "T1528"
+        ],
+        "description": "Agent reads/modifies files"
+      },
+      "expected_detection": "ai-agent-external-network-communication",
+      "mitre": [
+        "T1083",
+        "T1565",
+        "T1528"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-13T16:19:08.932Z",
+      "provider": "Sigma",
+      "event_name": "External Resource Access",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1071",
+          "T1567"
+        ],
+        "description": "Agent contacts APIs or downloads packages"
+      },
+      "expected_detection": "ai-agent-suspicious-command-chain",
+      "mitre": [
+        "T1071",
+        "T1567"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-13T16:21:08.932Z",
+      "provider": "Sigma",
+      "event_name": "Governance Review",
+      "data": {
+        "step": 5,
+        "mitre": [],
+        "description": "Actions reviewed and audit logged"
+      },
+      "expected_detection": "ai-agent-forbidden-path-access",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "ai-agent-suspicious-command-chain",
+      "file": "detection.yaml",
+      "platform": "cross-platform",
+      "description": "AI Agent Suspicious Command Chaining Detection"
+    },
+    {
+      "detection_id": "ai-agent-forbidden-path-access",
+      "file": "detection.yaml",
+      "platform": "cross-platform",
+      "description": "AI Agent Forbidden Path Access Attempt"
+    },
+    {
+      "detection_id": "ai-agent-external-network-communication",
+      "file": "detection.yaml",
+      "platform": "sentinel",
+      "description": "AI Agent Unauthorized External Network Communication"
+    }
+  ]
+}

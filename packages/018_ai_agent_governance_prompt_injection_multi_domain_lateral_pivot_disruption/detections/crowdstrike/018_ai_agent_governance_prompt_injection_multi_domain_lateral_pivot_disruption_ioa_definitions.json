@@ -1,0 +1,10 @@
+{
+  "name": "AI Agent Unauthorized External Network Communication",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1071",
+    "T1567"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "ai-agent-external-network-communication"
+}

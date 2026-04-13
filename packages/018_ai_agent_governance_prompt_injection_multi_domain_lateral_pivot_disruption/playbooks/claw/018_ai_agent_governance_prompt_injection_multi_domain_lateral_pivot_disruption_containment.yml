@@ -1,0 +1,69 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: ai-agent-prompt-injection-lateral-pivot-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-13T16:12:29.863Z'
+  tags:
+    - ai-governance
+    - prompt-injection
+    - lateral-movement
+    - coding-agent
+    - ide-security
+  mitre_attack:
+    - T1059
+    - T1059.004
+    - T1083
+    - T1565
+    - T1528
+    - T1071
+    - T1567
+  severity: CRITICAL
+  package_id: pkg-018
+spec:
+  steps:
+    - id: step-1
+      name: immediate-agent-suspension
+      action: api_call
+      target: ai_governance_controller
+      parameters:
+        action: suspend_agent
+        agent_id: '{{inputs.agent_id}}'
+        reason: prompt_injection_detected
+        preserve_session: true
+      timeout: 10s
+      on_failure: escalate
+    - id: step-2
+      name: capture-session-artifacts
+      action: script
+      target: forensics_collector
+      parameters:
+        collect_prompts: true
+        collect_commands: true
+        collect_file_access: true
+        session_id: '{{inputs.session_context.session_id}}'
+      timeout: 30s
+      on_failure: continue
+    - id: step-3
+      name: analyze-command-chain
+      action: api_call
+      target: threat_analyzer
+      parameters:
+        analysis_type: command_sequence
+        data_source: agent_session
+        lookback_window: 1h
+        focus: lateral_movement_indicators
+      timeout: 45s
+      on_failure: continue
+    - id: step-4
+      name: check-repository-integrity
+      action: api_call
+      target: repo_security_scanner
+      parameters:
+        scan_type: integrity_check
+        compare_baseline: true
+        check_unauthorized_changes: true
+        agent_id: '{{inputs.agent_id}}'
+      timeout: 60s
+      on_failure: continue

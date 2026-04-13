@@ -1,0 +1,199 @@
+kind: DetectionRule
+metadata:
+  name: ai-agent-prompt-injection-lateral-pivot
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: "2026-04-13T16:12:01Z"
+  package_id: pkg-018
+  mitre_attack:
+    - T1059
+    - T1059.004
+    - T1083
+    - T1565
+    - T1528
+    - T1071
+    - T1567
+  severity: CRITICAL
+  data_sources:
+    - IDE Telemetry
+    - Process Monitoring
+    - File System
+    - Network Traffic
+    - Application Logs
+spec:
+  description: >-
+    Detects AI coding agent prompt injection attempts and multi-domain lateral pivot activities including suspicious
+    command execution, unauthorized repository access, and external resource communication that bypasses governance
+    controls
+  platforms:
+    - Windows
+    - Linux
+    - macOS
+  inline_rules:
+    - id: ai-agent-suspicious-command-chain
+      name: AI Agent Suspicious Command Chaining Detection
+      format: sigma
+      platform: cross-platform
+      mitre:
+        - T1059
+        - T1059.004
+      severity: HIGH
+      query: |-
+        title: AI Agent Suspicious Command Chaining
+        status: experimental
+        logsource:
+          category: process_creation
+          product: windows
+        detection:
+          selection_agent:
+            ParentImage|contains:
+              - 'cursor.exe'
+              - 'code.exe'
+              - 'claude-desktop.exe'
+          selection_commands:
+            CommandLine|contains:
+              - 'powershell -enc'
+              - 'cmd /c echo'
+              - 'curl -s'
+              - 'wget -q'
+              - 'git clone'
+              - 'ssh -o'
+          timeframe: 30s
+          condition: selection_agent and selection_commands | count() > 3
+        falsepositives:
+          - Legitimate development workflows
+        level: high
+    - id: ai-agent-forbidden-path-access
+      name: AI Agent Forbidden Path Access Attempt
+      format: sigma
+      platform: cross-platform
+      mitre:
+        - T1083
+        - T1565
+      severity: CRITICAL
+      query: |-
+        title: AI Agent Forbidden Path Access
+        status: experimental
+        logsource:
+          category: file_access
+          product: windows
+        detection:
+          selection_agent:
+            ProcessName|contains:
+              - 'cursor'
+              - 'code'
+              - 'claude'
+          selection_paths:
+            TargetFilename|contains:
+              - '.ssh/'
+              - '.aws/credentials'
+              - '.env'
+              - 'id_rsa'
+              - 'config/secrets'
+              - '/etc/passwd'
+              - 'C:\Windows\System32\'
+          condition: selection_agent and selection_paths
+        falsepositives:
+          - Authorized configuration access
+        level: critical
+    - id: ai-agent-external-network-communication
+      name: AI Agent Unauthorized External Network Communication
+      format: kql
+      platform: sentinel
+      mitre:
+        - T1071
+        - T1567
+      severity: HIGH
+      query: >-
+        DeviceNetworkEvents
+
+        | where ProcessCommandLine contains_any ('cursor', 'code', 'claude')
+
+        | where RemoteIPType == 'Public'
+
+        | where RemotePort in (22, 443, 80, 21, 3389)
+
+        | where not(RemoteUrl has_any ('github.com', 'gitlab.com', 'bitbucket.org', 'anthropic.com', 'openai.com'))
+
+        | summarize NetworkConnections=count(), UniqueDestinations=dcount(RemoteIP) by DeviceName, ProcessCommandLine,
+        bin(TimeGenerated, 5m)
+
+        | where NetworkConnections > 5 or UniqueDestinations > 3
+    - id: ai-agent-governance-bypass-attempt
+      name: AI Agent Governance Control Bypass Detection
+      format: sigma
+      platform: cross-platform
+      mitre:
+        - T1528
+        - T1565
+      severity: CRITICAL
+      query: |-
+        title: AI Agent Governance Bypass Attempt
+        status: experimental
+        logsource:
+          category: application
+          product: ide
+        detection:
+          selection_agent:
+            source|contains:
+              - 'ai-agent'
+              - 'coding-assistant'
+          selection_bypass:
+            message|contains:
+              - 'approval_required: false'
+              - 'skip_review'
+              - 'bypass_policy'
+              - 'override_restriction'
+              - 'disable_audit'
+          selection_actions:
+            action|contains:
+              - 'file_write'
+              - 'command_execute'
+              - 'repo_modify'
+              - 'credential_access'
+          condition: selection_agent and (selection_bypass or selection_actions)
+        falsepositives:
+          - Legitimate administrative overrides
+        level: critical
+    - id: ai-agent-prompt-injection-indicators
+      name: AI Agent Prompt Injection Attack Indicators
+      format: kql
+      platform: sentinel
+      mitre:
+        - T1059
+      severity: HIGH
+      query: >-
+        AIAgentLogs
+
+        | where EventType == 'PromptProcessing'
+
+        | where PromptContent contains_any ('ignore previous instructions', 'system:', 'execute:', 'run command',
+        'bypass security', 'disable logging', 'admin mode', 'root access')
+
+        | extend SuspiciousPatterns = extract_all(@'(ignore|bypass|disable|execute|system|admin|root)\s+(\w+)',
+        PromptContent)
+
+        | where array_length(SuspiciousPatterns) >= 2
+
+        | summarize InjectionAttempts=count(), UniquePatterns=dcount(tostring(SuspiciousPatterns)) by UserIdentity,
+        AgentSession, bin(TimeGenerated, 1m)
+
+        | where InjectionAttempts > 1
+  test_cases:
+    - id: tc-001
+      name: Legitimate AI Agent Development Workflow
+      type: true_negative
+      expected_result: No alerts triggered for normal coding assistance
+    - id: tc-002
+      name: AI Agent Command Injection Attack
+      type: true_positive
+      expected_result: Critical alert for suspicious command chaining and external communication
+    - id: tc-003
+      name: Prompt Injection with Governance Bypass
+      type: true_positive
+      expected_result: Critical alert for prompt injection and policy bypass attempt
+    - id: tc-004
+      name: Authorized Secret File Access
+      type: false_positive
+      expected_result: Alert may trigger but should be reviewed for legitimate access patterns
+apiVersion: soac.io/v1

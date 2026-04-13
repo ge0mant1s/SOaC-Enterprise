@@ -1,0 +1,7 @@
+AIAgentLogs
+| where EventType == 'PromptProcessing'
+| where PromptContent contains_any ('ignore previous instructions', 'system:', 'execute:', 'run command', 'bypass security', 'disable logging', 'admin mode', 'root access')
+| extend SuspiciousPatterns = extract_all(@'(ignore|bypass|disable|execute|system|admin|root)\s+(\w+)', PromptContent)
+| where array_length(SuspiciousPatterns) >= 2
+| summarize InjectionAttempts=count(), UniquePatterns=dcount(tostring(SuspiciousPatterns)) by UserIdentity, AgentSession, bin(TimeGenerated, 1m)
+| where InjectionAttempts > 1

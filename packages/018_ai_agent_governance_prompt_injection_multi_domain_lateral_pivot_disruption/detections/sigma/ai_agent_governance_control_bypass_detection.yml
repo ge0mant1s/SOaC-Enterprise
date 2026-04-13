@@ -1,0 +1,14 @@
+title: AI Agent Governance Control Bypass Detection
+id: ai-agent-governance-bypass-attempt
+status: production
+description: AI Agent Governance Control Bypass Detection
+logsource:
+  product: sigma
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1528
+  - T1565
+level: critical

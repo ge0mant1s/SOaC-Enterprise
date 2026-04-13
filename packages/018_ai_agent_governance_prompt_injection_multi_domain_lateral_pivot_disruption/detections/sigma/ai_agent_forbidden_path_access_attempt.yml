@@ -1,0 +1,14 @@
+title: AI Agent Forbidden Path Access Attempt
+id: ai-agent-forbidden-path-access
+status: production
+description: AI Agent Forbidden Path Access Attempt
+logsource:
+  product: sigma
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1083
+  - T1565
+level: critical

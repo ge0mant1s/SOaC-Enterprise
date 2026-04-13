@@ -1,0 +1,14 @@
+title: AI Agent Suspicious Command Chaining Detection
+id: ai-agent-suspicious-command-chain
+status: production
+description: AI Agent Suspicious Command Chaining Detection
+logsource:
+  product: sigma
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+mitre:
+  - T1059
+  - T1059.004
+level: high

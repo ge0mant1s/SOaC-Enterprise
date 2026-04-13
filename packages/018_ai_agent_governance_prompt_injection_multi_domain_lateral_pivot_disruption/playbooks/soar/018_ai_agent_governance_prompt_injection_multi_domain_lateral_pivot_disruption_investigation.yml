@@ -1,0 +1,70 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: ai-agent-prompt-injection-lateral-pivot-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-13T16:12:29.863Z'
+  tags:
+    - ai-governance
+    - prompt-injection
+    - lateral-movement
+    - coding-agent
+    - ide-security
+  mitre_attack:
+    - T1059
+    - T1059.004
+    - T1083
+    - T1565
+    - T1528
+    - T1071
+    - T1567
+  severity: CRITICAL
+  package_id: pkg-018
+spec:
+  steps:
+    - id: step-5
+      name: credential-exposure-assessment
+      action: script
+      target: secret_scanner
+      parameters:
+        scan_agent_memory: true
+        scan_recent_files: true
+        check_env_variables: true
+        session_context: '{{inputs.session_context}}'
+      timeout: 30s
+      on_failure: continue
+    - id: step-6
+      name: network-egress-investigation
+      action: api_call
+      target: network_monitor
+      parameters:
+        query_type: agent_connections
+        agent_id: '{{inputs.agent_id}}'
+        time_range: last_2h
+        include_dns: true
+      timeout: 20s
+      on_failure: continue
+    - id: step-7
+      name: governance-policy-enforcement
+      action: api_call
+      target: policy_engine
+      parameters:
+        action: apply_emergency_restrictions
+        agent_id: '{{inputs.agent_id}}'
+        restriction_level: maximum
+        require_human_approval: true
+      timeout: 15s
+      on_failure: abort
+    - id: step-8
+      name: incident-escalation
+      action: notify
+      target: security_team
+      parameters:
+        priority: critical
+        incident_type: ai_agent_compromise
+        agent_details: '{{inputs.agent_id}}'
+        violation_summary: '{{inputs.violation_type}}'
+        risk_score: '{{inputs.risk_score}}'
+      timeout: 10s
+      on_failure: continue

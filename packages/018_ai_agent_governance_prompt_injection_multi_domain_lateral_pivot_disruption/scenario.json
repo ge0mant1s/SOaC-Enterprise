@@ -1,0 +1,82 @@
+{
+  "package_id": "pkg-018",
+  "title": "AI Agent Governance: Prompt Injection & Multi-Domain Lateral Pivot Disruption",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Agent Task Prompt",
+      "text": "AI agent receives a task",
+      "description": "AI agent receives a task",
+      "mitre": [],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for  indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Code Execution",
+      "text": "Agent runs commands or modifies code",
+      "description": "Agent runs commands or modifies code",
+      "mitre": [
+        "T1059",
+        "T1059.004"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1059, T1059.004 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Blue Team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "title": "Repository Access",
+      "text": "Agent reads/modifies files",
+      "description": "Agent reads/modifies files",
+      "mitre": [
+        "T1083",
+        "T1565",
+        "T1528"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1083, T1565, T1528 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "SOC Team",
+      "phase": "Command and Control",
+      "pillar": "Respond",
+      "title": "External Resource Access",
+      "text": "Agent contacts APIs or downloads packages",
+      "description": "Agent contacts APIs or downloads packages",
+      "mitre": [
+        "T1071",
+        "T1567"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1071, T1567 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Governance Review",
+      "text": "Actions reviewed and audit logged",
+      "description": "Actions reviewed and audit logged",
+      "mitre": [],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for  indicators",
+      "playbookRefs": []
+    }
+  ]
+}

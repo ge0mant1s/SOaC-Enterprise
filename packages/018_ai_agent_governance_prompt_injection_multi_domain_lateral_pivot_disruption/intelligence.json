@@ -1,0 +1,52 @@
+{
+  "source_type": "url",
+  "source_name": "https://www.bugcrowd.com/blog/a-guide-to-the-hidden-threat-of-prompt-injection/, https://www-cdn.anthropic.com/08ab9158070959f88f296514c21b7facce6f52bc.pdf, https://red.anthropic.com/2026/mythos-preview/",
+  "analysis_date": "2026-04-13",
+  "ttps": [
+    "T1190",
+    "T1059",
+    "T1068",
+    "T1055",
+    "T1078",
+    "T1552.005",
+    "T1083",
+    "T1005",
+    "T1041",
+    "T1046",
+    "T1018",
+    "T1082",
+    "T1021",
+    "T1570",
+    "T1003",
+    "T1110",
+    "T1566",
+    "T1204",
+    "T1567",
+    "T1195.002",
+    "T1078.004",
+    "T1098.001"
+  ],
+  "attack_chain": [
+    "Initial Access",
+    "Execution",
+    "Privilege Escalation",
+    "Credential Access",
+    "Discovery",
+    "Collection",
+    "Exfiltration"
+  ],
+  "platforms": [
+    "Windows",
+    "Linux",
+    "AWS",
+    "Web Applications",
+    "LLM Systems"
+  ],
+  "detection_surfaces": [
+    "Application Logs",
+    "CloudTrail",
+    "Network Monitoring",
+    "Container Logs",
+    "LLM Query Logs"
+  ]
+}
