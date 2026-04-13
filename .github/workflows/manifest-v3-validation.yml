@@ -8,6 +8,9 @@
 
 name: Manifest v3.0 Validation
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   push:
     branches: [main]
