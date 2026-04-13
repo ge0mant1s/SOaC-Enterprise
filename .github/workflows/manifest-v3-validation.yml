@@ -1,0 +1,137 @@
+# ============================================================================
+# SOaC Manifest v3.0 Drift Validation
+# ============================================================================
+# Validates all package manifests against the manifest v3.0 schema.
+# Fails on missing required fields: tier, roles, mitre, stacks.
+# Runs on PRs touching packages/, generator/finalizer code, or schema files.
+# ============================================================================
+
+name: Manifest v3.0 Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/**/manifest.json'
+      - 'core/templates/manifest_v3.0.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/**'
+      - 'core/templates/**'
+  workflow_dispatch:
+
+jobs:
+  validate-manifests:
+    name: Validate Manifest v3.0 Compliance
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate manifests
+        run: |
+          echo "## 🔍 Manifest v3.0 Validation Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          VALID_TIERS='Foundations Intermediate Advanced Elite'
+          MITRE_PATTERN='^T[0-9]{4}'
+          CONTROLLED_STACKS='Sigma Sentinel Splunk CrowdStrike Wazuh MDE AWS GitHub CI/CD Identity Endpoint Cloud SaaS Network'
+
+          TOTAL=0
+          PASS=0
+          FAIL=0
+          ERRORS=""
+
+          for manifest in packages/*/manifest.json; do
+            [ -f "$manifest" ] || continue
+            TOTAL=$((TOTAL + 1))
+            PKG_ID=$(python3 -c "import json; print(json.load(open('$manifest')).get('package_id','unknown'))" 2>/dev/null)
+            PKG_TITLE=$(python3 -c "import json; print(json.load(open('$manifest')).get('title',''))" 2>/dev/null)
+            PKG_ERRORS=""
+
+            # Check tier
+            TIER=$(python3 -c "import json; print(json.load(open('$manifest')).get('tier',''))" 2>/dev/null)
+            TIER_VALID=false
+            for t in $VALID_TIERS; do
+              [ "$TIER" = "$t" ] && TIER_VALID=true
+            done
+            [ "$TIER_VALID" = "false" ] && PKG_ERRORS="$PKG_ERRORS tier='$TIER'(invalid);"
+
+            # Check roles
+            ROLES_LEN=$(python3 -c "import json; r=json.load(open('$manifest')).get('roles',[]); print(len(r) if isinstance(r,list) else 0)" 2>/dev/null)
+            [ "$ROLES_LEN" = "0" ] && PKG_ERRORS="$PKG_ERRORS roles(empty);"
+
+            # Check mitre
+            MITRE_LEN=$(python3 -c "import json; m=json.load(open('$manifest')); r=m.get('mitre',m.get('mitre_techniques',[])); print(len(r) if isinstance(r,list) else 0)" 2>/dev/null)
+            [ "$MITRE_LEN" = "0" ] && PKG_ERRORS="$PKG_ERRORS mitre(empty);"
+
+            # Check stacks
+            STACKS_LEN=$(python3 -c "import json; s=json.load(open('$manifest')).get('stacks',[]); print(len(s) if isinstance(s,list) else 0)" 2>/dev/null)
+            [ "$STACKS_LEN" = "0" ] && PKG_ERRORS="$PKG_ERRORS stacks(empty);"
+
+            # Check stacks normalization
+            STACKS_RAW=$(python3 -c "import json; print(' '.join(json.load(open('$manifest')).get('stacks',[])))" 2>/dev/null)
+            for s in $STACKS_RAW; do
+              FOUND=false
+              for cs in $CONTROLLED_STACKS; do
+                [ "$s" = "$cs" ] && FOUND=true
+              done
+              [ "$FOUND" = "false" ] && PKG_ERRORS="$PKG_ERRORS stack '$s' not controlled;"
+            done
+
+            if [ -z "$PKG_ERRORS" ]; then
+              PASS=$((PASS + 1))
+              echo "✅ $PKG_ID ($PKG_TITLE)" >> $GITHUB_STEP_SUMMARY
+            else
+              FAIL=$((FAIL + 1))
+              echo "❌ $PKG_ID ($PKG_TITLE): $PKG_ERRORS" >> $GITHUB_STEP_SUMMARY
+              echo "::error::$PKG_ID failed v3.0 validation: $PKG_ERRORS"
+              ERRORS="$ERRORS\n$PKG_ID: $PKG_ERRORS"
+            fi
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Total | $TOTAL |" >> $GITHUB_STEP_SUMMARY
+          echo "| ✅ Pass | $PASS |" >> $GITHUB_STEP_SUMMARY
+          echo "| ❌ Fail | $FAIL |" >> $GITHUB_STEP_SUMMARY
+
+          if [ $FAIL -gt 0 ]; then
+            echo ""
+            echo "::error::$FAIL package(s) failed manifest v3.0 validation"
+            exit 1
+          fi
+          echo "✅ All $TOTAL packages pass manifest v3.0 validation"
+
+      - name: Generate JSON report
+        if: always()
+        run: |
+          python3 -c "
+import json, os, glob
+results = []
+for mf in sorted(glob.glob('packages/*/manifest.json')):
+    m = json.load(open(mf))
+    pkg_id = m.get('package_id', 'unknown')
+    errors = []
+    if m.get('tier') not in ['Foundations','Intermediate','Advanced','Elite']: errors.append('invalid tier')
+    if not isinstance(m.get('roles'), list) or len(m.get('roles',[])) == 0: errors.append('empty roles')
+    mitre = m.get('mitre', m.get('mitre_techniques', []))
+    if not isinstance(mitre, list) or len(mitre) == 0: errors.append('empty mitre')
+    if not isinstance(m.get('stacks'), list) or len(m.get('stacks',[])) == 0: errors.append('empty stacks')
+    results.append({'package_id': pkg_id, 'title': m.get('title',''), 'valid': len(errors)==0, 'errors': errors})
+report = {'total': len(results), 'pass': sum(1 for r in results if r['valid']), 'fail': sum(1 for r in results if not r['valid']), 'results': results}
+json.dump(report, open('/tmp/manifest-v3-report.json','w'), indent=2)
+"
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: manifest-v3-validation-report
+          path: /tmp/manifest-v3-report.json
+          retention-days: 30
