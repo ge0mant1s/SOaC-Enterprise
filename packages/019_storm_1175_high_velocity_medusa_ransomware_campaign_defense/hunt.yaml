@@ -1,0 +1,140 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: storm-1175-medusa-ransomware-defense
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: "2026-04-13T20:14:47.849Z"
+  package_id: pkg-019
+  mitre_attack:
+    - T1190
+    - T1059
+    - T1053
+    - T1003
+    - T1552
+    - T1021
+    - T1570
+    - T1005
+    - T1486
+  severity: CRITICAL
+  data_sources:
+    - MDE
+    - M365
+    - CrowdStrike
+    - Sentinel
+    - Entra ID
+    - AWS
+  tags:
+    - ransomware
+    - medusa
+    - storm-1175
+    - n-day
+    - exploitation
+    - lateral-movement
+spec:
+  description: >-
+    Proactive hunt for Storm-1175 high-velocity Medusa ransomware campaign targeting internet-facing applications
+    through N-day vulnerability exploitation
+  hypothesis: >-
+    Storm-1175 threat actors are exploiting known vulnerabilities in internet-facing applications to deploy Medusa
+    ransomware through rapid post-exploitation techniques
+  hunt_type: proactive
+  telemetry_sources:
+    - logs
+    - edr
+    - network
+    - identity
+  queries:
+    - id: query-001
+      name: Internet-Facing Application Exploitation Indicators
+      platform: kql
+      query: >-
+        DeviceProcessEvents | where Timestamp > ago(7d) | where ProcessCommandLine has_any ("exchange", "papercut",
+        "ivanti", "connectwise", "teamcity", "simplehelp", "crushftp", "goanywhere", "smartermail", "beyondtrust",
+        "netweaver", "weblogic", "veeam") | where ProcessCommandLine has_any ("powershell", "cmd", "wscript", "cscript",
+        "rundll32") | where InitiatingProcessFileName in~ ("w3wp.exe", "java.exe", "tomcat.exe", "httpd.exe",
+        "nginx.exe")
+      expected_results: Suspicious command execution from web application processes indicating post-exploitation activity
+    - id: query-002
+      name: Credential Harvesting and LSASS Access
+      platform: kql
+      query: >-
+        DeviceProcessEvents | where Timestamp > ago(7d) | where ProcessCommandLine has_any ("lsass", "sekurlsa",
+        "mimikatz", "procdump", "comsvcs.dll") or (FileName =~ "rundll32.exe" and ProcessCommandLine contains
+        "comsvcs.dll") | where InitiatingProcessParentFileName in~ ("w3wp.exe", "java.exe", "powershell.exe", "cmd.exe")
+      expected_results: Evidence of credential dumping tools or techniques targeting LSASS process from compromised web applications
+    - id: query-003
+      name: Lateral Movement via Remote Services
+      platform: sigma
+      query: |-
+        title: Storm-1175 Lateral Movement Detection
+        detection:
+          selection:
+            EventID: 4624
+            LogonType: 3
+            AuthenticationPackageName: 'NTLM'
+          condition: selection and not filter
+          filter:
+            SubjectUserName: '*$'
+          timeframe: 7d
+      expected_results: Unusual NTLM authentication patterns indicating lateral movement with compromised credentials
+    - id: query-004
+      name: Scheduled Task Creation for Persistence
+      platform: kql
+      query: >-
+        DeviceProcessEvents | where Timestamp > ago(7d) | where FileName =~ "schtasks.exe" and ProcessCommandLine
+        contains "/create" | where InitiatingProcessFileName in~ ("powershell.exe", "cmd.exe", "w3wp.exe") | project
+        Timestamp, DeviceName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessCommandLine
+      expected_results: Scheduled tasks created by suspicious parent processes for maintaining persistence
+    - id: query-005
+      name: Medusa Ransomware File Encryption Indicators
+      platform: kql
+      query: >-
+        DeviceFileEvents | where Timestamp > ago(7d) | where ActionType == "FileCreated" | where FileName endswith_any
+        (".medusa", ".encrypted", ".locked") or FileName contains "README" or FileName contains "RECOVER" | summarize
+        FileCount = count(), UniqueFiles = dcount(FileName) by DeviceName, bin(Timestamp, 1h) | where FileCount > 50
+      expected_results: Mass file creation events consistent with ransomware encryption activity and ransom note deployment
+  analysis_steps:
+    - id: step-1
+      name: Initial Exploitation Validation
+      description: >-
+        Analyze query-001 results to identify compromised internet-facing applications and validate initial access
+        vectors
+      tools:
+        - Microsoft Defender for Endpoint
+        - Process Explorer
+        - Timeline Analysis
+    - id: step-2
+      name: Credential Compromise Assessment
+      description: Review query-002 findings to determine scope of credential harvesting and identify compromised accounts
+      tools:
+        - Azure AD Sign-in Logs
+        - Bloodhound
+        - Account Activity Analysis
+    - id: step-3
+      name: Lateral Movement Mapping
+      description: Correlate query-003 and query-004 results to map lateral movement paths and persistence mechanisms
+      tools:
+        - Network Topology Mapping
+        - Authentication Log Analysis
+        - Task Scheduler Investigation
+    - id: step-4
+      name: Impact Assessment and Containment
+      description: Evaluate query-005 results to assess ransomware deployment scope and initiate containment procedures
+      tools:
+        - File System Analysis
+        - Network Segmentation
+        - Backup Verification
+  success_criteria:
+    - Identification of exploitation attempts against internet-facing applications with subsequent command execution
+    - Detection of credential harvesting activities targeting LSASS or using known dumping techniques
+    - Evidence of lateral movement using compromised credentials across multiple systems
+    - Discovery of scheduled tasks or other persistence mechanisms created by suspicious processes
+    - Confirmation of file encryption patterns consistent with Medusa ransomware deployment
+  escalation:
+    on_confirmed: >-
+      Immediately escalate to incident response team, initiate network isolation procedures, and begin containment and
+      eradication activities
+    on_inconclusive: >-
+      Continue monitoring with enhanced logging, deploy additional detection rules, and schedule follow-up hunt in 24
+      hours

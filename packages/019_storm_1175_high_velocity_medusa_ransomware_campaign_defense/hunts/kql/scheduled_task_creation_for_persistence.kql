@@ -1,0 +1,1 @@
+DeviceProcessEvents | where Timestamp > ago(7d) | where FileName =~ "schtasks.exe" and ProcessCommandLine contains "/create" | where InitiatingProcessFileName in~ ("powershell.exe", "cmd.exe", "w3wp.exe") | project Timestamp, DeviceName, ProcessCommandLine, InitiatingProcessFileName, InitiatingProcessCommandLine

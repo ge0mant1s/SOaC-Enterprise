@@ -1,0 +1,75 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: storm-1175-medusa-ransomware-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-13T20:14:13.041Z'
+  tags:
+    - ransomware
+    - storm-1175
+    - medusa
+    - n-day-exploitation
+    - high-velocity
+    - exchange
+    - papercut
+    - ivanti
+  mitre_attack:
+    - T1190
+    - T1059
+    - T1053
+    - T1003
+    - T1552
+    - T1021
+    - T1570
+    - T1005
+    - T1486
+  severity: CRITICAL
+  package_id: pkg-019
+spec:
+  steps:
+    - id: step-1
+      name: validate-exposed-assets
+      action: api_call
+      target: asset_inventory
+      parameters:
+        query: >-
+          internet_facing AND (exchange OR papercut OR ivanti OR connectwise OR
+          teamcity OR simplehelp OR crushftp OR goanywhere OR smartermail OR
+          beyondtrust OR netweaver OR weblogic OR veeam)
+        include_patch_status: true
+      timeout: 45s
+      on_failure: continue
+    - id: step-2
+      name: emergency-containment
+      action: script
+      target: containment_engine
+      parameters:
+        action: isolate_affected_systems
+        preserve_evidence: true
+        block_lateral_movement: true
+      timeout: 60s
+      on_failure: escalate
+    - id: step-3
+      name: deploy-compensating-controls
+      action: api_call
+      target: waf_firewall
+      parameters:
+        rules:
+          - block_exploit_patterns
+          - rate_limit_vulnerable_endpoints
+        scope: internet_facing_services
+        emergency_mode: true
+      timeout: 30s
+      on_failure: continue
+    - id: step-4
+      name: credential-reset-enforcement
+      action: api_call
+      target: entra_id
+      parameters:
+        action: force_password_reset
+        scope: affected_users
+        revoke_sessions: true
+        require_mfa: true
+      timeout: 90s
+      on_failure: continue

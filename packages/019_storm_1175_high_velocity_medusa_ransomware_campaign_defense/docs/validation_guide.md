@@ -1,0 +1,22 @@
+# Storm-1175 High-Velocity Medusa Ransomware Campaign Defense — Validation Guide
+
+## Schema Validation
+This package conforms to SOaC Harness v3.0 schema.
+
+## Required Checks
+1. `manifest.json` — All required v3.0 fields present
+2. `detection.yaml` — kind: DetectionRule, inline_rules populated
+3. `playbook.yaml` — CLAW v1 compliant, steps defined
+4. `policy.yaml` — Environments and controls defined
+5. Evidence bundle — L3 replay passes
+
+## MITRE Technique Validation
+- [x] T1190
+- [x] T1059
+- [x] T1053
+- [x] T1003
+- [x] T1552
+- [x] T1021
+- [x] T1570
+- [x] T1005
+- [x] T1486
