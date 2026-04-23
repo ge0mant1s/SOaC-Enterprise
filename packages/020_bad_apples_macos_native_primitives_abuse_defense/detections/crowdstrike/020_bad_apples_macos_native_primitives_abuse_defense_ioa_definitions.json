@@ -1,0 +1,10 @@
+{
+  "name": "AppleScript Remote Execution via SSH",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1021.004",
+    "T1059.002"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "rule-020-001"
+}

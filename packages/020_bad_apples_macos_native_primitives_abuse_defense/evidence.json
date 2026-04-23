@@ -1,0 +1,170 @@
+{
+  "test_id": "020-L3-001",
+  "package_id": "pkg-020",
+  "description": "Synthetic telemetry for Bad Apples: macOS Native Primitives Abuse Defense",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-23T10:40:58.018Z",
+      "provider": "Endpoint",
+      "event_name": "Remote Application Scripting for initial execution",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1072",
+          "T1059.002",
+          "T1027"
+        ],
+        "description": "Attackers use Remote Application Scripting (RAS) to execute commands on remote macOS systems by leveraging Terminal.app as an execution proxy. Base64-encoded payloads are deployed and executed in a two-stage process to bypass Apple's -10016 Handler Error restrictions."
+      },
+      "expected_detection": "rule-020-001",
+      "mitre": [
+        "T1072",
+        "T1059.002",
+        "T1027"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-23T10:42:58.018Z",
+      "provider": "Endpoint",
+      "event_name": "AppleScript execution over SSH for lateral movement",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1021.004",
+          "T1059.002",
+          "T1570",
+          "T1021"
+        ],
+        "description": "Adversaries invoke osascript directly over SSH to execute AppleScript commands remotely, using 'do shell script' handlers for arbitrary command execution while bypassing traditional process execution telemetry through Apple Events IPC."
+      },
+      "expected_detection": "rule-020-002",
+      "mitre": [
+        "T1021.004",
+        "T1059.002",
+        "T1570",
+        "T1021"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-23T10:44:58.018Z",
+      "provider": "Endpoint",
+      "event_name": "Socat remote shell establishment",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1021",
+          "T1059.004",
+          "T1021.004"
+        ],
+        "description": "Attackers establish interactive shells using socat to create bidirectional data streams between endpoints, operating entirely outside the SSH ecosystem to avoid SSH-based detection mechanisms and logging."
+      },
+      "expected_detection": "rule-020-003",
+      "mitre": [
+        "T1021",
+        "T1059.004",
+        "T1021.004"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-23T10:46:58.018Z",
+      "provider": "Endpoint",
+      "event_name": "Finder metadata abuse for payload staging",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1027.009",
+          "T1564.004",
+          "T1090.003",
+          "T1046",
+          "T1018",
+          "T1082"
+        ],
+        "description": "Malicious payloads are stored within Spotlight metadata using the Finder Comment field (kMDItemFinderComment) rather than file contents, bypassing traditional file-based security scanners and static analysis tools that focus on executable code."
+      },
+      "expected_detection": "rule-020-001",
+      "mitre": [
+        "T1027.009",
+        "T1564.004",
+        "T1090.003",
+        "T1046",
+        "T1018",
+        "T1082"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-23T10:48:58.018Z",
+      "provider": "Endpoint",
+      "event_name": "Metadata payload extraction and execution",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1140",
+          "T1059.004",
+          "T1090.003"
+        ],
+        "description": "Stored payloads are extracted from Spotlight metadata using mdls command, Base64 decoded, and piped directly to bash for execution, allowing malicious code to run from metadata storage locations unexamined by standard EDR solutions."
+      },
+      "expected_detection": "rule-020-002",
+      "mitre": [
+        "T1140",
+        "T1059.004",
+        "T1090.003"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-04-23T10:50:58.018Z",
+      "provider": "Endpoint",
+      "event_name": "LaunchAgent persistence establishment",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1543.001",
+          "T1547.011",
+          "T1059.002",
+          "T1547",
+          "T1546",
+          "T1098",
+          "T1041"
+        ],
+        "description": "Attackers create LaunchAgent plists in ~/Library/LaunchAgents that execute metadata extraction chains at user login, using osascript to call Finder directly for reading comments and achieving automatic payload execution at startup."
+      },
+      "expected_detection": "rule-020-003",
+      "mitre": [
+        "T1543.001",
+        "T1547.011",
+        "T1059.002",
+        "T1547",
+        "T1546",
+        "T1098",
+        "T1041"
+      ]
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-020-001",
+      "file": "detection.yaml",
+      "platform": "macOS",
+      "description": "AppleScript Remote Execution via SSH"
+    },
+    {
+      "detection_id": "rule-020-002",
+      "file": "detection.yaml",
+      "platform": "macOS",
+      "description": "Socat Remote Shell Establishment"
+    },
+    {
+      "detection_id": "rule-020-003",
+      "file": "detection.yaml",
+      "platform": "macOS",
+      "description": "Finder Metadata Abuse for Payload Staging"
+    }
+  ]
+}

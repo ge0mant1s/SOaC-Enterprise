@@ -1,0 +1,66 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: bad-apples-macos-primitives-defense
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: "2026-04-23T10:40:47.026Z"
+  package_id: pkg-020
+  scope: package
+  tags:
+    - endpoint
+    - network
+    - identity
+    - macos
+    - primitives-abuse
+    - advanced
+spec:
+  description: >-
+    Governance policy for Bad Apples: macOS Native Primitives Abuse Defense package, implementing controls for advanced
+    endpoint protection against macOS-specific attack techniques including software deployment tools abuse, AppleScript
+    execution, obfuscated files, SSH lateral movement, and persistence mechanisms
+  environments:
+    - name: lab
+      mode: testing
+      data_handling: relaxed
+    - name: staging
+      mode: staging
+      data_handling: standard
+    - name: production
+      mode: production
+      data_handling: strict
+  access_control:
+    required_roles:
+      - endpoint_security_analyst
+      - macos_specialist
+      - incident_responder
+    approval_workflow: true
+  compliance_frameworks:
+    - NIST_CSF
+    - CIS_Controls
+    - MITRE_ATT&CK
+  controls:
+    - name: macos-primitives-monitoring
+      description: >-
+        Monitor and detect abuse of macOS native tools and primitives including software deployment tools, AppleScript,
+        and system utilities
+      enforcement: mandatory
+      evidence: endpoint_telemetry_logs
+    - name: lateral-movement-detection
+      description: Implement detection capabilities for SSH-based lateral movement and remote service abuse on macOS endpoints
+      enforcement: mandatory
+      evidence: network_flow_analysis
+    - name: persistence-prevention
+      description: >-
+        Control and monitor macOS persistence mechanisms including launch agents, login items, and event-triggered
+        execution
+      enforcement: mandatory
+      evidence: system_configuration_audit
+    - name: obfuscation-detection
+      description: Detect and analyze obfuscated files and embedded payloads targeting macOS systems
+      enforcement: recommended
+      evidence: file_analysis_reports
+    - name: network-discovery-monitoring
+      description: Monitor network service scanning, remote system discovery, and proxy usage from macOS endpoints
+      enforcement: mandatory
+      evidence: network_monitoring_logs

@@ -1,0 +1,74 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: macos-native-primitives-abuse-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-23T10:40:25.876Z'
+  tags:
+    - macos
+    - applescript
+    - lateral-movement
+    - persistence
+    - metadata-abuse
+    - socat
+    - launchagent
+  mitre_attack:
+    - T1072
+    - T1059.002
+    - T1027
+    - T1021.004
+    - T1570
+    - T1021
+    - T1059.004
+    - T1027.009
+    - T1564.004
+    - T1090.003
+    - T1046
+    - T1018
+    - T1082
+    - T1140
+    - T1543.001
+    - T1547.011
+    - T1547
+    - T1546
+    - T1098
+    - T1041
+  severity: HIGH
+  package_id: pkg-020
+spec:
+  steps:
+    - id: step-5
+      name: disable-user-account
+      action: api_call
+      target: identity_provider
+      parameters:
+        action: disable_account
+        username: '{{inputs.user_name}}'
+        reason: suspected_compromise
+      timeout: 30s
+      on_failure: escalate
+    - id: step-6
+      name: block-ssh-access
+      action: api_call
+      target: firewall_manager
+      parameters:
+        action: block_service
+        host_id: '{{inputs.host_id}}'
+        service: ssh
+        direction: inbound
+      timeout: 30s
+      on_failure: continue
+    - id: step-7
+      name: notify-security-team
+      action: notify
+      target: security_team
+      parameters:
+        channel: incident_response
+        severity: high
+        message: >-
+          macOS native primitives abuse detected on host {{inputs.host_id}}.
+          AppleScript and socat activity observed.
+        include_artifacts: true
+      timeout: 15s
+      on_failure: continue
