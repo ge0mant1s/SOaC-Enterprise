@@ -1,0 +1,183 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: macos-native-primitives-abuse-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: "2026-04-23T10:40:25.876Z"
+  tags:
+    - macos
+    - applescript
+    - lateral-movement
+    - persistence
+    - metadata-abuse
+    - socat
+    - launchagent
+  mitre_attack:
+    - T1072
+    - T1059.002
+    - T1027
+    - T1021.004
+    - T1570
+    - T1021
+    - T1059.004
+    - T1027.009
+    - T1564.004
+    - T1090.003
+    - T1046
+    - T1018
+    - T1082
+    - T1140
+    - T1543.001
+    - T1547.011
+    - T1547
+    - T1546
+    - T1098
+    - T1041
+  severity: HIGH
+  package_id: pkg-020
+spec:
+  description: >-
+    Automated response playbook for macOS native primitives abuse including AppleScript execution, socat shells,
+    metadata payload staging, and LaunchAgent persistence
+  trigger:
+    source: BRAIN
+    conditions:
+      - field: event.category
+        operator: equals
+        value: process
+      - field: process.name
+        operator: in
+        value:
+          - osascript
+          - socat
+          - ssh
+      - field: host.os.platform
+        operator: equals
+        value: darwin
+    cooldown: 10m
+  inputs:
+    - name: host_id
+      type: string
+      required: true
+      description: Target macOS host identifier
+    - name: process_pid
+      type: number
+      required: true
+      description: Suspicious process ID
+    - name: user_name
+      type: string
+      required: true
+      description: User account associated with activity
+    - name: ssh_connections
+      type: array
+      required: false
+      description: Active SSH connection details
+  steps:
+    - id: step-1
+      name: isolate-macos-endpoint
+      action: api_call
+      target: edr_platform
+      parameters:
+        action: isolate_host
+        host_id: "{{inputs.host_id}}"
+        isolation_type: network
+      timeout: 45s
+      on_failure: continue
+    - id: step-2
+      name: terminate-suspicious-processes
+      action: api_call
+      target: edr_platform
+      parameters:
+        action: kill_process
+        host_id: "{{inputs.host_id}}"
+        process_names:
+          - osascript
+          - socat
+        force: true
+      timeout: 30s
+      on_failure: continue
+    - id: step-3
+      name: collect-applescript-artifacts
+      action: script
+      target: forensics_collector
+      parameters:
+        script: collect_macos_artifacts.py
+        host_id: "{{inputs.host_id}}"
+        artifacts:
+          - applescript_history
+          - ssh_logs
+          - finder_metadata
+      timeout: 120s
+      on_failure: continue
+    - id: step-4
+      name: scan-launchagents
+      action: api_call
+      target: edr_platform
+      parameters:
+        action: scan_persistence
+        host_id: "{{inputs.host_id}}"
+        paths:
+          - ~/Library/LaunchAgents
+          - /Library/LaunchAgents
+          - /System/Library/LaunchAgents
+      timeout: 60s
+      on_failure: continue
+    - id: step-5
+      name: disable-user-account
+      action: api_call
+      target: identity_provider
+      parameters:
+        action: disable_account
+        username: "{{inputs.user_name}}"
+        reason: suspected_compromise
+      timeout: 30s
+      on_failure: escalate
+    - id: step-6
+      name: block-ssh-access
+      action: api_call
+      target: firewall_manager
+      parameters:
+        action: block_service
+        host_id: "{{inputs.host_id}}"
+        service: ssh
+        direction: inbound
+      timeout: 30s
+      on_failure: continue
+    - id: step-7
+      name: notify-security-team
+      action: notify
+      target: security_team
+      parameters:
+        channel: incident_response
+        severity: high
+        message: macOS native primitives abuse detected on host {{inputs.host_id}}. AppleScript and socat activity observed.
+        include_artifacts: true
+      timeout: 15s
+      on_failure: continue
+  outputs:
+    - name: isolation_status
+      type: boolean
+      description: Whether host isolation was successful
+    - name: artifacts_collected
+      type: array
+      description: List of collected forensic artifacts
+    - name: persistence_findings
+      type: object
+      description: LaunchAgent persistence mechanisms discovered
+  rollback:
+    steps:
+      - id: rb-1
+        name: restore-network-access
+        action: api_call
+        target: edr_platform
+        parameters:
+          action: unisolate_host
+          host_id: "{{inputs.host_id}}"
+      - id: rb-2
+        name: re-enable-user-account
+        action: api_call
+        target: identity_provider
+        parameters:
+          action: enable_account
+          username: "{{inputs.user_name}}"

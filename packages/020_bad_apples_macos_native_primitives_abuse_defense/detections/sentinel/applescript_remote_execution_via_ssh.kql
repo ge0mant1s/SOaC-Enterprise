@@ -1,0 +1,1 @@
+DeviceProcessEvents | where ProcessCommandLine contains "osascript" and (ProcessCommandLine contains "ssh" or ParentProcessName == "sshd") and (ProcessCommandLine contains "-e" or ProcessCommandLine contains "-l")

@@ -1,0 +1,1 @@
+DeviceProcessEvents | where ProcessCommandLine contains "xattr" and (ProcessCommandLine contains "-w" or ProcessCommandLine contains "-l") and ProcessCommandLine contains "com.apple"

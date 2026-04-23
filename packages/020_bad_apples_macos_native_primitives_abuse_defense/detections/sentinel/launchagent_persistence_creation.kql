@@ -1,0 +1,1 @@
+DeviceFileEvents | where FolderPath contains "LaunchAgents" and FileName endswith ".plist" and ActionType == "FileCreated"

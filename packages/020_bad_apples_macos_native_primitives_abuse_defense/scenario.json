@@ -1,0 +1,117 @@
+{
+  "package_id": "pkg-020",
+  "title": "Bad Apples: macOS Native Primitives Abuse Defense",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Remote Application Scripting for initial execution",
+      "text": "Attackers use Remote Application Scripting (RAS) to execute commands on remote macOS systems by leveraging Terminal.app as an execution proxy. Base64-encoded payloads are deployed and executed in a two-stage process to bypass Apple's -10016 Handler Error restrictions.",
+      "description": "Attackers use Remote Application Scripting (RAS) to execute commands on remote macOS systems by leveraging Terminal.app as an execution proxy. Base64-encoded payloads are deployed and executed in a two-stage process to bypass Apple's -10016 Handler Error restrictions.",
+      "mitre": [
+        "T1072",
+        "T1059.002",
+        "T1027"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1072, T1059.002, T1027 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "SOC Team",
+      "phase": "Lateral Movement",
+      "pillar": "Respond",
+      "title": "AppleScript execution over SSH for lateral movement",
+      "text": "Adversaries invoke osascript directly over SSH to execute AppleScript commands remotely, using 'do shell script' handlers for arbitrary command execution while bypassing traditional process execution telemetry through Apple Events IPC.",
+      "description": "Adversaries invoke osascript directly over SSH to execute AppleScript commands remotely, using 'do shell script' handlers for arbitrary command execution while bypassing traditional process execution telemetry through Apple Events IPC.",
+      "mitre": [
+        "T1021.004",
+        "T1059.002",
+        "T1570",
+        "T1021"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1021.004, T1059.002, T1570, T1021 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "SOC Team",
+      "phase": "Lateral Movement",
+      "pillar": "Respond",
+      "title": "Socat remote shell establishment",
+      "text": "Attackers establish interactive shells using socat to create bidirectional data streams between endpoints, operating entirely outside the SSH ecosystem to avoid SSH-based detection mechanisms and logging.",
+      "description": "Attackers establish interactive shells using socat to create bidirectional data streams between endpoints, operating entirely outside the SSH ecosystem to avoid SSH-based detection mechanisms and logging.",
+      "mitre": [
+        "T1021",
+        "T1059.004",
+        "T1021.004"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1021, T1059.004, T1021.004 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "title": "Finder metadata abuse for payload staging",
+      "text": "Malicious payloads are stored within Spotlight metadata using the Finder Comment field (kMDItemFinderComment) rather than file contents, bypassing traditional file-based security scanners and static analysis tools that focus on executable code.",
+      "description": "Malicious payloads are stored within Spotlight metadata using the Finder Comment field (kMDItemFinderComment) rather than file contents, bypassing traditional file-based security scanners and static analysis tools that focus on executable code.",
+      "mitre": [
+        "T1027.009",
+        "T1564.004",
+        "T1090.003",
+        "T1046",
+        "T1018",
+        "T1082"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1027.009, T1564.004, T1090.003, T1046, T1018, T1082 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Metadata payload extraction and execution",
+      "text": "Stored payloads are extracted from Spotlight metadata using mdls command, Base64 decoded, and piped directly to bash for execution, allowing malicious code to run from metadata storage locations unexamined by standard EDR solutions.",
+      "description": "Stored payloads are extracted from Spotlight metadata using mdls command, Base64 decoded, and piped directly to bash for execution, allowing malicious code to run from metadata storage locations unexamined by standard EDR solutions.",
+      "mitre": [
+        "T1140",
+        "T1059.004",
+        "T1090.003"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1140, T1059.004, T1090.003 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "Red Team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "title": "LaunchAgent persistence establishment",
+      "text": "Attackers create LaunchAgent plists in ~/Library/LaunchAgents that execute metadata extraction chains at user login, using osascript to call Finder directly for reading comments and achieving automatic payload execution at startup.",
+      "description": "Attackers create LaunchAgent plists in ~/Library/LaunchAgents that execute metadata extraction chains at user login, using osascript to call Finder directly for reading comments and achieving automatic payload execution at startup.",
+      "mitre": [
+        "T1543.001",
+        "T1547.011",
+        "T1059.002",
+        "T1547",
+        "T1546",
+        "T1098",
+        "T1041"
+      ],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Monitor for T1543.001, T1547.011, T1059.002, T1547, T1546, T1098, T1041 indicators",
+      "playbookRefs": []
+    }
+  ]
+}

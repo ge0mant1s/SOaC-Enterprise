@@ -1,0 +1,1 @@
+DeviceProcessEvents | where ProcessCommandLine contains "socat" and (ProcessCommandLine contains "TCP" or ProcessCommandLine contains "EXEC") and ProcessCommandLine contains "bash"

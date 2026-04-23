@@ -1,0 +1,1 @@
+DeviceProcessEvents | where ProcessCommandLine contains "mdls" or ProcessCommandLine contains "mdfind" and ProcessCommandLine contains "kMDItemWhereFroms"

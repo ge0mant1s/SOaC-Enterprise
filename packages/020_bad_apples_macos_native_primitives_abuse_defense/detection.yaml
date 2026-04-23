@@ -1,0 +1,114 @@
+kind: DetectionRule
+metadata:
+  name: macos-native-primitives-abuse-defense
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: "2026-04-23T10:40:10Z"
+  package_id: pkg-020
+  mitre_attack:
+    - T1072
+    - T1059.002
+    - T1027
+    - T1021.004
+    - T1570
+    - T1021
+    - T1059.004
+    - T1027.009
+    - T1564.004
+    - T1090.003
+    - T1046
+    - T1018
+    - T1082
+    - T1140
+    - T1543.001
+    - T1547.011
+    - T1547
+    - T1546
+    - T1098
+    - T1041
+  severity: HIGH
+  data_sources:
+    - Process Monitoring
+    - File Monitoring
+    - Network Monitoring
+    - Command Line Monitoring
+spec:
+  description: >-
+    Detects abuse of macOS native primitives including AppleScript execution over SSH, socat remote shells, Finder
+    metadata abuse for payload staging, and LaunchAgent persistence establishment
+  platforms:
+    - macOS
+  inline_rules:
+    - id: rule-020-001
+      name: AppleScript Remote Execution via SSH
+      format: kql
+      platform: macOS
+      mitre:
+        - T1021.004
+        - T1059.002
+      severity: HIGH
+      query: >-
+        DeviceProcessEvents | where ProcessCommandLine contains "osascript" and (ProcessCommandLine contains "ssh" or
+        ParentProcessName == "sshd") and (ProcessCommandLine contains "-e" or ProcessCommandLine contains "-l")
+    - id: rule-020-002
+      name: Socat Remote Shell Establishment
+      format: kql
+      platform: macOS
+      mitre:
+        - T1021
+        - T1059.004
+      severity: HIGH
+      query: >-
+        DeviceProcessEvents | where ProcessCommandLine contains "socat" and (ProcessCommandLine contains "TCP" or
+        ProcessCommandLine contains "EXEC") and ProcessCommandLine contains "bash"
+    - id: rule-020-003
+      name: Finder Metadata Abuse for Payload Staging
+      format: kql
+      platform: macOS
+      mitre:
+        - T1027.009
+        - T1564.004
+      severity: MEDIUM
+      query: >-
+        DeviceProcessEvents | where ProcessCommandLine contains "xattr" and (ProcessCommandLine contains "-w" or
+        ProcessCommandLine contains "-l") and ProcessCommandLine contains "com.apple"
+    - id: rule-020-004
+      name: LaunchAgent Persistence Creation
+      format: kql
+      platform: macOS
+      mitre:
+        - T1543.001
+        - T1547.011
+      severity: HIGH
+      query: >-
+        DeviceFileEvents | where FolderPath contains "LaunchAgents" and FileName endswith ".plist" and ActionType ==
+        "FileCreated"
+    - id: rule-020-005
+      name: Suspicious Metadata Extraction and Execution
+      format: kql
+      platform: macOS
+      mitre:
+        - T1140
+        - T1059.004
+      severity: HIGH
+      query: >-
+        DeviceProcessEvents | where ProcessCommandLine contains "mdls" or ProcessCommandLine contains "mdfind" and
+        ProcessCommandLine contains "kMDItemWhereFroms"
+  test_cases:
+    - id: tc-020-001
+      name: AppleScript SSH Execution True Positive
+      type: true_positive
+      expected_result: Alert triggered for osascript execution via SSH
+    - id: tc-020-002
+      name: Legitimate SSH Connection True Negative
+      type: true_negative
+      expected_result: No alert for normal SSH without AppleScript
+    - id: tc-020-003
+      name: Socat Network Tool True Positive
+      type: true_positive
+      expected_result: Alert triggered for socat remote shell
+    - id: tc-020-004
+      name: LaunchAgent Creation True Positive
+      type: true_positive
+      expected_result: Alert triggered for suspicious LaunchAgent creation
+apiVersion: soac.io/v1

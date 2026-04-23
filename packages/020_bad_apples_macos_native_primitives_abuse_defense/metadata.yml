@@ -1,0 +1,43 @@
+package_id: pkg-020
+title: 'Bad Apples: macOS Native Primitives Abuse Defense'
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 3
+tier: Advanced
+package_family: general_threat_defense
+category: Endpoint
+categories:
+  - Endpoint
+  - Network
+  - Identity
+primary_category: Endpoint
+mitre_techniques:
+  - T1072
+  - T1059.002
+  - T1027
+  - T1021.004
+  - T1570
+  - T1021
+  - T1059.004
+  - T1027.009
+  - T1564.004
+  - T1090.003
+  - T1046
+  - T1018
+  - T1082
+  - T1140
+  - T1543.001
+  - T1547.011
+  - T1547
+  - T1546
+  - T1098
+  - T1041
+platform_targets:
+  - Endpoint
+source_type: null
+source_urls: []
+confidence: 0.7
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-04-23T10:40:58.012Z'
+generated_by: soac-wizard-finalizer
