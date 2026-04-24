@@ -1,0 +1,68 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: ai-assisted-aws-intrusion-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-24T11:49:47.901Z'
+  tags:
+    - aws-cloud-intrusion
+    - ai-assisted-attack
+    - exploit-chain-disruption
+    - credential-discovery
+    - lambda-injection
+    - cross-account-movement
+  mitre_attack:
+    - T1552.001
+    - T1526
+    - T1580
+    - T1134.001
+    - T1059.006
+    - T1484.002
+    - T1078.004
+    - T1021.007
+    - T1530
+  severity: CRITICAL
+  package_id: pkg-021
+spec:
+  steps:
+    - id: step-1
+      name: immediate-credential-revocation
+      action: api_call
+      target: aws-iam-service
+      parameters:
+        action: revoke_credentials
+        accounts: '{{inputs.compromised_accounts}}'
+        scope: all_access_keys
+      timeout: 45s
+      on_failure: escalate
+    - id: step-2
+      name: isolate-lambda-functions
+      action: api_call
+      target: aws-lambda-service
+      parameters:
+        action: disable_functions
+        functions: '{{inputs.affected_lambda_functions}}'
+        preserve_logs: true
+      timeout: 30s
+      on_failure: continue
+    - id: step-3
+      name: block-cross-account-access
+      action: script
+      target: aws-organizations-blocker
+      parameters:
+        script_path: /opt/claw/scripts/block_cross_account.py
+        accounts: '{{inputs.compromised_accounts}}'
+        emergency_mode: true
+      timeout: 60s
+      on_failure: abort
+    - id: step-4
+      name: secure-s3-buckets
+      action: api_call
+      target: aws-s3-service
+      parameters:
+        action: apply_emergency_policy
+        buckets: '{{inputs.suspicious_s3_buckets}}'
+        policy: deny_all_public_access
+      timeout: 30s
+      on_failure: continue

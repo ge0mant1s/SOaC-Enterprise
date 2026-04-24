@@ -1,0 +1,147 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: ai-assisted-aws-cloud-intrusion-8min-admin
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: "2026-04-24T11:50:26.772Z"
+  package_id: pkg-021
+  mitre_attack:
+    - T1552.001
+    - T1526
+    - T1580
+    - T1134.001
+    - T1059.006
+    - T1484.002
+    - T1078.004
+    - T1021.007
+    - T1530
+  severity: CRITICAL
+  data_sources:
+    - AWS CloudTrail
+    - AWS S3 Access Logs
+    - AWS Lambda Logs
+    - AWS IAM Events
+  tags:
+    - cloud-intrusion
+    - aws
+    - credential-access
+    - lateral-movement
+    - ai-assisted
+    - exploit-chain
+spec:
+  description: >-
+    Proactive hunt for AI-assisted AWS cloud intrusion exploit chain targeting rapid administrative access escalation
+    within 8 minutes
+  hypothesis: >-
+    Threat actors are leveraging AI-assisted techniques to execute a multi-stage AWS cloud intrusion chain, progressing
+    from credential discovery in public S3 buckets to administrative access and cross-account lateral movement within 8
+    minutes
+  hunt_type: proactive
+  telemetry_sources:
+    - cloud
+    - identity
+    - logs
+  queries:
+    - id: query-001
+      name: s3-credential-discovery-patterns
+      platform: kql
+      query: >-
+        AWSCloudTrail | where EventName in ('GetObject', 'ListObjects', 'ListBucket') | where RequestParameters contains
+        '.aws' or RequestParameters contains 'credentials' or RequestParameters contains 'config' | where
+        SourceIPAddress !startswith '10.' and SourceIPAddress !startswith '172.' and SourceIPAddress !startswith
+        '192.168.' | summarize count() by SourceIPAddress, UserIdentityType, bin(TimeGenerated, 5m) | where count_ > 10
+      expected_results: External IP addresses making rapid sequential requests to S3 objects containing AWS credential patterns
+    - id: query-002
+      name: aws-service-reconnaissance-burst
+      platform: sigma
+      query: |-
+        title: AWS Service Reconnaissance Burst
+        detection:
+          selection:
+            eventName:
+              - 'DescribeInstances'
+              - 'DescribeSecurityGroups'
+              - 'ListRoles'
+              - 'GetAccountSummary'
+              - 'DescribeRegions'
+          condition: selection
+          timeframe: 2m
+          count: 15
+      expected_results: Rapid enumeration of AWS services and resources from single source within 2-minute window
+    - id: query-003
+      name: failed-role-assumption-escalation
+      platform: kql
+      query: >-
+        AWSCloudTrail | where EventName == 'AssumeRole' and ErrorCode in ('AccessDenied', 'InvalidUserID.NotFound') |
+        extend RoleName = tostring(RequestParameters.roleArn) | summarize FailedAttempts = count(), UniqueRoles =
+        dcount(RoleName) by SourceIPAddress, UserIdentityArn, bin(TimeGenerated, 1m) | where FailedAttempts > 5 and
+        UniqueRoles > 3
+      expected_results: Multiple failed role assumption attempts targeting various high-privilege roles from same source
+    - id: query-004
+      name: lambda-code-injection-indicators
+      platform: splunk
+      query: >-
+        index=aws sourcetype=aws:cloudtrail eventName IN ("UpdateFunctionCode", "CreateFunction",
+        "UpdateFunctionConfiguration") | eval code_size=tonumber('requestParameters.codeSize') | where code_size >
+        1000000 OR match('requestParameters.code', "(?i)(eval|exec|system|subprocess|os\.system)") | stats count by
+        sourceIPAddress, userIdentity.arn, awsRegion | where count > 2
+      expected_results: Lambda function modifications with suspicious code patterns or unusually large payloads
+    - id: query-005
+      name: rapid-admin-key-creation-timeline
+      platform: kql
+      query: >-
+        AWSCloudTrail | where EventName in ('CreateAccessKey', 'CreateUser', 'AttachUserPolicy', 'PutUserPolicy') |
+        where RequestParameters contains 'Admin' or RequestParameters contains '*' | extend TimeDiff =
+        datetime_diff('minute', TimeGenerated, prev(TimeGenerated)) | where TimeDiff <= 8 | summarize Events =
+        make_list(EventName), TimeSpan = max(TimeGenerated) - min(TimeGenerated) by SourceIPAddress, UserIdentityArn |
+        where array_length(Events) >= 3 and TimeSpan <= 8m
+      expected_results: Administrative access key creation and policy attachment events occurring within 8-minute window
+  analysis_steps:
+    - id: step-1
+      name: timeline-correlation-analysis
+      description: >-
+        Correlate all identified events across queries to establish attack timeline and validate 8-minute progression
+        hypothesis
+      tools:
+        - Timeline Explorer
+        - AWS CloudTrail Insights
+        - Correlation Engine
+    - id: step-2
+      name: source-attribution-investigation
+      description: >-
+        Investigate source IP addresses and user identities to determine if they represent legitimate administrative
+        activity or threat actor infrastructure
+      tools:
+        - Threat Intelligence Platform
+        - IP Geolocation Service
+        - AWS Access Analyzer
+    - id: step-3
+      name: impact-assessment-validation
+      description: >-
+        Assess the scope of potential compromise by examining what resources were accessed and what privileges were
+        obtained
+      tools:
+        - AWS Config
+        - AWS Security Hub
+        - IAM Access Analyzer
+    - id: step-4
+      name: cross-account-movement-tracking
+      description: Trace any cross-account lateral movement attempts and identify additional affected AWS accounts
+      tools:
+        - AWS Organizations Console
+        - Cross-Account Access Analyzer
+        - CloudTrail Multi-Account View
+  success_criteria:
+    - Identification of coordinated multi-stage AWS attack progression within 8-minute timeframe
+    - Evidence of credential discovery followed by service reconnaissance from same source
+    - Failed role assumption attempts preceding successful administrative access creation
+    - Lambda function modifications containing suspicious code injection patterns
+    - Cross-account lateral movement attempts using newly created administrative credentials
+  escalation:
+    on_confirmed: >-
+      Immediately isolate affected AWS accounts, revoke suspicious access keys, enable AWS GuardDuty findings review,
+      and initiate incident response procedures
+    on_inconclusive: >-
+      Continue monitoring for additional indicators, expand hunt timeframe to 24 hours, and correlate with external
+      threat intelligence feeds

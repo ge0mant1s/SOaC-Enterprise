@@ -1,0 +1,157 @@
+kind: DetectionRule
+metadata:
+  name: aws-s3-credential-discovery-public-buckets
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: "2026-04-24T11:49:14Z"
+  package_id: pkg-021
+  mitre_attack:
+    - T1552.001
+  severity: HIGH
+  data_sources:
+    - AWS CloudTrail
+    - S3 Access Logs
+spec:
+  description: >-
+    Detects potential credential discovery activities targeting public S3 buckets, including enumeration of bucket
+    contents and access to credential-like files
+  platforms:
+    - AWS
+    - Sentinel
+    - Sigma
+  inline_rules:
+    - id: aws-s3-cred-enum-001
+      name: S3 Public Bucket Credential Enumeration
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1552.001
+      severity: HIGH
+      query: >-
+        AWSCloudTrail | where EventName in ('GetObject', 'ListObjects', 'ListObjectsV2') | where RequestParameters
+        contains '.aws' or RequestParameters contains 'credentials' or RequestParameters contains '.pem' or
+        RequestParameters contains 'key' | where ErrorCode == '' | summarize count() by SourceIPAddress,
+        UserIdentity_principalId, bin(TimeGenerated, 5m) | where count_ > 10
+    - id: aws-recon-enum-002
+      name: AWS Service Reconnaissance Pattern
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1526
+        - T1580
+      severity: MEDIUM
+      query: >-
+        AWSCloudTrail | where EventName in ('DescribeInstances', 'ListBuckets', 'GetAccountSummary', 'ListRoles',
+        'ListUsers', 'DescribeDBInstances') | summarize ReconEvents = dcount(EventName), EventCount = count() by
+        SourceIPAddress, UserIdentity_principalId, bin(TimeGenerated, 10m) | where ReconEvents >= 4 and EventCount > 15
+    - id: aws-role-assume-fail-003
+      name: Failed Role Assumption Attempts
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1134.001
+      severity: MEDIUM
+      query: >-
+        AWSCloudTrail | where EventName == 'AssumeRole' | where ErrorCode in ('AccessDenied', 'InvalidUserID.NotFound',
+        'TokenRefreshRequired') | summarize FailedAttempts = count(), UniqueRoles = dcount(RequestParameters) by
+        SourceIPAddress, UserIdentity_principalId, bin(TimeGenerated, 5m) | where FailedAttempts > 5
+    - id: aws-lambda-injection-004
+      name: Lambda Function Code Injection
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1059.006
+        - T1484.002
+      severity: CRITICAL
+      query: >-
+        AWSCloudTrail | where EventName in ('UpdateFunctionCode', 'CreateFunction', 'UpdateFunctionConfiguration') |
+        where UserIdentity_type != 'Root' | extend FunctionName = tostring(RequestParameters.functionName) | summarize
+        ModificationCount = count() by SourceIPAddress, UserIdentity_principalId, FunctionName, bin(TimeGenerated, 15m)
+        | where ModificationCount > 1
+    - id: aws-admin-key-creation-005
+      name: Administrative Access Key Creation
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1078.004
+      severity: CRITICAL
+      query: >-
+        AWSCloudTrail | where EventName in ('CreateAccessKey', 'CreateUser', 'AttachUserPolicy', 'PutUserPolicy') |
+        where RequestParameters contains 'Admin' or ResponseElements contains
+        'arn:aws:iam::aws:policy/AdministratorAccess' | summarize AdminActions = count() by SourceIPAddress,
+        UserIdentity_principalId, bin(TimeGenerated, 10m)
+    - id: aws-cross-account-lateral-006
+      name: Cross-Account Lateral Movement
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1021.007
+        - T1134.001
+      severity: HIGH
+      query: >-
+        AWSCloudTrail | where EventName == 'AssumeRole' | where ErrorCode == '' | extend TargetAccount =
+        extract('arn:aws:iam::([0-9]+):', 1, tostring(ResponseElements)) | extend SourceAccount =
+        extract('arn:aws:iam::([0-9]+):', 1, tostring(UserIdentity_arn)) | where TargetAccount != SourceAccount |
+        summarize CrossAccountAssuptions = count(), UniqueTargetAccounts = dcount(TargetAccount) by SourceIPAddress,
+        UserIdentity_principalId, bin(TimeGenerated, 15m)
+    - id: aws-backdoor-user-007
+      name: Backdoor User Creation Pattern
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1078.004
+      severity: HIGH
+      query: >-
+        AWSCloudTrail | where EventName in ('CreateUser', 'CreateAccessKey', 'AttachUserPolicy', 'CreateLoginProfile') |
+        extend UserName = tostring(RequestParameters.userName) | summarize BackdoorActions = count(), ActionTypes =
+        make_set(EventName) by SourceIPAddress, UserIdentity_principalId, UserName, bin(TimeGenerated, 20m) | where
+        BackdoorActions >= 3 and array_length(ActionTypes) >= 2
+    - id: aws-data-exfiltration-008
+      name: Data Collection and Exfiltration
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1530
+        - T1552.001
+      severity: CRITICAL
+      query: >-
+        AWSCloudTrail | where EventName in ('GetObject', 'CopyObject', 'DownloadDBLogFilePortion') | where
+        RequestParameters contains 'credentials' or RequestParameters contains 'config' or RequestParameters contains
+        'backup' | summarize DataAccess = count(), UniqueObjects = dcount(RequestParameters) by SourceIPAddress,
+        UserIdentity_principalId, bin(TimeGenerated, 10m) | where DataAccess > 20
+    - id: aws-attack-chain-correlation-009
+      name: AI-Assisted AWS Intrusion Chain Correlation
+      format: kql
+      platform: Sentinel
+      mitre:
+        - T1552.001
+        - T1526
+        - T1078.004
+      severity: CRITICAL
+      query: >-
+        let CredDiscovery = AWSCloudTrail | where EventName in ('GetObject', 'ListObjects') and (RequestParameters
+        contains '.aws' or RequestParameters contains 'credentials') | project TimeGenerated, SourceIPAddress,
+        UserIdentity_principalId, Stage = 'CredDiscovery'; let Reconnaissance = AWSCloudTrail | where EventName in
+        ('DescribeInstances', 'ListBuckets', 'ListRoles') | summarize by TimeGenerated, SourceIPAddress,
+        UserIdentity_principalId | project TimeGenerated, SourceIPAddress, UserIdentity_principalId, Stage =
+        'Reconnaissance'; let PrivEsc = AWSCloudTrail | where EventName in ('CreateAccessKey', 'AttachUserPolicy') |
+        project TimeGenerated, SourceIPAddress, UserIdentity_principalId, Stage = 'PrivilegeEscalation'; union
+        CredDiscovery, Reconnaissance, PrivEsc | summarize Stages = make_set(Stage), StageCount = dcount(Stage),
+        EventSpan = max(TimeGenerated) - min(TimeGenerated) by SourceIPAddress, UserIdentity_principalId | where
+        StageCount >= 2 and EventSpan <= 30m
+  test_cases:
+    - id: tc-001
+      name: S3 Credential Discovery True Positive
+      type: true_positive
+      expected_result: Alert triggered for multiple .aws credential file access from public S3 bucket
+    - id: tc-002
+      name: Normal AWS Service Usage
+      type: true_negative
+      expected_result: No alert for legitimate AWS console usage patterns
+    - id: tc-003
+      name: Attack Chain Correlation
+      type: true_positive
+      expected_result: >-
+        High-severity alert for correlated credential discovery, reconnaissance, and privilege escalation within
+        30-minute window
+apiVersion: soac.io/v1

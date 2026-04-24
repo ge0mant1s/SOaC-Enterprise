@@ -1,0 +1,172 @@
+{
+  "test_id": "021-L3-001",
+  "package_id": "pkg-021",
+  "description": "Synthetic telemetry for AI-Assisted AWS Cloud Intrusion with 8-Minute Admin Access",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-04-24T11:50:59.747Z",
+      "provider": "AWS",
+      "event_name": "Credential Discovery in Public S3 Buckets",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1552.001"
+        ],
+        "description": "Credential Discovery in Public S3 Buckets"
+      },
+      "expected_detection": "aws-s3-cred-enum-001",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-04-24T11:52:59.747Z",
+      "provider": "AWS",
+      "event_name": "AWS Service Reconnaissance",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1526",
+          "T1580"
+        ],
+        "description": "[BREAKPOINT] AWS Service Reconnaissance"
+      },
+      "expected_detection": "aws-recon-enum-002",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-04-24T11:54:59.747Z",
+      "provider": "AWS",
+      "event_name": "Failed Role Assumption Attempts",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1134.001"
+        ],
+        "description": "[BREAKPOINT] Failed Role Assumption Attempts"
+      },
+      "expected_detection": "aws-role-assume-fail-003",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-04-24T11:56:59.747Z",
+      "provider": "AWS",
+      "event_name": "Lambda Function Code Injection",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1059.006",
+          "T1484.002"
+        ],
+        "description": "[BREAKPOINT] Lambda Function Code Injection"
+      },
+      "expected_detection": "aws-s3-cred-enum-001",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-04-24T11:58:59.747Z",
+      "provider": "AWS",
+      "event_name": "Administrative Access Key Creation",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1078.004"
+        ],
+        "description": "[BREAKPOINT] Administrative Access Key Creation"
+      },
+      "expected_detection": "aws-recon-enum-002",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-04-24T12:00:59.747Z",
+      "provider": "AWS",
+      "event_name": "Cross-Account Lateral Movement",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1021.007",
+          "T1134.001"
+        ],
+        "description": "[BREAKPOINT] Cross-Account Lateral Movement"
+      },
+      "expected_detection": "aws-role-assume-fail-003",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-04-24T12:02:59.747Z",
+      "provider": "AWS",
+      "event_name": "Backdoor User Creation",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1078.004"
+        ],
+        "description": "[BREAKPOINT] Backdoor User Creation"
+      },
+      "expected_detection": "aws-s3-cred-enum-001",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2026-04-24T12:04:59.747Z",
+      "provider": "AWS",
+      "event_name": "Data Collection and Exfiltration",
+      "data": {
+        "step": 8,
+        "mitre": [
+          "T1530",
+          "T1552.001"
+        ],
+        "description": "Data Collection and Exfiltration"
+      },
+      "expected_detection": "aws-recon-enum-002",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "aws-s3-cred-enum-001",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "S3 Public Bucket Credential Enumeration"
+    },
+    {
+      "detection_id": "aws-recon-enum-002",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "AWS Service Reconnaissance Pattern"
+    },
+    {
+      "detection_id": "aws-role-assume-fail-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Failed Role Assumption Attempts"
+    }
+  ]
+}

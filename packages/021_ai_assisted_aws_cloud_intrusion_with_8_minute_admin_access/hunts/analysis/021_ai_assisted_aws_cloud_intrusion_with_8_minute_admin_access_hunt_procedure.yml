@@ -1,0 +1,92 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: ai-assisted-aws-cloud-intrusion-8min-admin
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-04-24T11:50:26.772Z'
+  package_id: pkg-021
+  mitre_attack:
+    - T1552.001
+    - T1526
+    - T1580
+    - T1134.001
+    - T1059.006
+    - T1484.002
+    - T1078.004
+    - T1021.007
+    - T1530
+  severity: CRITICAL
+  data_sources:
+    - AWS CloudTrail
+    - AWS S3 Access Logs
+    - AWS Lambda Logs
+    - AWS IAM Events
+  tags:
+    - cloud-intrusion
+    - aws
+    - credential-access
+    - lateral-movement
+    - ai-assisted
+    - exploit-chain
+spec:
+  hypothesis: >-
+    Threat actors are leveraging AI-assisted techniques to execute a multi-stage
+    AWS cloud intrusion chain, progressing from credential discovery in public
+    S3 buckets to administrative access and cross-account lateral movement
+    within 8 minutes
+  hunt_type: proactive
+  analysis_steps:
+    - id: step-1
+      name: timeline-correlation-analysis
+      description: >-
+        Correlate all identified events across queries to establish attack
+        timeline and validate 8-minute progression hypothesis
+      tools:
+        - Timeline Explorer
+        - AWS CloudTrail Insights
+        - Correlation Engine
+    - id: step-2
+      name: source-attribution-investigation
+      description: >-
+        Investigate source IP addresses and user identities to determine if they
+        represent legitimate administrative activity or threat actor
+        infrastructure
+      tools:
+        - Threat Intelligence Platform
+        - IP Geolocation Service
+        - AWS Access Analyzer
+    - id: step-3
+      name: impact-assessment-validation
+      description: >-
+        Assess the scope of potential compromise by examining what resources
+        were accessed and what privileges were obtained
+      tools:
+        - AWS Config
+        - AWS Security Hub
+        - IAM Access Analyzer
+    - id: step-4
+      name: cross-account-movement-tracking
+      description: >-
+        Trace any cross-account lateral movement attempts and identify
+        additional affected AWS accounts
+      tools:
+        - AWS Organizations Console
+        - Cross-Account Access Analyzer
+        - CloudTrail Multi-Account View
+  success_criteria:
+    - >-
+      Identification of coordinated multi-stage AWS attack progression within
+      8-minute timeframe
+    - >-
+      Evidence of credential discovery followed by service reconnaissance from
+      same source
+    - >-
+      Failed role assumption attempts preceding successful administrative access
+      creation
+    - >-
+      Lambda function modifications containing suspicious code injection
+      patterns
+    - >-
+      Cross-account lateral movement attempts using newly created administrative
+      credentials

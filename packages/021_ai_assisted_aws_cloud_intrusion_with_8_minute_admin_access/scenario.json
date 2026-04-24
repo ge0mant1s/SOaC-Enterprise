@@ -1,0 +1,131 @@
+{
+  "package_id": "pkg-021",
+  "title": "AI-Assisted AWS Cloud Intrusion with 8-Minute Admin Access",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Blue Team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "title": "Credential Discovery in Public S3 Buckets",
+      "text": "Credential Discovery in Public S3 Buckets",
+      "description": "Credential Discovery in Public S3 Buckets",
+      "mitre": [
+        "T1552.001"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1552.001 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "AWS Service Reconnaissance",
+      "text": "[BREAKPOINT] AWS Service Reconnaissance",
+      "description": "[BREAKPOINT] AWS Service Reconnaissance",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1526, T1580 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Failed Role Assumption Attempts",
+      "text": "[BREAKPOINT] Failed Role Assumption Attempts",
+      "description": "[BREAKPOINT] Failed Role Assumption Attempts",
+      "mitre": [
+        "T1134.001"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1134.001 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Lambda Function Code Injection",
+      "text": "[BREAKPOINT] Lambda Function Code Injection",
+      "description": "[BREAKPOINT] Lambda Function Code Injection",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1059.006, T1484.002 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Administrative Access Key Creation",
+      "text": "[BREAKPOINT] Administrative Access Key Creation",
+      "description": "[BREAKPOINT] Administrative Access Key Creation",
+      "mitre": [
+        "T1078.004"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1078.004 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "SOC Team",
+      "phase": "Lateral Movement",
+      "pillar": "Respond",
+      "title": "Cross-Account Lateral Movement",
+      "text": "[BREAKPOINT] Cross-Account Lateral Movement",
+      "description": "[BREAKPOINT] Cross-Account Lateral Movement",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Monitor for T1021.007, T1134.001 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 7,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Backdoor User Creation",
+      "text": "[BREAKPOINT] Backdoor User Creation",
+      "description": "[BREAKPOINT] Backdoor User Creation",
+      "mitre": [
+        "T1078.004"
+      ],
+      "expectedOutcome": "Step 7 completes successfully",
+      "detectionHints": "Monitor for T1078.004 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 8,
+      "role": "Blue Team",
+      "phase": "Collection",
+      "pillar": "Detect",
+      "title": "Data Collection and Exfiltration",
+      "text": "Data Collection and Exfiltration",
+      "description": "Data Collection and Exfiltration",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ],
+      "expectedOutcome": "Step 8 completes successfully",
+      "detectionHints": "Monitor for T1530, T1552.001 indicators",
+      "playbookRefs": []
+    }
+  ]
+}

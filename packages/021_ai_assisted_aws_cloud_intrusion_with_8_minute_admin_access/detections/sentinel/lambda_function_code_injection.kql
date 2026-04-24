@@ -1,0 +1,1 @@
+AWSCloudTrail | where EventName in ('UpdateFunctionCode', 'CreateFunction', 'UpdateFunctionConfiguration') | where UserIdentity_type != 'Root' | extend FunctionName = tostring(RequestParameters.functionName) | summarize ModificationCount = count() by SourceIPAddress, UserIdentity_principalId, FunctionName, bin(TimeGenerated, 15m) | where ModificationCount > 1

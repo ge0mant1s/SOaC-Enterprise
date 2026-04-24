@@ -1,0 +1,72 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: ai-assisted-aws-intrusion-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-04-24T11:49:47.901Z'
+  tags:
+    - aws-cloud-intrusion
+    - ai-assisted-attack
+    - exploit-chain-disruption
+    - credential-discovery
+    - lambda-injection
+    - cross-account-movement
+  mitre_attack:
+    - T1552.001
+    - T1526
+    - T1580
+    - T1134.001
+    - T1059.006
+    - T1484.002
+    - T1078.004
+    - T1021.007
+    - T1530
+  severity: CRITICAL
+  package_id: pkg-021
+spec:
+  steps:
+    - id: step-5
+      name: hunt-backdoor-users
+      action: script
+      target: iam-user-hunter
+      parameters:
+        script_path: /opt/claw/scripts/hunt_backdoor_users.py
+        timeframe: last_10_minutes
+        auto_disable: true
+      timeout: 90s
+      on_failure: continue
+    - id: step-6
+      name: activate-data-loss-prevention
+      action: api_call
+      target: aws-cloudtrail-service
+      parameters:
+        action: enable_data_events
+        scope: all_s3_buckets
+        alert_threshold: immediate
+      timeout: 30s
+      on_failure: continue
+    - id: step-7
+      name: notify-security-team
+      action: notify
+      target: security-operations-center
+      parameters:
+        channel: critical-incidents
+        message: >-
+          AI-assisted AWS intrusion contained - Stage {{inputs.attack_stage}} -
+          Incident {{inputs.incident_id}}
+        priority: P1
+        include_forensics: true
+      timeout: 15s
+      on_failure: continue
+    - id: step-8
+      name: initiate-forensic-collection
+      action: script
+      target: forensics-collector
+      parameters:
+        script_path: /opt/claw/scripts/aws_forensics.py
+        incident_id: '{{inputs.incident_id}}'
+        preserve_cloudtrail: true
+        snapshot_instances: true
+      timeout: 120s
+      on_failure: continue

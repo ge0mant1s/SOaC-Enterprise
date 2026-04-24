@@ -1,0 +1,9 @@
+{
+  "name": "S3 Public Bucket Credential Enumeration",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1552.001"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "aws-s3-cred-enum-001"
+}

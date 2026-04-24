@@ -1,0 +1,34 @@
+package_id: pkg-021
+title: AI-Assisted AWS Cloud Intrusion with 8-Minute Admin Access
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: exploit_chain_disruption
+category: Cloud
+categories:
+  - Cloud
+  - Identity
+  - Supply Chain
+primary_category: Cloud
+mitre_techniques:
+  - T1552.001
+  - T1526
+  - T1580
+  - T1134.001
+  - T1059.006
+  - T1484.002
+  - T1078.004
+  - T1021.007
+  - T1530
+platform_targets:
+  - AWS
+  - Sentinel
+  - Sigma
+source_type: null
+source_urls: []
+confidence: 0.7
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-04-24T11:50:59.742Z'
+generated_by: soac-wizard-finalizer

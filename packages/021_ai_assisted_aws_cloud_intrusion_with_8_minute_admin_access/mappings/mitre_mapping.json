@@ -1,0 +1,119 @@
+{
+  "package_id": "pkg-021",
+  "mappings": [
+    {
+      "technique_id": "T1552.001",
+      "detection_rules": [
+        "aws-s3-cred-enum-001",
+        "aws-data-exfiltration-008",
+        "aws-attack-chain-correlation-009"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1526",
+      "detection_rules": [
+        "aws-recon-enum-002",
+        "aws-attack-chain-correlation-009"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1580",
+      "detection_rules": [
+        "aws-recon-enum-002"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1134.001",
+      "detection_rules": [
+        "aws-role-assume-fail-003",
+        "aws-cross-account-lateral-006"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1059.006",
+      "detection_rules": [
+        "aws-lambda-injection-004"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1484.002",
+      "detection_rules": [
+        "aws-lambda-injection-004"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1078.004",
+      "detection_rules": [
+        "aws-admin-key-creation-005",
+        "aws-backdoor-user-007",
+        "aws-attack-chain-correlation-009"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1021.007",
+      "detection_rules": [
+        "aws-cross-account-lateral-006"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1530",
+      "detection_rules": [
+        "aws-data-exfiltration-008"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    }
+  ]
+}

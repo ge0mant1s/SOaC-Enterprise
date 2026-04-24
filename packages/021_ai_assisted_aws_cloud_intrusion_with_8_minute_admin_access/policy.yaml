@@ -1,0 +1,71 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: ai-assisted-aws-cloud-intrusion-governance
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: "2026-04-24T11:50:14.560Z"
+  package_id: pkg-021
+  scope: package
+  tags:
+    - cloud-security
+    - aws-intrusion
+    - exploit-chain
+    - ai-assisted
+    - elite-difficulty
+spec:
+  description: >-
+    Governance policy for AI-Assisted AWS Cloud Intrusion simulation package focusing on exploit chain disruption and
+    multi-stage attack detection capabilities
+  environments:
+    - name: lab
+      mode: testing
+      data_handling: relaxed
+    - name: staging
+      mode: staging
+      data_handling: standard
+    - name: production
+      mode: production
+      data_handling: strict
+  access_control:
+    required_roles:
+      - cloud-security-engineer
+      - threat-hunter
+      - incident-responder
+      - aws-security-specialist
+    approval_workflow: true
+  compliance_frameworks:
+    - NIST-CSF
+    - AWS-Security-Best-Practices
+    - MITRE-ATT&CK
+  controls:
+    - name: exploit-chain-detection-coverage
+      description: >-
+        Ensure comprehensive detection coverage across all 8 attack stages with stage, correlation, and objective
+        detections
+      enforcement: mandatory
+      evidence: detection-rule-validation
+    - name: aws-cloud-telemetry-integration
+      description: Validate proper integration with AWS CloudTrail, GuardDuty, and identity management telemetry sources
+      enforcement: mandatory
+      evidence: telemetry-source-verification
+    - name: mitre-attack-mapping
+      description: >-
+        Verify accurate mapping to MITRE ATT&CK techniques T1552.001, T1526, T1580, T1134.001, T1059.006, T1484.002,
+        T1078.004, T1021.007, T1530
+      enforcement: mandatory
+      evidence: attack-technique-mapping
+    - name: containment-playbook-readiness
+      description: >-
+        Ensure at least one validated containment playbook is available for rapid response to detected intrusion
+        attempts
+      enforcement: mandatory
+      evidence: playbook-testing-results
+    - name: ai-assisted-attack-simulation
+      description: Validate AI-assisted attack simulation capabilities and 8-minute admin access timeline constraints
+      enforcement: recommended
+      evidence: simulation-performance-metrics
+    - name: cross-account-lateral-movement-detection
+      description: Ensure detection capabilities for cross-account lateral movement and backdoor user creation activities
+      enforcement: mandatory
+      evidence: lateral-movement-detection-validation

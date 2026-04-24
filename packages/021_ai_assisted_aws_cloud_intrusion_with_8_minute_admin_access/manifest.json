@@ -1,0 +1,327 @@
+{
+  "package_id": "pkg-021",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "AI-Assisted AWS Cloud Intrusion with 8-Minute Admin Access",
+  "description": "AI-assisted cloud intrusion campaign leveraging Large Language Models (LLMs) to achieve AWS administrative access in under 10 minutes. Threat actors steal valid credentials from misconfigured public S3 buckets, then use LLM-generated code to inject malicious Lambda functions, escalate privileges, and establish persistent backdoor access. The campaign demonstrates novel tactics including LLM-assisted reconnaissance, automated code generation for privilege escalation, and unauthorized usage of cloud-hosted AI models (LLMjacking). Targets include DevOps and cloud engineering teams with access to AWS environments containing sensitive data, ML models, and production infrastructure. This package provides detection coverage for rapid cloud privilege escalation, LLM-assisted automation patterns, Lambda function code injection, and unauthorized Bedrock model invocations.",
+  "difficulty": 4,
+  "tier": "Elite",
+  "package_family": "exploit_chain_disruption",
+  "package_type": "instance",
+  "attack_intent": {
+    "entry": "credential_discovery_in_public_s3_buckets",
+    "pivot": "aws_service_reconnaissance",
+    "objective": "data_collection_and_exfiltration"
+  },
+  "source_type": null,
+  "confidence": 0.7,
+  "human_review_required": false,
+  "deployment_mode": "detect-and-respond",
+  "category": "Cloud",
+  "categories": [
+    "Cloud",
+    "Identity",
+    "Supply Chain"
+  ],
+  "primary_category": "Cloud",
+  "secondary_categories": [
+    "Identity",
+    "Supply Chain"
+  ],
+  "tags": [
+    "aws",
+    "sentinel",
+    "sigma",
+    "cloud",
+    "identity",
+    "supply chain",
+    "red_team",
+    "blue_team",
+    "soc_manager",
+    "exploit-chain-disruption"
+  ],
+  "threat_actor": "UNC-Classified / AI-Assisted Cloud Intrusion Cluster",
+  "campaign_name": "AWS AI-Assisted Cloud Intrusion with LLM Automation",
+  "github_path": "packages/021_ai_assisted_aws_cloud_intrusion_with_8_minute_admin_access",
+  "slug": "021_ai_assisted_aws_cloud_intrusion_with_8_minute_admin_access",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC",
+    "CISO"
+  ],
+  "mitre": [
+    "T1552.001",
+    "T1526",
+    "T1580",
+    "T1134.001",
+    "T1059.006",
+    "T1484.002",
+    "T1078.004",
+    "T1021.007",
+    "T1530"
+  ],
+  "mitre_techniques": [
+    "T1552.001",
+    "T1526",
+    "T1580",
+    "T1134.001",
+    "T1059.006",
+    "T1484.002",
+    "T1078.004",
+    "T1021.007",
+    "T1530"
+  ],
+  "mitre_version": "v15.1",
+  "stacks": [
+    "AWS",
+    "Sentinel",
+    "Sigma"
+  ],
+  "platform_targets": [
+    "AWS",
+    "Sentinel",
+    "Sigma"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Credential Discovery in Public S3 Buckets",
+      "description": "Credential Discovery in Public S3 Buckets",
+      "role": "blue_team",
+      "phase": "Credential Access",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1552.001"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "AWS Service Reconnaissance",
+      "description": "[BREAKPOINT] AWS Service Reconnaissance",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1526",
+        "T1580"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Failed Role Assumption Attempts",
+      "description": "[BREAKPOINT] Failed Role Assumption Attempts",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1134.001"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 4,
+      "title": "Lambda Function Code Injection",
+      "description": "[BREAKPOINT] Lambda Function Code Injection",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1059.006",
+        "T1484.002"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 5,
+      "title": "Administrative Access Key Creation",
+      "description": "[BREAKPOINT] Administrative Access Key Creation",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1078.004"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 6,
+      "title": "Cross-Account Lateral Movement",
+      "description": "[BREAKPOINT] Cross-Account Lateral Movement",
+      "role": "soc_team",
+      "phase": "Lateral Movement",
+      "pillar": "Respond",
+      "mitre_techniques": [
+        "T1021.007",
+        "T1134.001"
+      ],
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        },
+        {
+          "role": "ciso",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 7,
+      "title": "Backdoor User Creation",
+      "description": "[BREAKPOINT] Backdoor User Creation",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1078.004"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 8,
+      "title": "Data Collection and Exfiltration",
+      "description": "Data Collection and Exfiltration",
+      "role": "blue_team",
+      "phase": "Collection",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1530",
+        "T1552.001"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Elite",
+  "family_metadata": {
+    "initial_vector": "valid_accounts",
+    "stages": [
+      {
+        "title": "Credential Discovery in Public S3 Buckets",
+        "techniques": "T1552.001",
+        "is_breakpoint": false
+      },
+      {
+        "title": "AWS Service Reconnaissance",
+        "techniques": "T1526, T1580",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Failed Role Assumption Attempts",
+        "techniques": "T1134.001",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Lambda Function Code Injection",
+        "techniques": "T1059.006, T1484.002",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Administrative Access Key Creation",
+        "techniques": "T1078.004",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Cross-Account Lateral Movement",
+        "techniques": "T1021.007, T1134.001",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Backdoor User Creation",
+        "techniques": "T1078.004",
+        "is_breakpoint": true
+      },
+      {
+        "title": "Data Collection and Exfiltration",
+        "techniques": "T1530, T1552.001",
+        "is_breakpoint": false
+      }
+    ],
+    "telemetry_sources": [
+      "Cloud",
+      "SIEM",
+      "Identity"
+    ],
+    "target_stacks": [
+      "AWS",
+      "Sentinel",
+      "Sigma"
+    ],
+    "correlation_strategy": "graph"
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes, https://cloud.google.com/security/report/resources/cloud-threat-horizons-report-h1-2026",
+    "analysis_date": "2026-04-24"
+  }
+}
