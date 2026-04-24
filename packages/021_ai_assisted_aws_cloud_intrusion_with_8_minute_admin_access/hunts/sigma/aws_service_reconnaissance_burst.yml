@@ -1,0 +1,11 @@
+title: aws-service-reconnaissance-burst
+id: query-002
+status: hunt
+description: Rapid enumeration of AWS services and resources from single source within 2-minute window
+logsource:
+  product: aws
+detection:
+  selection:
+    EventID: '*'
+  condition: selection
+level: high

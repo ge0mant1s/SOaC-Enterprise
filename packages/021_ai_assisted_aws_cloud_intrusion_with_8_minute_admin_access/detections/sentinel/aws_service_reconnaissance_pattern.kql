@@ -1,0 +1,1 @@
+AWSCloudTrail | where EventName in ('DescribeInstances', 'ListBuckets', 'GetAccountSummary', 'ListRoles', 'ListUsers', 'DescribeDBInstances') | summarize ReconEvents = dcount(EventName), EventCount = count() by SourceIPAddress, UserIdentity_principalId, bin(TimeGenerated, 10m) | where ReconEvents >= 4 and EventCount > 15

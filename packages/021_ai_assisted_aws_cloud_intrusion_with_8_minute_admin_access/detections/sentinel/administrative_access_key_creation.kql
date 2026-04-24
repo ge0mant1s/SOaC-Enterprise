@@ -1,0 +1,1 @@
+AWSCloudTrail | where EventName in ('CreateAccessKey', 'CreateUser', 'AttachUserPolicy', 'PutUserPolicy') | where RequestParameters contains 'Admin' or ResponseElements contains 'arn:aws:iam::aws:policy/AdministratorAccess' | summarize AdminActions = count() by SourceIPAddress, UserIdentity_principalId, bin(TimeGenerated, 10m)

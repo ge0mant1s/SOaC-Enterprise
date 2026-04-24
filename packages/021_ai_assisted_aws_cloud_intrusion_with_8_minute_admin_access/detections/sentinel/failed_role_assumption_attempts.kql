@@ -1,0 +1,1 @@
+AWSCloudTrail | where EventName == 'AssumeRole' | where ErrorCode in ('AccessDenied', 'InvalidUserID.NotFound', 'TokenRefreshRequired') | summarize FailedAttempts = count(), UniqueRoles = dcount(RequestParameters) by SourceIPAddress, UserIdentity_principalId, bin(TimeGenerated, 5m) | where FailedAttempts > 5

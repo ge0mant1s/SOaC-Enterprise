@@ -1,0 +1,1 @@
+index=aws sourcetype=aws:cloudtrail eventName IN ("UpdateFunctionCode", "CreateFunction", "UpdateFunctionConfiguration") | eval code_size=tonumber('requestParameters.codeSize') | where code_size > 1000000 OR match('requestParameters.code', "(?i)(eval|exec|system|subprocess|os\.system)") | stats count by sourceIPAddress, userIdentity.arn, awsRegion | where count > 2

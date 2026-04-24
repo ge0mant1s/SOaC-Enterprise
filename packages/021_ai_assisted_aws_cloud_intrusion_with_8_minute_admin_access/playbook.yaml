@@ -1,0 +1,183 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: ai-assisted-aws-intrusion-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: "2026-04-24T11:49:47.901Z"
+  tags:
+    - aws-cloud-intrusion
+    - ai-assisted-attack
+    - exploit-chain-disruption
+    - credential-discovery
+    - lambda-injection
+    - cross-account-movement
+  mitre_attack:
+    - T1552.001
+    - T1526
+    - T1580
+    - T1134.001
+    - T1059.006
+    - T1484.002
+    - T1078.004
+    - T1021.007
+    - T1530
+  severity: CRITICAL
+  package_id: pkg-021
+spec:
+  description: >-
+    Automated response playbook for AI-assisted AWS cloud intrusion with 8-minute admin access exploit chain. Disrupts
+    multi-stage attack progression through containment, credential revocation, and lateral movement prevention.
+  trigger:
+    source: BRAIN
+    conditions:
+      - field: attack_chain_stage
+        operator: gte
+        value: "3"
+      - field: threat_actor
+        operator: eq
+        value: UNC-Classified
+      - field: severity
+        operator: gte
+        value: HIGH
+    cooldown: 2m
+  inputs:
+    - name: incident_id
+      type: string
+      required: true
+      description: Unique incident identifier for the AI-assisted intrusion
+    - name: compromised_accounts
+      type: array
+      required: true
+      description: List of AWS accounts showing signs of compromise
+    - name: attack_stage
+      type: number
+      required: true
+      description: Current stage of the 8-step attack chain (1-8)
+    - name: affected_lambda_functions
+      type: array
+      required: false
+      description: Lambda functions with detected code injection
+    - name: suspicious_s3_buckets
+      type: array
+      required: false
+      description: S3 buckets with credential exposure indicators
+  steps:
+    - id: step-1
+      name: immediate-credential-revocation
+      action: api_call
+      target: aws-iam-service
+      parameters:
+        action: revoke_credentials
+        accounts: "{{inputs.compromised_accounts}}"
+        scope: all_access_keys
+      timeout: 45s
+      on_failure: escalate
+    - id: step-2
+      name: isolate-lambda-functions
+      action: api_call
+      target: aws-lambda-service
+      parameters:
+        action: disable_functions
+        functions: "{{inputs.affected_lambda_functions}}"
+        preserve_logs: true
+      timeout: 30s
+      on_failure: continue
+    - id: step-3
+      name: block-cross-account-access
+      action: script
+      target: aws-organizations-blocker
+      parameters:
+        script_path: /opt/claw/scripts/block_cross_account.py
+        accounts: "{{inputs.compromised_accounts}}"
+        emergency_mode: true
+      timeout: 60s
+      on_failure: abort
+    - id: step-4
+      name: secure-s3-buckets
+      action: api_call
+      target: aws-s3-service
+      parameters:
+        action: apply_emergency_policy
+        buckets: "{{inputs.suspicious_s3_buckets}}"
+        policy: deny_all_public_access
+      timeout: 30s
+      on_failure: continue
+    - id: step-5
+      name: hunt-backdoor-users
+      action: script
+      target: iam-user-hunter
+      parameters:
+        script_path: /opt/claw/scripts/hunt_backdoor_users.py
+        timeframe: last_10_minutes
+        auto_disable: true
+      timeout: 90s
+      on_failure: continue
+    - id: step-6
+      name: activate-data-loss-prevention
+      action: api_call
+      target: aws-cloudtrail-service
+      parameters:
+        action: enable_data_events
+        scope: all_s3_buckets
+        alert_threshold: immediate
+      timeout: 30s
+      on_failure: continue
+    - id: step-7
+      name: notify-security-team
+      action: notify
+      target: security-operations-center
+      parameters:
+        channel: critical-incidents
+        message: AI-assisted AWS intrusion contained - Stage {{inputs.attack_stage}} - Incident {{inputs.incident_id}}
+        priority: P1
+        include_forensics: true
+      timeout: 15s
+      on_failure: continue
+    - id: step-8
+      name: initiate-forensic-collection
+      action: script
+      target: forensics-collector
+      parameters:
+        script_path: /opt/claw/scripts/aws_forensics.py
+        incident_id: "{{inputs.incident_id}}"
+        preserve_cloudtrail: true
+        snapshot_instances: true
+      timeout: 120s
+      on_failure: continue
+  outputs:
+    - name: containment_status
+      type: string
+      description: Overall containment success status
+    - name: revoked_credentials_count
+      type: number
+      description: Number of credentials successfully revoked
+    - name: blocked_accounts
+      type: array
+      description: List of accounts with cross-account access blocked
+    - name: forensic_artifacts
+      type: object
+      description: Collected forensic evidence and artifact locations
+  rollback:
+    steps:
+      - id: rb-1
+        name: restore-lambda-functions
+        action: api_call
+        target: aws-lambda-service
+        parameters:
+          action: enable_functions
+          functions: "{{inputs.affected_lambda_functions}}"
+      - id: rb-2
+        name: restore-cross-account-access
+        action: script
+        target: aws-organizations-restorer
+        parameters:
+          script_path: /opt/claw/scripts/restore_cross_account.py
+          accounts: "{{inputs.compromised_accounts}}"
+      - id: rb-3
+        name: restore-s3-policies
+        action: api_call
+        target: aws-s3-service
+        parameters:
+          action: restore_original_policy
+          buckets: "{{inputs.suspicious_s3_buckets}}"

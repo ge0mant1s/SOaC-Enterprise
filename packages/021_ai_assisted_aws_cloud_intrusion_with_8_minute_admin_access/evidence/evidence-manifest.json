@@ -1,0 +1,1148 @@
+{
+  "schema_version": "2.0.0",
+  "harness_level": 3,
+  "package_id": "pkg-021",
+  "package_name": "AI-Assisted AWS Cloud Intrusion with 8-Minute Admin Access",
+  "scenario_id": "pkg-021",
+  "scenario_title": "AI-Assisted AWS Cloud Intrusion with 8-Minute Admin Access",
+  "generated_at": "2026-04-24T11:50:59.742Z",
+  "summary": {
+    "total_steps": 80,
+    "body_steps": 20,
+    "brain_steps": 20,
+    "purpose_steps": 20,
+    "edge_steps": 20,
+    "detection_triggers": 13,
+    "playbook_actions": 4,
+    "mitre_techniques_declared": 9,
+    "mitre_techniques_exercised": 5,
+    "coverage_pct": 56
+  },
+  "source_counts": {
+    "detection_files": 13,
+    "playbook_files": 4,
+    "policy_files": 2,
+    "doc_files": 3,
+    "scenario_steps": 8,
+    "mitre_techniques": 9,
+    "platform_targets": [
+      "AWS",
+      "Sentinel",
+      "Sigma"
+    ]
+  },
+  "mitre_coverage": [
+    {
+      "technique_id": "T1552.001",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1526",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1580",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1134.001",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1059.006",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1484.002",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1078.004",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1021.007",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    },
+    {
+      "technique_id": "T1530",
+      "tactic": "Enterprise ATT&CK",
+      "exercised": true,
+      "evidence_refs": [
+        "evt-001"
+      ]
+    }
+  ],
+  "replay_status": "PASS",
+  "verdict": "PASS",
+  "replay_timeline": [
+    {
+      "step": 1,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "credential_telemetry_ingest",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "credential_anomaly_scoring",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "credential_isolation_trigger",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "credential_access_audit",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "credential_forensic_capture",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "credential_correlation_engine",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "credential_notification_dispatch",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "credential_egress_monitor",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "credential_process_tree_analysis",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 1,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "credential_heuristic_eval",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "recon_playbook_execution",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "recon_cloud_posture_scan",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "recon_log_collection",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "recon_threat_classification",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "recon_policy_enforcement",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "recon_dns_inspection",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "recon_ioc_correlation",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "recon_ml_inference",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "recon_rollback_action",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 2,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "recon_zero_trust_verify",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1526",
+        "T1580"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "t1134001_telemetry_ingest",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "t1134001_anomaly_scoring",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "t1134001_isolation_trigger",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "t1134001_access_audit",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "t1134001_forensic_capture",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "t1134001_correlation_engine",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "t1134001_notification_dispatch",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "t1134001_egress_monitor",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "t1134001_process_tree_analysis",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 3,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "t1134001_heuristic_eval",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "injection_playbook_execution",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "injection_cloud_posture_scan",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "injection_log_collection",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "injection_threat_classification",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "injection_policy_enforcement",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "injection_dns_inspection",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "injection_ioc_correlation",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "injection_ml_inference",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "injection_rollback_action",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 4,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "injection_zero_trust_verify",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1059.006",
+        "T1484.002"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "t1078004_telemetry_ingest",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "t1078004_anomaly_scoring",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "t1078004_isolation_trigger",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "t1078004_access_audit",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "t1078004_forensic_capture",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "t1078004_correlation_engine",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "t1078004_notification_dispatch",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "t1078004_egress_monitor",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "t1078004_process_tree_analysis",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 5,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "t1078004_heuristic_eval",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "lateral_playbook_execution",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "lateral_cloud_posture_scan",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "lateral_log_collection",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "lateral_threat_classification",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "lateral_policy_enforcement",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "lateral_dns_inspection",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "lateral_ioc_correlation",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "lateral_ml_inference",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "lateral_rollback_action",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 6,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "lateral_zero_trust_verify",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1021.007",
+        "T1134.001"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 1,
+      "pillar": "BODY",
+      "action": "t1078004_telemetry_ingest",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 2,
+      "pillar": "BRAIN",
+      "action": "t1078004_anomaly_scoring",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 3,
+      "pillar": "PURPOSE",
+      "action": "t1078004_isolation_trigger",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 4,
+      "pillar": "EDGE",
+      "action": "t1078004_access_audit",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 5,
+      "pillar": "BODY",
+      "action": "t1078004_forensic_capture",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 6,
+      "pillar": "BRAIN",
+      "action": "t1078004_correlation_engine",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 7,
+      "pillar": "PURPOSE",
+      "action": "t1078004_notification_dispatch",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 8,
+      "pillar": "EDGE",
+      "action": "t1078004_egress_monitor",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 9,
+      "pillar": "BODY",
+      "action": "t1078004_process_tree_analysis",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 7,
+      "substep": 10,
+      "pillar": "BRAIN",
+      "action": "t1078004_heuristic_eval",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1078.004"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 1,
+      "pillar": "PURPOSE",
+      "action": "exfil_playbook_execution",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 2,
+      "pillar": "EDGE",
+      "action": "exfil_cloud_posture_scan",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 3,
+      "pillar": "BODY",
+      "action": "exfil_log_collection",
+      "artifact_type": "detection",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 4,
+      "pillar": "BRAIN",
+      "action": "exfil_threat_classification",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 5,
+      "pillar": "PURPOSE",
+      "action": "exfil_policy_enforcement",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 6,
+      "pillar": "EDGE",
+      "action": "exfil_dns_inspection",
+      "artifact_type": "playbook",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 7,
+      "pillar": "BODY",
+      "action": "exfil_ioc_correlation",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 8,
+      "pillar": "BRAIN",
+      "action": "exfil_ml_inference",
+      "artifact_type": "policy",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 9,
+      "pillar": "PURPOSE",
+      "action": "exfil_rollback_action",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    },
+    {
+      "step": 8,
+      "substep": 10,
+      "pillar": "EDGE",
+      "action": "exfil_zero_trust_verify",
+      "artifact_type": "evidence",
+      "result": "PASS",
+      "mitre": [
+        "T1530",
+        "T1552.001"
+      ]
+    }
+  ],
+  "correlation_analysis": {
+    "strategy": "Mythos Defense Strategy",
+    "description": "Cross-domain correlation linking attack phases through shared indicators and defensive breakpoints.",
+    "cross_domain_links": [
+      {
+        "phase": "Credential Access",
+        "technique": "T1552.001",
+        "provider": "Sentinel",
+        "breakpoint": "BP-01"
+      },
+      {
+        "phase": "Execution",
+        "technique": "T1526",
+        "provider": "MDE",
+        "breakpoint": "BP-02"
+      },
+      {
+        "phase": "Execution",
+        "technique": "T1134.001",
+        "provider": "CloudTrail",
+        "breakpoint": "BP-03"
+      },
+      {
+        "phase": "Execution",
+        "technique": "T1059.006",
+        "provider": "CloudTrail",
+        "breakpoint": "BP-04"
+      },
+      {
+        "phase": "Initial Access",
+        "technique": "T1078.004",
+        "provider": "CloudTrail",
+        "breakpoint": "BP-05"
+      },
+      {
+        "phase": "Lateral Movement",
+        "technique": "T1021.007",
+        "provider": "CloudTrail",
+        "breakpoint": "BP-06"
+      },
+      {
+        "phase": "Initial Access",
+        "technique": "T1078.004",
+        "provider": "CloudTrail",
+        "breakpoint": "BP-07"
+      },
+      {
+        "phase": "Collection",
+        "technique": "T1530",
+        "provider": "CloudTrail",
+        "breakpoint": "BP-08"
+      }
+    ],
+    "breakpoint_analysis": [
+      {
+        "id": "BP-01",
+        "trigger": "Credential Discovery in Public S3 Buckets",
+        "detection_window": "15s",
+        "containment_action": "block_exploit_source"
+      },
+      {
+        "id": "BP-02",
+        "trigger": "AWS Service Reconnaissance",
+        "detection_window": "30s",
+        "containment_action": "terminate_process"
+      },
+      {
+        "id": "BP-03",
+        "trigger": "Failed Role Assumption Attempts",
+        "detection_window": "45s",
+        "containment_action": "revoke_credentials"
+      },
+      {
+        "id": "BP-04",
+        "trigger": "Lambda Function Code Injection",
+        "detection_window": "60s",
+        "containment_action": "revoke_credentials"
+      },
+      {
+        "id": "BP-05",
+        "trigger": "Administrative Access Key Creation",
+        "detection_window": "75s",
+        "containment_action": "revoke_credentials"
+      },
+      {
+        "id": "BP-06",
+        "trigger": "Cross-Account Lateral Movement",
+        "detection_window": "90s",
+        "containment_action": "revoke_credentials"
+      },
+      {
+        "id": "BP-07",
+        "trigger": "Backdoor User Creation",
+        "detection_window": "105s",
+        "containment_action": "revoke_credentials"
+      },
+      {
+        "id": "BP-08",
+        "trigger": "Data Collection and Exfiltration",
+        "detection_window": "120s",
+        "containment_action": "revoke_credentials"
+      }
+    ]
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://www.sysdig.com/blog/ai-assisted-cloud-intrusion-achieves-admin-access-in-8-minutes, https://cloud.google.com/security/report/resources/cloud-threat-horizons-report-h1-2026",
+    "analysis_date": "2026-04-24",
+    "ttps_count": 34
+  },
+  "evidence": {
+    "scenario": "scenario.json",
+    "intelligence": "intelligence.json",
+    "replays": []
+  }
+}
