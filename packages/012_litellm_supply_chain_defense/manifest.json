@@ -36,11 +36,11 @@
     "T1567"
   ],
   "stacks": [
-    "sentinel",
-    "sigma",
-    "splunk",
-    "wazuh",
-    "crowdstrike"
+    "Sentinel",
+    "Sigma",
+    "Splunk",
+    "Wazuh",
+    "CrowdStrike"
   ],
   "created": "2026-03-28",
   "updated": "2026-03-28",

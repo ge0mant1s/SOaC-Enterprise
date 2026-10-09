@@ -35,11 +35,11 @@
   ],
   "mitre_version": "v15.1",
   "stacks": [
-    "sentinel",
-    "sigma",
-    "splunk",
-    "wazuh",
-    "crowdstrike"
+    "Sentinel",
+    "Sigma",
+    "Splunk",
+    "Wazuh",
+    "CrowdStrike"
   ],
   "platform_targets": [
     "multi_platform"
