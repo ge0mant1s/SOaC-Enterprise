@@ -1,0 +1,59 @@
+header:
+  schema-version: 2.2.0
+  last-updated: '2026-10-09'
+  last-reviewed: '2026-10-09'
+  url: https://github.com/ge0mant1s/SOaC-Enterprise/raw/main/security-insights.yml
+  comment: |
+    OpenSSF Security Insights for SOaC-Enterprise. Single-repository file
+    containing project, repository, and security sections. Maintainers should
+    update contact details and review this file at least annually.
+
+project:
+  name: SOaC-Enterprise
+  homepage: https://soacframe.io
+  administrators:
+    - name: ge0mant1s
+      affiliation: SOaC Community
+      email: 14939233+ge0mant1s@users.noreply.github.com
+      social: https://github.com/ge0mant1s
+      primary: true
+  repositories:
+    - name: SOaC-Enterprise
+      url: https://github.com/ge0mant1s/SOaC-Enterprise
+      comment: |
+        Core repository for the Security-Operations-as-Code framework.
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    security-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/SECURITY.md
+    comment: |
+      Report privately via GitHub Private Vulnerability Reporting. See SECURITY.md.
+
+repository:
+  url: https://github.com/ge0mant1s/SOaC-Enterprise
+  status: active
+  accepts-change-request: true
+  accepts-automated-change-request: true
+  core-team:
+    - name: ge0mant1s
+      affiliation: SOaC Community
+      email: 14939233+ge0mant1s@users.noreply.github.com
+      social: https://github.com/ge0mant1s
+      primary: true
+  license:
+    url: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/LICENSE
+    expression: Apache-2.0
+  security:
+    assessments:
+      self:
+        comment: |
+          A formal self-assessment has not yet been completed. Baseline hardening
+          for OpenSSF Security Baseline / Security Slam Fall 2026 is in progress:
+          LICENSE, SECURITY.md, GOVERNANCE.md, this file, Dependabot, and CI
+          hardening are being added and tracked in the project's Slam plan.
+    tools:
+      - name: OpenSSF Scorecard
+        type: SCA
+        comment: |
+          Planned: Scorecard workflow to be enabled once CI write access is
+          granted. See the Security Slam implementation plan.

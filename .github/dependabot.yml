@@ -1,0 +1,33 @@
+# Dependabot configuration for SOaC-Enterprise
+# Keeps dependencies and GitHub Actions patched (OSPS Baseline / Security Slam).
+version: 2
+updates:
+  # Python dependencies (repo root requirements.txt)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+
+  # Node dependencies for the validation harness
+  - package-ecosystem: "npm"
+    directory: "/tools/soac-harness"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # GitHub Actions used in workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
