@@ -1,0 +1,7 @@
+// Antino M365 API C2: principal polling Outlook ~10s and OneDrive ~1min
+let window = 10m;
+OfficeActivity
+| where Operation in ("MailItemsAccessed", "FileAccessed", "FileDownloaded")
+| summarize reqs=count(), apps=make_set(ClientAppId) by UserId, bin(TimeGenerated, 1m)
+| where reqs > 30
+| project TimeGenerated, UserId, reqs, apps

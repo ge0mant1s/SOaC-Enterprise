@@ -1,0 +1,57 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: 029-uat-11587-antino-m365-api-c2-mitigation
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-029
+  scope: package
+  tags:
+  - espionage
+  - china-nexus
+  - uat-11587
+  - antino
+  - m365
+  - outlook
+spec:
+  description: 'Enforces hardening against API-based C2 and signed-binary abuse: OAuth app governance, monitoring of legitimate
+    Microsoft 365 API usage, and application-control policies for sideloading-prone utilities.'
+  environments:
+  - name: lab
+    mode: testing
+    data_handling: relaxed
+  - name: staging
+    mode: staging
+    data_handling: standard
+  - name: production
+    mode: production
+    data_handling: strict
+  access_control:
+    required_roles:
+    - M365 Security Engineer
+    - Identity Engineer
+    - Threat Hunter
+    approval_workflow: true
+  compliance_frameworks:
+  - NIST CSF 2.0
+  - ISO/IEC 27001:2022
+  - MITRE ATT&CK
+  - CIS Controls v8
+  controls:
+  - name: OAuth application governance
+    description: OAuth apps and delegated permissions are inventoried, approved and monitored; anomalous consent is blocked.
+    enforcement: automated
+    evidence: Entra ID app governance / consent audit
+  - name: Monitor M365 API usage baselines
+    description: Outlook/OneDrive API access is baselined; abnormal high-frequency polling triggers alerts.
+    enforcement: automated
+    evidence: M365 API usage analytics
+  - name: Application control for sideloading-prone binaries
+    description: Signed utilities prone to DLL sideloading are constrained via application control / WDAC.
+    enforcement: automated
+    evidence: Application-control policy reports
+  - name: Attachment and link protection
+    description: HTML preview clones and Cloudflare-hosted payloads are inspected and detonated before delivery.
+    enforcement: automated
+    evidence: Email security detonation logs

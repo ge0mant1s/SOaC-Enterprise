@@ -1,0 +1,166 @@
+{
+  "test_id": "025-L3-001",
+  "package_id": "pkg-025",
+  "description": "Synthetic telemetry for Citrix NetScaler ADC/Gateway RCE and Web-Shell Activity",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Send command-bearing request to NetScaler",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "Attacker sends abnormal command-bearing or malformed requests to an unmitigated NetScaler ADC/Gateway."
+      },
+      "expected_detection": "rule-025-001",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Unauthenticated command execution",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1190",
+          "T1059"
+        ],
+        "description": "CVE-2026-88771/88772 yield unauthenticated command execution / memory-overflow exploitation."
+      },
+      "expected_detection": "rule-025-002",
+      "mitre": [
+        "T1190",
+        "T1059"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Deploy PHP web shell (WHIPSHOT)",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1505.003"
+        ],
+        "description": "Attacker writes a PHP web shell into appliance web-serving locations for persistent access."
+      },
+      "expected_detection": "rule-025-003",
+      "mitre": [
+        "T1505.003"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Deploy SLAPSHOT Python tunneler",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1105",
+          "T1572"
+        ],
+        "description": "Attacker transfers and runs the SLAPSHOT Python tunneler for reconnaissance and tunneling."
+      },
+      "expected_detection": "rule-025-001",
+      "mitre": [
+        "T1105",
+        "T1572"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "File and directory discovery",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1083"
+        ],
+        "description": "Reconnaissance examines appliance data and configuration."
+      },
+      "expected_detection": "rule-025-002",
+      "mitre": [
+        "T1083"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Exfiltrate over established channel",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1041"
+        ],
+        "description": "Files are removed through the established C2/tunnel channel."
+      },
+      "expected_detection": "rule-025-003",
+      "mitre": [
+        "T1041"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-10-09T12:12:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect web-service child process and new PHP",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1505.003",
+          "T1059"
+        ],
+        "description": "Blue team flags appliance web-service processes spawning a shell/Python interpreter and new PHP content in web roots."
+      },
+      "expected_detection": "rule-025-001",
+      "mitre": [
+        "T1505.003",
+        "T1059"
+      ]
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2026-10-09T12:14:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Rebuild and rotate secrets",
+      "data": {
+        "step": 8,
+        "mitre": [],
+        "description": "SOC upgrades to fixed releases, rebuilds compromised appliances, revokes sessions and rotates appliance-held secrets."
+      },
+      "expected_detection": "rule-025-002",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-025-001",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "NetScaler web-service process spawning interpreter"
+    },
+    {
+      "detection_id": "rule-025-002",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "New PHP file created in NetScaler web root"
+    },
+    {
+      "detection_id": "rule-025-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "NetScaler appliance outbound tunnel/exfiltration"
+    }
+  ]
+}

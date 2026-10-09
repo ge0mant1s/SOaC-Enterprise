@@ -1,0 +1,9 @@
+{
+  "name": "AF_ALG socket creation by non-root container workload",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1068"
+  ],
+  "severity": "HIGH",
+  "query_reference": "rule-027-001"
+}

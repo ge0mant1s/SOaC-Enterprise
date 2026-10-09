@@ -1,0 +1,55 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 024-panos-captive-portal-root-rce-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - palo-alto
+  - pan-os
+  - captive-portal
+  - user-id
+  - cve-2026-0300
+  - cl-sta-1132
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1105
+  - T1572
+  - T1087
+  - T1018
+  - T1070
+  severity: CRITICAL
+  package_id: pkg-024
+spec:
+  steps:
+  - id: step-5
+    name: remove-unauthorized-binaries
+    action: script
+    target: firewall
+    parameters:
+      remove:
+      - EarthWorm
+      - ReverseSocks5
+      - persistence
+      after: evidence_collection
+    timeout: 180s
+    on_failure: escalate
+  - id: step-6
+    name: upgrade-panos
+    action: api_call
+    target: patch_manager
+    parameters:
+      cve: CVE-2026-0300
+      target: fixed_release
+    timeout: 600s
+    on_failure: escalate
+  - id: step-7
+    name: rotate-exposed-credentials
+    action: api_call
+    target: identity_provider
+    parameters:
+      scope: credentials_visible_to_or_traversing_appliance
+    timeout: 180s
+    on_failure: escalate

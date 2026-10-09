@@ -1,0 +1,18 @@
+<group name="soac,pkg-025,citrix_netscaler,">
+  <rule id="920251" level="13">
+    <decoded_as>json</decoded_as>
+    <field name="event.action">webroot_php_created</field>
+    <description>SOaC pkg-025: NetScaler new PHP web-shell file in appliance web root (behavioral)</description>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+  </rule>
+  <rule id="920252" level="12">
+    <if_sid>920251</if_sid>
+    <field name="event.action">appliance_outbound_tunnel</field>
+    <description>SOaC pkg-025: NetScaler appliance-originated tunnel/exfiltration (behavioral)</description>
+    <mitre>
+      <id>T1572</id>
+    </mitre>
+  </rule>
+</group>

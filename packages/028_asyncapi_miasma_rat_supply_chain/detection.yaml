@@ -1,0 +1,118 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 028-asyncapi-miasma-rat-supply-chain
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-028
+  mitre_attack:
+  - T1195.002
+  - T1552
+  - T1059.007
+  - T1105
+  - T1543.002
+  - T1053.003
+  - T1018
+  - T1102
+  severity: HIGH
+  data_sources:
+  - GitHub audit logs
+  - npm registry / lockfiles
+  - CI/CD runner telemetry
+  - EDR process & network telemetry
+  - Cloud audit logs
+spec:
+  description: 'Detects the AsyncAPI / Miasma RAT supply-chain compromise through multiple signals: installation of affected
+    `@asyncapi/*` versions, execution of `sync.js` and detached Node processes from npm post-install scripts, and network
+    connections to the published C2 indicators (IP 85.137.53.71 on ports 8080/8081/8091, IPFS CIDs, and decentralized relays).
+    The listed package versions, file paths, IPFS CIDs, C2 IP/ports, ETH contract and relay endpoints are publicly reported
+    IOCs.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  - CrowdStrike
+  - Wazuh
+  - MDE
+  inline_rules:
+  - id: rule-028-001
+    name: Installation of compromised @asyncapi/* package versions
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1195.002
+    severity: high
+    query: |-
+      // Detect install/build of known-compromised @asyncapi/* versions (Miasma RAT)
+      DeviceProcessEvents
+      | where FileName in~ ("npm", "npm.exe", "node", "node.exe", "yarn", "pnpm")
+      | where ProcessCommandLine has_any (
+          "@asyncapi/generator@3.3.1",
+          "@asyncapi/specs@6.11.2",
+          "@asyncapi/generator-helpers",
+          "@asyncapi/generator-components")
+      | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName
+  - id: rule-028-002
+    name: Miasma RAT C2 connection to 85.137.53.71
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1105
+    - T1102
+    severity: high
+    sigma_description: Detects network connections to the publicly reported Miasma RAT C2 server 85.137.53.71 on ports 8080,
+      8081 or 8091.
+    logsource:
+      category: network_connection
+      product: windows
+    sigma_detection:
+      selection:
+        DestinationIp: 85.137.53.71
+        DestinationPort:
+        - 8080
+        - 8081
+        - 8091
+      condition: selection
+    query: |-
+      title: Miasma RAT C2 Connection (85.137.53.71)
+      logsource:
+        category: network_connection
+        product: windows
+      detection:
+        selection:
+          DestinationIp: '85.137.53.71'
+          DestinationPort:
+            - 8080
+            - 8081
+            - 8091
+        condition: selection
+  - id: rule-028-003
+    name: Detached Node process from npm post-install (sync.js)
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1059.007
+    - T1105
+    severity: high
+    query: |-
+      // Detached Node process / sync.js execution spawned from npm install lifecycle
+      DeviceProcessEvents
+      | where InitiatingProcessFileName in~ ("npm", "npm.exe", "node", "node.exe")
+      | where ProcessCommandLine has "sync.js"
+          or ProcessCommandLine has ".local/share/NodeJS/sync.js"
+          or (FileName in~ ("node","node.exe") and ProcessCommandLine has_any ("detached", "unref"))
+      | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessCommandLine
+  test_cases:
+  - id: tc-28-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-28-002
+    name: AsyncAPI Miasma RAT exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-28-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

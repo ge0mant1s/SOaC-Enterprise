@@ -1,0 +1,17 @@
+title: AF_ALG socket creation by non-root container workload
+id: rule-027-001
+status: experimental
+description: Detects creation of AF_ALG cryptographic sockets by a containerized, non-root workload (behavioral precursor
+  to Copy Fail exploitation; AF_ALG itself is a legitimate kernel feature).
+logsource:
+  product: linux
+  category: network_connection
+detection:
+  selection:
+    SocketDomain: AF_ALG
+  filter_root:
+    Uid: 0
+  condition: selection and not filter_root
+mitre:
+- T1068
+level: high

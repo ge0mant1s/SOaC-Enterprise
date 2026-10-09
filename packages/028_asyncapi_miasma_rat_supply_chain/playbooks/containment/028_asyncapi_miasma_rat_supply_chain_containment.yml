@@ -1,0 +1,71 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 028-asyncapi-miasma-rat-supply-chain-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - supply-chain
+  - npm
+  - asyncapi
+  - miasma-rat
+  - pull-request-target
+  - ipfs
+  mitre_attack:
+  - T1195.002
+  - T1552
+  - T1059.007
+  - T1105
+  - T1543.002
+  - T1053.003
+  - T1018
+  - T1102
+  severity: HIGH
+  package_id: pkg-028
+spec:
+  steps:
+  - id: step-1
+    name: Quarantine affected runners and endpoints
+    action: isolate_host
+    target: endpoint
+    parameters:
+      scope: hosts_with_affected_versions
+    timeout: 300
+    on_failure: escalate_to_ir_team
+  - id: step-2
+    name: Remove affected versions and rebuild
+    action: remediate_dependencies
+    target: repository
+    parameters:
+      remove:
+      - '@asyncapi/generator@3.3.1'
+      - '@asyncapi/specs@6.11.2'
+      - '@asyncapi/generator-helpers'
+      - '@asyncapi/generator-components'
+      rebuild_lockfiles: true
+    timeout: 1800
+    on_failure: escalate_to_devsecops
+  - id: step-3
+    name: Revoke exposed credentials and tokens
+    action: rotate_credentials
+    target: identity
+    parameters:
+      include:
+      - github_pat
+      - npm_token
+      - ssh_keys
+      - aws_credentials
+    timeout: 900
+    on_failure: escalate_to_identity_team
+  - id: step-4
+    name: Remove unauthorized commits, releases and workflows
+    action: revert_repository_changes
+    target: repository
+    parameters:
+      scope:
+      - commits
+      - releases
+      - workflows
+    timeout: 1800
+    on_failure: escalate_to_github_admin

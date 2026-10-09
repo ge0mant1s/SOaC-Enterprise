@@ -1,0 +1,151 @@
+{
+  "test_id": "024-L3-001",
+  "package_id": "pkg-024",
+  "description": "Synthetic telemetry for PAN-OS User-ID Authentication Portal Root RCE",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Send crafted traffic to exposed portal",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "Attacker sends crafted requests to an internet-exposed User-ID Authentication Portal."
+      },
+      "expected_detection": "rule-024-001",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Unauthenticated root RCE",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1190",
+          "T1059"
+        ],
+        "description": "Buffer overflow (CVE-2026-0300) yields unauthenticated code execution as root on the firewall."
+      },
+      "expected_detection": "rule-024-002",
+      "mitre": [
+        "T1190",
+        "T1059"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Deploy EarthWorm and ReverseSocks5",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1105",
+          "T1572"
+        ],
+        "description": "Attacker transfers and runs EarthWorm and ReverseSocks5 tunneling tools on the appliance."
+      },
+      "expected_detection": "rule-024-003",
+      "mitre": [
+        "T1105",
+        "T1572"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Active Directory enumeration",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1087",
+          "T1018"
+        ],
+        "description": "From the firewall, the attacker enumerates Active Directory and internal systems."
+      },
+      "expected_detection": "rule-024-001",
+      "mitre": [
+        "T1087",
+        "T1018"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Lateral movement and log cleanup",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1070"
+        ],
+        "description": "Attacker pivots to internal systems and removes logs to hinder investigation."
+      },
+      "expected_detection": "rule-024-002",
+      "mitre": [
+        "T1070"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect appliance-originated tunnels",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1572",
+          "T1105"
+        ],
+        "description": "Blue team flags the firewall initiating sustained encrypted/SOCKS connections to previously unseen destinations."
+      },
+      "expected_detection": "rule-024-003",
+      "mitre": [
+        "T1572",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-10-09T12:12:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Isolate and remediate firewall",
+      "data": {
+        "step": 7,
+        "mitre": [],
+        "description": "SOC isolates the firewall, preserves evidence, removes tooling, upgrades PAN-OS and rotates exposed credentials."
+      },
+      "expected_detection": "rule-024-001",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-024-001",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Firewall appliance initiating reverse SOCKS tunnel"
+    },
+    {
+      "detection_id": "rule-024-002",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "PAN-OS portal exploit alert followed by directory enumeration"
+    },
+    {
+      "detection_id": "rule-024-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "PAN-OS portal exploitation with Threat ID 510019"
+    }
+  ]
+}

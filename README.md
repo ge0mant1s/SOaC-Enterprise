@@ -37,7 +37,7 @@ python quick_start_validation.py
 ---
 
 ### 📂 Repository Structure
-- **`/packages`**: 11 Production-ready Threat Intelligence Packages (Identity, Cloud, SaaS, GenAI, etc.).
+- **`/packages`**: 32 Production-ready Threat Intelligence Packages (Identity, Cloud, SaaS, GenAI, Network Edge, Supply Chain, etc.).
 - **`/core`**: The Master Orchestrator, Normalizer, and Brain Connector logic.
 - **`/docs`**: 
     - `executive/`: CISO Transformation Guide & Board-level KPIs.
@@ -54,14 +54,24 @@ python quick_start_validation.py
 
 ---
 
-### 🛡️ The 11 Core Defense Packages
+### 🛡️ The 32 Threat Intelligence Packages
 | ID | Package Name | Focus Area |
 |:---|:---|:---|
 | **001** | Identity Control Plane | Token Theft, PIM Abuse, MFA Fatigue |
 | **002** | Cloud Control Plane | AWS/Azure Root Abuse, IAM Shadowing |
 | **003** | SaaS Pivot & Extortion | Salesforce, SAP, Google Workspace |
 | **006** | GenAI & LLM Abuse | Prompt Injection, Data Exfiltration |
-| **...** | *See /packages for full list* | *Healthcare, Finance, ICS/SCADA* |
+| **023** | Cisco Catalyst SD-WAN Exploitation | Network Edge RCE, Exploitation Clusters |
+| **024** | PAN-OS Captive Portal Root RCE | Firewall Edge Compromise |
+| **025** | Citrix NetScaler RCE & Webshells | ADC Exploitation, Webshell Persistence |
+| **026** | Dell RecoverPoint Hardcoded Credential | Backup Appliance Compromise |
+| **027** | Linux copy_file_range Container Breakout | Kernel Privilege Escalation |
+| **028** | AsyncAPI Miasma RAT Supply Chain | Package Supply-Chain Compromise |
+| **029** | UAT-11587 Antino M365 API C2 | Cloud API Command & Control |
+| **030** | OpenClaw / ClawHub CVE-2026-25253 | Open-Source Platform Exploitation |
+| **031** | WordPress WP2Shell Chained Takeover | CMS Exploitation Chain |
+| **032** | Windows September 2026 EoP Exploitation | Endpoint Privilege Escalation |
+| **...** | *See /packages for the full 32-package list* | *Healthcare, Finance, ICS/SCADA* |
 
 ---
 
@@ -77,5 +87,5 @@ We believe in **Open Security**. SOaC-Enterprise is built by the community, for 
 - **License:** [Apache License 2.0](./LICENSE).
 - **Compliance:** Designed to meet **GDPR Article 32** and **EU AI Act** transparency requirements.
 
-**Last Updated:** 2026-03-10  
+**Last Updated:** 2026-10-09  
 **Maintainer:** SOaC Community / SOaC-Enterprise Team

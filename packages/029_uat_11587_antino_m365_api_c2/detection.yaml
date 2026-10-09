@@ -1,0 +1,111 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 029-uat-11587-antino-m365-api-c2
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-029
+  mitre_attack:
+  - T1566
+  - T1204
+  - T1059.005
+  - T1059.007
+  - T1218.005
+  - T1574.002
+  - T1620
+  - T1102
+  - T1059.001
+  severity: HIGH
+  data_sources:
+  - M365 / Entra ID audit logs
+  - OAuth sign-in logs
+  - EDR process telemetry
+  - Email security logs
+  - DNS / proxy logs
+spec:
+  description: Detects the UAT-11587 Antino backdoor via DLL sideloading (GatherOsState.exe loading an unexpected slc.dll),
+    signed-utility abuse (sdiagnhost.exe proxying PowerShell) and anomalous Microsoft 365 API C2 (an OAuth principal polling
+    Outlook approximately every 10 seconds and OneDrive approximately every minute). slc.dll, GatherOsState.exe, sdiagnhost.exe
+    and TestAssembly.dll are the publicly named artifacts; because several are legitimate Windows binaries, detection is based
+    on anomalous usage, not their presence alone.
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  - CrowdStrike
+  - MDE
+  inline_rules:
+  - id: rule-029-001
+    name: GatherOsState.exe sideloading unexpected slc.dll
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1574.002
+    severity: high
+    sigma_description: Detects GatherOsState.exe loading slc.dll from a non-system path (Antino DLL sideloading). GatherOsState.exe
+      and slc.dll are otherwise legitimate Windows components.
+    logsource:
+      category: image_load
+      product: windows
+    sigma_detection:
+      selection:
+        Image|endswith: \GatherOsState.exe
+        ImageLoaded|endswith: \slc.dll
+      filter:
+        ImageLoaded|startswith: C:\Windows\System32\
+      condition: selection and not filter
+    query: |-
+      title: GatherOsState.exe Sideloading Unexpected slc.dll
+      logsource:
+        category: image_load
+        product: windows
+      detection:
+        selection:
+          Image|endswith: '\GatherOsState.exe'
+          ImageLoaded|endswith: '\slc.dll'
+        filter:
+          ImageLoaded|startswith: 'C:\Windows\System32\'
+        condition: selection and not filter
+  - id: rule-029-002
+    name: sdiagnhost.exe proxying PowerShell execution
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1218
+    - T1059.001
+    severity: high
+    query: |-
+      // sdiagnhost.exe spawning PowerShell (Antino signed-utility proxy abuse)
+      DeviceProcessEvents
+      | where InitiatingProcessFileName =~ "sdiagnhost.exe"
+      | where FileName in~ ("powershell.exe", "pwsh.exe")
+      | project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, FileName, ProcessCommandLine
+  - id: rule-029-003
+    name: Anomalous M365 OAuth polling of Outlook/OneDrive
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1102
+    severity: high
+    query: |-
+      // Antino M365 API C2: principal polling Outlook ~10s and OneDrive ~1min
+      let window = 10m;
+      OfficeActivity
+      | where Operation in ("MailItemsAccessed", "FileAccessed", "FileDownloaded")
+      | summarize reqs=count(), apps=make_set(ClientAppId) by UserId, bin(TimeGenerated, 1m)
+      | where reqs > 30
+      | project TimeGenerated, UserId, reqs, apps
+  test_cases:
+  - id: tc-29-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-29-002
+    name: UAT-11587 Antino exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-29-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

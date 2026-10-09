@@ -1,0 +1,51 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 031-wordpress-wp2shell-chained-takeover-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - wordpress
+  - wp2shell
+  - cve-2026-60137
+  - cve-2026-63030
+  - web-exploitation
+  - chained-exploit
+  mitre_attack:
+  - T1190
+  severity: HIGH
+  package_id: pkg-031
+spec:
+  steps:
+  - id: step-5
+    name: Preserve forensic evidence
+    action: collect_logs
+    target: wordpress
+    parameters:
+      sources:
+      - web_access
+      - waf
+      - application
+      - db
+    timeout: 300
+    on_failure: continue
+  - id: step-6
+    name: Investigate for behavioral takeover indicators
+    action: initiate_hunt
+    target: wordpress
+    parameters:
+      scope:
+      - admin_sessions
+      - content_changes
+      - outbound_connections
+    timeout: 900
+    on_failure: continue
+  - id: step-7
+    name: Restore from known-good backup
+    action: restore_backup
+    target: wordpress
+    parameters:
+      verify_integrity: true
+    timeout: 3600
+    on_failure: escalate_to_web_team

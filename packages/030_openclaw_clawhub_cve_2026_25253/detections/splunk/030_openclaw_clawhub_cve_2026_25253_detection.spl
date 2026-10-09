@@ -1,0 +1,6 @@
+// OpenClaw / ClawHub Malicious Skills & Control-UI RCE (CVE-2026-25253) — Splunk detection
+// MITRE: T1195.002, T1204.001, T1204.002, T1059.004, T1105, T1190, T1555
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=edr parent_process=*openclaw* process IN (bash,sh,zsh) 
+| search (command="*base64 -d*" OR command="*base64 --decode*") 
+| table _time host user parent_process command

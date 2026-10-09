@@ -1,0 +1,42 @@
+package_id: pkg-029
+title: UAT-11587 Antino Backdoor & Microsoft 365 API C2
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: Espionage
+category: SaaS
+categories:
+- SaaS
+- Identity
+- Endpoint
+primary_category: SaaS
+mitre_techniques:
+- T1566
+- T1204
+- T1059.005
+- T1059.007
+- T1218.005
+- T1574.002
+- T1620
+- T1102
+- T1059.001
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- CrowdStrike
+- MDE
+- Identity
+- Endpoint
+- SaaS
+- Network
+source_type: url
+source_urls:
+- https://blog.talosintelligence.com/china-nexus-uat-11587-targets-government-and-policy-organizations-across-asia-with-antino-backdoor/
+- https://thehackernews.com/2026/10/antino-backdoor-uses-outlook-and.html
+confidence: 0.85
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

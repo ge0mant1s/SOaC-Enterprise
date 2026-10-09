@@ -1,0 +1,35 @@
+package_id: pkg-026
+title: Dell RecoverPoint for Virtual Machines Hardcoded Credential Exploitation
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: virtual-infrastructure-persistence
+category: Cloud
+categories:
+- Cloud
+- Identity
+- Network
+primary_category: Cloud
+mitre_techniques:
+- T1078
+- T1133
+- T1059
+- T1543
+- T1021
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- Identity
+- Network
+source_type: url
+source_urls:
+- https://www.dell.com/support/kbdoc/en-us/000426773/dsa-2026-079
+- https://www.dell.com/support/kbdoc/en-us/000426742/recoverpoint-for-vms-apply-the-remediation-script-for-dsa
+- https://cloud.google.com/blog/topics/threat-intelligence/unc6201-exploiting-dell-recoverpoint-zero-day
+confidence: 0.8
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

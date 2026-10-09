@@ -1,0 +1,96 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 026-dell-recoverpoint-hardcoded-credential
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-026
+  mitre_attack:
+  - T1078
+  - T1133
+  - T1059
+  - T1543
+  - T1021
+  severity: CRITICAL
+  data_sources:
+  - RecoverPoint appliance logs
+  - SSH authentication logs
+  - VMware vCenter/ESXi logs
+  - Network flow
+  - Identity logs
+spec:
+  description: 'Detects RecoverPoint hardcoded-credential exploitation behaviors: appliance access from unapproved identity
+    paths, root sessions without maintenance tickets, and appliances initiating connections to VMware management infrastructure.
+    GRIMBOLT and BRICKSTORM are named backdoors; no hashes/IPs/paths are established, so detection of remote root access and
+    unusual VMware connections is behavioral/engineering logic.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  inline_rules:
+  - id: rule-026-001
+    name: RecoverPoint access from unapproved identity path
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1078
+    - T1133
+    severity: high
+    query: |-
+      // Behavioral: successful RecoverPoint appliance access from a source/account not in the approved management inventory.
+      let approvedSources = dynamic(["10.0.0.0/8_mgmt"]);
+      Syslog
+      | where Computer has "recoverpoint" or SyslogMessage has "RecoverPoint"
+      | where SyslogMessage has_any ("Accepted", "login", "session opened")
+      | extend src = extract(@"from ([0-9]{1,3}(?:\.[0-9]{1,3}){3})", 1, SyslogMessage), user = extract(@"for ([A-Za-z0-9_\-]+)", 1, SyslogMessage)
+      | where isnotempty(src)
+      | project TimeGenerated, Computer, src, user, SyslogMessage
+  - id: rule-026-002
+    name: RecoverPoint root session without maintenance ticket
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1078
+    - T1543
+    severity: high
+    sigma_description: Detects a root session or persistence-related service change on a RecoverPoint appliance absent a maintenance
+      change record (behavioral).
+    logsource:
+      product: linux
+      service: auth
+    sigma_detection:
+      selection:
+        message|contains:
+        - session opened for user root
+        - 'systemd: new service'
+        - service created
+      condition: selection
+    query: message contains session opened for user root
+  - id: rule-026-003
+    name: RecoverPoint appliance connecting to VMware management
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1021
+    severity: high
+    query: |-
+      // Behavioral: RecoverPoint appliance initiating connections to vCenter/ESXi management outside normal replication/management peers.
+      CommonSecurityLog
+      | where SourceHostName has "recoverpoint" or Computer has "recoverpoint"
+      | where DestinationPort in (443, 902, 22)
+      | summarize Count=count(), Dests=make_set(DestinationIP, 20) by SourceHostName, bin(TimeGenerated, 1h)
+      | where Count > 5
+  test_cases:
+  - id: tc-026-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-026-002
+    name: Dell RecoverPoint exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-026-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

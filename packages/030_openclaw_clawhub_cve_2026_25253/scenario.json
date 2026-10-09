@@ -1,0 +1,127 @@
+{
+  "package_id": "pkg-030",
+  "title": "OpenClaw / ClawHub Malicious Skills & Control-UI RCE (CVE-2026-25253)",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Resource Development",
+      "pillar": "Offense",
+      "title": "Marketplace poisoning / typosquatting",
+      "text": "Malicious skills are published to ClawHub using typosquatted names and poisoned SKILL.md prerequisites.",
+      "description": "Malicious skills are published to ClawHub using typosquatted names and poisoned SKILL.md prerequisites.",
+      "mitre": [
+        "T1195.002"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1195.002 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "User installs malicious skill",
+      "text": "A user installs a malicious skill whose SKILL.md prerequisites trigger execution.",
+      "description": "A user installs a malicious skill whose SKILL.md prerequisites trigger execution.",
+      "mitre": [
+        "T1204.002"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1204.002 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Encoded shell and archive staging",
+      "text": "The skill runs Base64-encoded shell commands and fetches password-protected archives.",
+      "description": "The skill runs Base64-encoded shell commands and fetches password-protected archives.",
+      "mitre": [
+        "T1059.004",
+        "T1105"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1059.004, T1105 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Credential Access",
+      "pillar": "Offense",
+      "title": "AMOS stealer deployment",
+      "text": "AMOS (Atomic macOS Stealer) is deployed to harvest browser, Keychain and crypto credentials.",
+      "description": "AMOS (Atomic macOS Stealer) is deployed to harvest browser, Keychain and crypto credentials.",
+      "mitre": [
+        "T1555"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1555 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Control UI WebSocket hijack (CVE-2026-25253)",
+      "text": "Alternatively, a malicious link abuses the Control UI gatewayUrl to hijack the WebSocket and execute host commands.",
+      "description": "Alternatively, a malicious link abuses the Control UI gatewayUrl to hijack the WebSocket and execute host commands.",
+      "mitre": [
+        "T1190"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1190 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Host command execution via hijacked gateway",
+      "text": "The hijacked WebSocket is used to run arbitrary commands on the host.",
+      "description": "The hijacked WebSocket is used to run arbitrary commands on the host.",
+      "mitre": [
+        "T1059.004"
+      ],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Monitor for T1059.004 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 7,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "title": "Detect malicious skills and Control-UI abuse",
+      "text": "Blue team detects encoded shell execution from skills and anomalous WebSocket connections to the Control UI gatewayUrl.",
+      "description": "Blue team detects encoded shell execution from skills and anomalous WebSocket connections to the Control UI gatewayUrl.",
+      "mitre": [
+        "T1059.004",
+        "T1190"
+      ],
+      "expectedOutcome": "Step 7 completes successfully",
+      "detectionHints": "Monitor for T1059.004, T1190 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 8,
+      "role": "SOC Team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "title": "Contain and remediate",
+      "text": "SOC removes untrusted skills, upgrades to v2026.1.29, isolates hosts, revokes credentials and rebuilds agents.",
+      "description": "SOC removes untrusted skills, upgrades to v2026.1.29, isolates hosts, revokes credentials and rebuilds agents.",
+      "mitre": [],
+      "expectedOutcome": "Step 8 completes successfully",
+      "detectionHints": "Behavioral monitoring (no source-reported IOC)",
+      "playbookRefs": []
+    }
+  ]
+}

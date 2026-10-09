@@ -1,0 +1,119 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 030-openclaw-clawhub-cve-2026-25253
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-030
+  mitre_attack:
+  - T1195.002
+  - T1204.001
+  - T1204.002
+  - T1059.004
+  - T1105
+  - T1190
+  - T1555
+  severity: HIGH
+  data_sources:
+  - EDR process telemetry
+  - Endpoint file/shell telemetry
+  - Network / WebSocket logs
+  - ClawHub / marketplace audit
+  - Cloud audit logs
+spec:
+  description: 'Detects OpenClaw/ClawHub abuse through two paths: (1) malicious-skill execution — Base64-encoded shell commands
+    and password-protected archive retrieval initiated by the OpenClaw agent — and (2) Control-UI exploitation — anomalous
+    WebSocket connections to the gatewayUrl (CVE-2026-25253) followed by host command execution. SKILL.md, Base64 shell payloads,
+    password-protected ZIPs and AMOS are generic artifacts; detection is behavioral and must not treat these as malicious
+    in isolation.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  - CrowdStrike
+  - Wazuh
+  - MDE
+  inline_rules:
+  - id: rule-030-001
+    name: OpenClaw skill spawning Base64-encoded shell
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1059.004
+    - T1204.002
+    severity: high
+    sigma_description: Detects the OpenClaw agent spawning a shell with Base64-encoded commands shortly after skill installation
+      (behavioral; encoded shell is also used legitimately).
+    logsource:
+      category: process_creation
+      product: linux
+    sigma_detection:
+      selection:
+        ParentImage|contains: openclaw
+        Image|endswith:
+        - /bash
+        - /sh
+        - /zsh
+        CommandLine|contains:
+        - base64 -d
+        - base64 --decode
+        - '| base64'
+      condition: selection
+    query: |-
+      title: OpenClaw Skill Spawning Base64-Encoded Shell
+      logsource:
+        category: process_creation
+        product: linux
+      detection:
+        selection:
+          ParentImage|contains: 'openclaw'
+          Image|endswith:
+            - '/bash'
+            - '/sh'
+            - '/zsh'
+          CommandLine|contains:
+            - 'base64 -d'
+            - 'base64 --decode'
+            - '| base64'
+        condition: selection
+  - id: rule-030-002
+    name: Anomalous WebSocket to OpenClaw Control UI gatewayUrl
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1190
+    severity: high
+    query: |-
+      // Control UI gatewayUrl WebSocket hijack (CVE-2026-25253)
+      DeviceNetworkEvents
+      | where RemoteUrl has "gatewayUrl" or (Protocol == "Ws" or Protocol == "Wss")
+      | where InitiatingProcessFileName has_any ("openclaw", "Control UI", "controlui")
+      | where RemoteIPType == "Public"
+      | project Timestamp, DeviceName, RemoteUrl, RemoteIP, InitiatingProcessFileName
+  - id: rule-030-003
+    name: AMOS post-exploitation credential access on macOS
+    format: kql
+    platform: MDE
+    mitre:
+    - T1555
+    severity: high
+    query: |-
+      // AMOS-style Keychain/browser credential access following skill install
+      DeviceProcessEvents
+      | where ProcessCommandLine has_any ("security find-generic-password", "login.keychain", "Cookies", "Local Storage")
+      | where InitiatingProcessParentFileName has_any ("openclaw", "osascript")
+      | project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessParentFileName
+  test_cases:
+  - id: tc-30-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-30-002
+    name: OpenClaw ClawHub exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-30-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

@@ -1,0 +1,138 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 024-panos-captive-portal-root-rce-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - palo-alto
+  - pan-os
+  - captive-portal
+  - user-id
+  - cve-2026-0300
+  - cl-sta-1132
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1105
+  - T1572
+  - T1087
+  - T1018
+  - T1070
+  severity: CRITICAL
+  package_id: pkg-024
+spec:
+  description: 'CLAW response playbook for suspected PAN-OS Captive Portal root RCE: restrict/disable the portal, isolate
+    the firewall, preserve evidence, remove tooling and upgrade PAN-OS.'
+  trigger:
+    source: BRAIN
+    conditions:
+    - field: alert.title
+      operator: contains
+      value: PAN-OS Captive Portal
+    - field: alert.severity
+      operator: gte
+      value: HIGH
+    cooldown: 2m
+  inputs:
+  - name: alert_id
+    type: string
+    required: true
+    description: Unique identifier for the triggering alert
+  - name: affected_asset
+    type: string
+    required: true
+    description: FQDN, IP, or identifier of the affected asset
+  - name: source_ip
+    type: string
+    required: false
+    description: Source IP address associated with the activity
+  steps:
+  - id: step-1
+    name: restrict-portal-access
+    action: api_call
+    target: firewall_config
+    parameters:
+      portal: user-id-auth
+      allow: trusted_internal_only
+      disable_if_unused: true
+    timeout: 120s
+    on_failure: escalate
+  - id: step-2
+    name: block-untrusted-response-pages
+    action: api_call
+    target: firewall_config
+    parameters:
+      response_pages: block_untrusted_interfaces
+    timeout: 90s
+    on_failure: continue
+  - id: step-3
+    name: isolate-firewall
+    action: api_call
+    target: network_control
+    parameters:
+      asset: affected_firewall
+      mode: isolate_on_root_exec_or_tunnel
+    timeout: 180s
+    on_failure: escalate
+  - id: step-4
+    name: preserve-evidence
+    action: script
+    target: evidence_collector
+    parameters:
+      artifacts:
+      - config
+      - core_files
+      - system_logs
+      - network_flows
+      - admin_history
+    timeout: 300s
+    on_failure: continue
+  - id: step-5
+    name: remove-unauthorized-binaries
+    action: script
+    target: firewall
+    parameters:
+      remove:
+      - EarthWorm
+      - ReverseSocks5
+      - persistence
+      after: evidence_collection
+    timeout: 180s
+    on_failure: escalate
+  - id: step-6
+    name: upgrade-panos
+    action: api_call
+    target: patch_manager
+    parameters:
+      cve: CVE-2026-0300
+      target: fixed_release
+    timeout: 600s
+    on_failure: escalate
+  - id: step-7
+    name: rotate-exposed-credentials
+    action: api_call
+    target: identity_provider
+    parameters:
+      scope: credentials_visible_to_or_traversing_appliance
+    timeout: 180s
+    on_failure: escalate
+  outputs:
+  - name: containment_status
+    type: string
+    description: Status of containment actions
+  - name: exploitation_confidence
+    type: string
+    description: Confidence level of successful exploitation
+  - name: affected_assets
+    type: array
+    description: List of impacted assets or accounts
+  rollback:
+    steps:
+    - id: rb-1
+      name: restore-service-availability
+      action: script
+    - id: rb-2
+      name: remove-temporary-isolation
+      action: api_call

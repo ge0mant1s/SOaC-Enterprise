@@ -1,0 +1,164 @@
+{
+  "test_id": "30-L3-001",
+  "package_id": "pkg-030",
+  "description": "Synthetic telemetry for OpenClaw / ClawHub Malicious Skills & Control-UI RCE (CVE-2026-25253)",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Marketplace poisoning / typosquatting",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1195.002"
+        ],
+        "description": "Malicious skills are published to ClawHub using typosquatted names and poisoned SKILL.md prerequisites."
+      },
+      "expected_detection": "rule-030-001",
+      "mitre": [
+        "T1195.002"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "User installs malicious skill",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1204.002"
+        ],
+        "description": "A user installs a malicious skill whose SKILL.md prerequisites trigger execution."
+      },
+      "expected_detection": "rule-030-002",
+      "mitre": [
+        "T1204.002"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Encoded shell and archive staging",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1059.004",
+          "T1105"
+        ],
+        "description": "The skill runs Base64-encoded shell commands and fetches password-protected archives."
+      },
+      "expected_detection": "rule-030-003",
+      "mitre": [
+        "T1059.004",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "AMOS stealer deployment",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1555"
+        ],
+        "description": "AMOS (Atomic macOS Stealer) is deployed to harvest browser, Keychain and crypto credentials."
+      },
+      "expected_detection": "rule-030-001",
+      "mitre": [
+        "T1555"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Control UI WebSocket hijack (CVE-2026-25253)",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "Alternatively, a malicious link abuses the Control UI gatewayUrl to hijack the WebSocket and execute host commands."
+      },
+      "expected_detection": "rule-030-002",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Host command execution via hijacked gateway",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1059.004"
+        ],
+        "description": "The hijacked WebSocket is used to run arbitrary commands on the host."
+      },
+      "expected_detection": "rule-030-003",
+      "mitre": [
+        "T1059.004"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-10-09T12:12:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect malicious skills and Control-UI abuse",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1059.004",
+          "T1190"
+        ],
+        "description": "Blue team detects encoded shell execution from skills and anomalous WebSocket connections to the Control UI gatewayUrl."
+      },
+      "expected_detection": "rule-030-001",
+      "mitre": [
+        "T1059.004",
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2026-10-09T12:14:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Contain and remediate",
+      "data": {
+        "step": 8,
+        "mitre": [],
+        "description": "SOC removes untrusted skills, upgrades to v2026.1.29, isolates hosts, revokes credentials and rebuilds agents."
+      },
+      "expected_detection": "rule-030-002",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-030-001",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "OpenClaw skill spawning Base64-encoded shell"
+    },
+    {
+      "detection_id": "rule-030-002",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Anomalous WebSocket to OpenClaw Control UI gatewayUrl"
+    },
+    {
+      "detection_id": "rule-030-003",
+      "file": "detection.yaml",
+      "platform": "MDE",
+      "description": "AMOS post-exploitation credential access on macOS"
+    }
+  ]
+}

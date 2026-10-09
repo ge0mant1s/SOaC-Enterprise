@@ -1,0 +1,57 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: 024-panos-captive-portal-root-rce-mitigation
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-024
+  scope: package
+  tags:
+  - palo-alto
+  - pan-os
+  - captive-portal
+  - user-id
+  - cve-2026-0300
+  - cl-sta-1132
+spec:
+  description: Governance policy to restrict User-ID Authentication Portal access to trusted internal IPs, disable response
+    pages on untrusted interfaces, apply vendor updates and enable Advanced Threat Prevention where licensed.
+  environments:
+  - name: lab
+    mode: testing
+    data_handling: relaxed
+  - name: staging
+    mode: staging
+    data_handling: standard
+  - name: production
+    mode: production
+    data_handling: strict
+  access_control:
+    required_roles:
+    - Network Security Engineer
+    - Incident Responder
+    - Identity Engineer
+    approval_workflow: true
+  compliance_frameworks:
+  - NIST CSF 2.0
+  - ISO/IEC 27001:2022
+  - MITRE ATT&CK
+  - CIS Controls v8
+  controls:
+  - name: Portal access restriction
+    description: Restrict User-ID Authentication Portal access to trusted internal IP addresses or disable it where unnecessary.
+    enforcement: mandatory
+    evidence: Firewall configuration review
+  - name: Response-page hardening
+    description: Disable response pages on untrusted interfaces.
+    enforcement: mandatory
+    evidence: Interface configuration audit
+  - name: Advanced Threat Prevention coverage
+    description: Enable Threat ID 510019 protection where licensed.
+    enforcement: recommended
+    evidence: ATP profile configuration
+  - name: Firmware patch management
+    description: Apply the fixed PAN-OS release for CVE-2026-0300.
+    enforcement: mandatory
+    evidence: Patch records

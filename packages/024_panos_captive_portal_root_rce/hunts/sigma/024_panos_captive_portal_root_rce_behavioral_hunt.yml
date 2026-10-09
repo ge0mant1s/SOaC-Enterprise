@@ -1,0 +1,17 @@
+title: Portal crash followed by log-service gap
+id: query-024-002
+status: hunt
+description: A portal crash immediately followed by a log-service interruption on the same firewall warrants investigation.
+logsource:
+  category: firewall
+  product: panos
+detection:
+  selection:
+    log_type:
+    - system
+    eventid|contains:
+    - crash
+    - general
+    - log-collector
+  condition: selection
+level: high

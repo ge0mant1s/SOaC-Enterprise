@@ -1,0 +1,129 @@
+{
+  "package_id": "pkg-029",
+  "title": "UAT-11587 Antino Backdoor & Microsoft 365 API C2",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Spearphishing with HTML preview clones",
+      "text": "Targets receive spearphishing emails with HTML attachment-preview clones linking to Cloudflare-hosted files.",
+      "description": "Targets receive spearphishing emails with HTML attachment-preview clones linking to Cloudflare-hosted files.",
+      "mitre": [
+        "T1566"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1566 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "User executes staged HTA/WSF",
+      "text": "User interaction launches HTA/WSF staging scripts.",
+      "description": "User interaction launches HTA/WSF staging scripts.",
+      "mitre": [
+        "T1204",
+        "T1059.005"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1204, T1059.005 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "title": "In-memory .NET deserialization",
+      "text": "Encrypted JavaScript/.NET payloads are deserialized and executed in memory.",
+      "description": "Encrypted JavaScript/.NET payloads are deserialized and executed in memory.",
+      "mitre": [
+        "T1620",
+        "T1059.007"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1620, T1059.007 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "title": "DLL sideloading via signed utility",
+      "text": "A signed utility (GatherOsState.exe) sideloads a malicious slc.dll.",
+      "description": "A signed utility (GatherOsState.exe) sideloads a malicious slc.dll.",
+      "mitre": [
+        "T1574.002",
+        "T1218.005"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1574.002, T1218.005 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Red Team",
+      "phase": "Defense Evasion",
+      "pillar": "Offense",
+      "title": "PowerShell proxying and sleep masking",
+      "text": "sdiagnhost.exe proxies PowerShell execution and the backdoor uses sleep masking to evade detection.",
+      "description": "sdiagnhost.exe proxies PowerShell execution and the backdoor uses sleep masking to evade detection.",
+      "mitre": [
+        "T1059.001"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1059.001 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "Red Team",
+      "phase": "Command and Control",
+      "pillar": "Offense",
+      "title": "Microsoft 365 API command-and-control",
+      "text": "The Antino backdoor polls Outlook (~every 10s) and OneDrive (~every minute) via OAuth for tasking.",
+      "description": "The Antino backdoor polls Outlook (~every 10s) and OneDrive (~every minute) via OAuth for tasking.",
+      "mitre": [
+        "T1102"
+      ],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Monitor for T1102 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 7,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "title": "Detect sideloading and M365 API C2",
+      "text": "Blue team detects GatherOsState.exe loading an unexpected slc.dll and anomalous OAuth polling of Outlook/OneDrive.",
+      "description": "Blue team detects GatherOsState.exe loading an unexpected slc.dll and anomalous OAuth polling of Outlook/OneDrive.",
+      "mitre": [
+        "T1574.002",
+        "T1102"
+      ],
+      "expectedOutcome": "Step 7 completes successfully",
+      "detectionHints": "Monitor for T1574.002, T1102 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 8,
+      "role": "SOC Team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "title": "Contain and evict the backdoor",
+      "text": "SOC isolates hosts, revokes OAuth grants/tokens, removes persistence and hunts for lateral movement.",
+      "description": "SOC isolates hosts, revokes OAuth grants/tokens, removes persistence and hunts for lateral movement.",
+      "mitre": [],
+      "expectedOutcome": "Step 8 completes successfully",
+      "detectionHints": "Behavioral monitoring (no source-reported IOC)",
+      "playbookRefs": []
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+// Behavioral: burst of unusual requests to NetScaler followed by process execution / PHP creation.
+let burst = CommonSecurityLog
+| where DeviceProduct has "NetScaler"
+| summarize Reqs=count() by SourceIP, bin(TimeGenerated, 5m)
+| where Reqs > 50;
+burst
+| join kind=leftouter (DeviceProcessEvents | where InitiatingProcessFileName in~ ("httpd","nsppe","php")) on $left.TimeGenerated == $right.TimeGenerated
+| project TimeGenerated, SourceIP, Reqs, FileName, ProcessCommandLine

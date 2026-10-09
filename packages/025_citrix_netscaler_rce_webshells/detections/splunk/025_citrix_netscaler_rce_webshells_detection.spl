@@ -1,0 +1,8 @@
+// Citrix NetScaler ADC/Gateway RCE and Web-Shell Activity — Splunk detection
+// MITRE: T1190, T1059, T1505.003, T1105, T1572, T1083, T1041
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=netscaler (sourcetype=citrix:netscaler:* )
+| transaction host maxspan=10m
+| search (eventtype=web_request AND status>=500) OR process IN ("sh","bash","python","php")
+| stats count values(process) as processes values(file_path) as files by host
+| where count>10

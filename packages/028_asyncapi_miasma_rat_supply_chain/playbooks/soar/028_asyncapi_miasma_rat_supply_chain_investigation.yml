@@ -1,0 +1,68 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 028-asyncapi-miasma-rat-supply-chain-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - supply-chain
+  - npm
+  - asyncapi
+  - miasma-rat
+  - pull-request-target
+  - ipfs
+  mitre_attack:
+  - T1195.002
+  - T1552
+  - T1059.007
+  - T1105
+  - T1543.002
+  - T1053.003
+  - T1018
+  - T1102
+  severity: HIGH
+  package_id: pkg-028
+spec:
+  steps:
+  - id: step-5
+    name: Block Miasma RAT C2 indicators
+    action: block_iocs
+    target: network
+    parameters:
+      ips:
+      - 85.137.53.71
+      ports:
+      - 8080
+      - 8081
+      - 8091
+    timeout: 120
+    on_failure: continue
+  - id: step-6
+    name: Preserve forensic evidence
+    action: collect_logs
+    target: endpoint
+    parameters:
+      sources:
+      - process
+      - network
+      - github_audit
+      - ci_runner
+    timeout: 300
+    on_failure: continue
+  - id: step-7
+    name: Reimage compromised endpoints
+    action: reimage_host
+    target: endpoint
+    parameters:
+      from_clean_image: true
+    timeout: 3600
+    on_failure: escalate_to_ir_team
+  - id: step-8
+    name: Reissue packages from verified commits
+    action: rebuild_from_verified_source
+    target: repository
+    parameters:
+      require_signed_commits: true
+    timeout: 1800
+    on_failure: escalate_to_devsecops

@@ -1,0 +1,26 @@
+{
+  "source_type": "url",
+  "source_name": "https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1068",
+    "T1611",
+    "T1059"
+  ],
+  "attack_chain": [
+    "Unprivileged execution",
+    "AF_ALG + splice() abuse",
+    "Page-cache corruption to root",
+    "Container escape to host",
+    "Host-level actions on objectives"
+  ],
+  "platforms": [
+    "MISP",
+    "OpenCTI"
+  ],
+  "detection_surfaces": [
+    "Linux endpoints",
+    "Container runtime",
+    "Kubernetes nodes"
+  ]
+}

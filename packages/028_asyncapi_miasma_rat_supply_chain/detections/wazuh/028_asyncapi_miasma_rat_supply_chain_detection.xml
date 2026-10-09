@@ -1,0 +1,14 @@
+<group name="soac,supply_chain,asyncapi,miasma_rat,">
+  <rule id="920281" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="command" type="pcre2">@asyncapi/(generator@3\.3\.1|specs@6\.11\.2|generator-helpers|generator-components)</field>
+    <description>AsyncAPI supply-chain: installation of known-compromised @asyncapi/* package version.</description>
+    <mitre><id>T1195.002</id></mitre>
+  </rule>
+  <rule id="920282" level="14">
+    <if_sid>920281</if_sid>
+    <field name="dstip">85.137.53.71</field>
+    <description>Miasma RAT: host with compromised AsyncAPI package connecting to known C2 (85.137.53.71).</description>
+    <mitre><id>T1105</id><id>T1102</id></mitre>
+  </rule>
+</group>

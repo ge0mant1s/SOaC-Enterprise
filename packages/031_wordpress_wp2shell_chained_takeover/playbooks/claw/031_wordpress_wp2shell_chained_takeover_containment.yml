@@ -1,0 +1,59 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 031-wordpress-wp2shell-chained-takeover-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - wordpress
+  - wp2shell
+  - cve-2026-60137
+  - cve-2026-63030
+  - web-exploitation
+  - chained-exploit
+  mitre_attack:
+  - T1190
+  severity: HIGH
+  package_id: pkg-031
+spec:
+  steps:
+  - id: step-1
+    name: Patch chained vulnerabilities
+    action: patch_software
+    target: wordpress
+    parameters:
+      cves:
+      - CVE-2026-60137
+      - CVE-2026-63030
+    timeout: 1800
+    on_failure: escalate_to_web_team
+  - id: step-2
+    name: Isolate affected site
+    action: isolate_site
+    target: wordpress
+    parameters:
+      mode: maintenance_or_offline
+    timeout: 300
+    on_failure: escalate_to_web_team
+  - id: step-3
+    name: Deploy virtual patch / WAF rule
+    action: apply_waf_rule
+    target: waf
+    parameters:
+      signatures:
+      - wp2shell_chain
+    timeout: 300
+    on_failure: continue
+  - id: step-4
+    name: Reset WordPress and hosting credentials
+    action: rotate_credentials
+    target: wordpress
+    parameters:
+      include:
+      - admin_accounts
+      - db
+      - hosting
+      - api_keys
+    timeout: 900
+    on_failure: escalate_to_identity_team

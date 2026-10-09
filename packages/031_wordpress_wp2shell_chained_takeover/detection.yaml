@@ -1,0 +1,103 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 031-wordpress-wp2shell-chained-takeover
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-031
+  mitre_attack:
+  - T1190
+  severity: HIGH
+  data_sources:
+  - Web server access logs
+  - WAF logs
+  - WordPress application logs
+  - Cloud audit logs
+  - Network flow logs
+spec:
+  description: 'Detects WP2Shell exploitation primarily at the exploitation stage (T1190): anomalous request bursts and exploit
+    signatures targeting the WordPress attack surface. Because public evidence is limited to the WP2Shell name and two CVE
+    IDs, post-takeover detections (admin-session anomalies, content changes, outbound connections) are modeled as behavioral
+    indicators and are not mapped to asserted ATT&CK techniques beyond T1190.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  - Wazuh
+  inline_rules:
+  - id: rule-031-001
+    name: Anomalous request burst against WordPress endpoints
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1190
+    severity: high
+    sigma_description: Detects anomalous bursts of requests to WordPress admin/XML-RPC/REST endpoints consistent with chained
+      WP2Shell exploitation (behavioral).
+    logsource:
+      category: webserver
+    sigma_detection:
+      selection:
+        cs-uri-stem|contains:
+        - /wp-admin/
+        - /xmlrpc.php
+        - /wp-json/
+        - /wp-login.php
+      timeframe: 1m
+      condition: selection | count() by c-ip > 100
+    query: |-
+      title: Anomalous Request Burst Against WordPress Endpoints (WP2Shell)
+      logsource:
+        category: webserver
+      detection:
+        selection:
+          cs-uri-stem|contains:
+            - '/wp-admin/'
+            - '/xmlrpc.php'
+            - '/wp-json/'
+            - '/wp-login.php'
+        timeframe: 1m
+        condition: selection | count() by c-ip > 100
+  - id: rule-031-002
+    name: WordPress exploitation signature (chained CVEs)
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1190
+    severity: high
+    query: |-
+      // WP2Shell exploitation attempts against WordPress attack surface
+      W3CIISLog
+      | where csUriStem has_any ("/wp-admin/", "/wp-json/", "/xmlrpc.php")
+      | where scStatus in (200, 500) and csMethod in ("POST", "PUT")
+      | summarize attempts=count() by cIp, bin(TimeGenerated, 5m)
+      | where attempts > 50
+      | project TimeGenerated, cIp, attempts
+  - id: rule-031-003
+    name: Behavioral post-takeover anomalies (admin session + content change)
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1190
+    severity: medium
+    query: |-
+      // Behavioral: successful admin session followed by content change / outbound connection
+      // NOTE: post-takeover techniques are behavioral; not asserted beyond initial access.
+      W3CIISLog
+      | where csUriStem has "/wp-admin/" and scStatus == 200
+      | join kind=inner (W3CIISLog | where csUriStem has_any ("/wp-admin/post.php", "/wp-admin/theme-editor.php", "/wp-admin/plugin-editor.php")) on cIp
+      | project TimeGenerated, cIp, csUriStem, csMethod
+  test_cases:
+  - id: tc-31-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-31-002
+    name: WordPress WP2Shell exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-31-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

@@ -1,0 +1,128 @@
+{
+  "test_id": "026-L3-001",
+  "package_id": "pkg-026",
+  "description": "Synthetic telemetry for Dell RecoverPoint for Virtual Machines Hardcoded Credential Exploitation",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Syslog",
+      "event_name": "Use hardcoded credential for remote access",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1078",
+          "T1133"
+        ],
+        "description": "Attacker uses the hardcoded credential (CVE-2026-22769) to access a network-reachable RecoverPoint for VMs appliance."
+      },
+      "expected_detection": "rule-026-001",
+      "mitre": [
+        "T1078",
+        "T1133"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Syslog",
+      "event_name": "Obtain operating-system access",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1059"
+        ],
+        "description": "Attacker reaches the underlying OS and executes commands as a privileged user."
+      },
+      "expected_detection": "rule-026-002",
+      "mitre": [
+        "T1059"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Syslog",
+      "event_name": "Establish root persistence",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1543"
+        ],
+        "description": "Attacker establishes root-level persistence; GRIMBOLT/BRICKSTORM backdoors reported. (T1543 enabled only if local validation confirms service creation \u2014 behavioral.)"
+      },
+      "expected_detection": "rule-026-003",
+      "mitre": [
+        "T1543"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Syslog",
+      "event_name": "Pivot toward VMware infrastructure",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1021"
+        ],
+        "description": "Attacker uses remote services to move into connected VMware virtual infrastructure."
+      },
+      "expected_detection": "rule-026-001",
+      "mitre": [
+        "T1021"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Syslog",
+      "event_name": "Detect root access without maintenance ticket",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1078"
+        ],
+        "description": "Blue team alerts on RecoverPoint access from an unapproved identity path and root sessions without a corresponding maintenance ticket."
+      },
+      "expected_detection": "rule-026-002",
+      "mitre": [
+        "T1078"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Syslog",
+      "event_name": "Contain and rebuild appliance",
+      "data": {
+        "step": 6,
+        "mitre": [],
+        "description": "SOC blocks untrusted access, applies the fixed release / remediation script, treats root access as an integrity failure and rebuilds as appropriate."
+      },
+      "expected_detection": "rule-026-003",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-026-001",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "RecoverPoint access from unapproved identity path"
+    },
+    {
+      "detection_id": "rule-026-002",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "RecoverPoint root session without maintenance ticket"
+    },
+    {
+      "detection_id": "rule-026-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "RecoverPoint appliance connecting to VMware management"
+    }
+  ]
+}

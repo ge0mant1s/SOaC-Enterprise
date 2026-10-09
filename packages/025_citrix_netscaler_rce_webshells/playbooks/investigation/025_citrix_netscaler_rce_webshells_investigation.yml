@@ -1,0 +1,56 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 025-citrix-netscaler-rce-webshells-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - citrix
+  - netscaler
+  - adc
+  - gateway
+  - cve-2026-88771
+  - web-shell
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1505.003
+  - T1105
+  - T1572
+  - T1083
+  - T1041
+  severity: CRITICAL
+  package_id: pkg-025
+spec:
+  steps:
+  - id: step-5
+    name: revoke-sessions-rotate-secrets
+    action: api_call
+    target: identity_provider
+    parameters:
+      revoke_sessions: true
+      rotate:
+      - admin_credentials
+      - appliance_secrets
+    timeout: 180s
+    on_failure: escalate
+  - id: step-6
+    name: rebuild-compromised-appliance
+    action: script
+    target: appliance
+    parameters:
+      condition: command_execution_or_webshell_confirmed
+    timeout: 600s
+    on_failure: escalate
+  - id: step-7
+    name: validate-ha-peers-backups
+    action: script
+    target: appliance
+    parameters:
+      check:
+      - ha_peers
+      - backups
+      for: malicious_changes
+    timeout: 240s
+    on_failure: continue

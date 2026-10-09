@@ -1,0 +1,20 @@
+title: New PHP file created in NetScaler web root
+id: rule-025-002
+status: experimental
+description: Detects creation of PHP content under appliance web-serving directories (behavioral; validate exact paths against
+  Citrix forensic guidance).
+logsource:
+  product: linux
+  category: file_event
+detection:
+  selection:
+    TargetFilename|endswith:
+    - .php
+    TargetFilename|contains:
+    - /netscaler/
+    - /var/vpn/
+    - /var/netscaler/logon/
+  condition: selection
+mitre:
+- T1505.003
+level: high

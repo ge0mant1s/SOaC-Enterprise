@@ -1,0 +1,18 @@
+title: GatherOsState.exe sideloading unexpected slc.dll
+id: rule-029-001
+status: experimental
+description: Detects GatherOsState.exe loading slc.dll from a non-system path (Antino DLL sideloading). GatherOsState.exe
+  and slc.dll are otherwise legitimate Windows components.
+logsource:
+  category: image_load
+  product: windows
+detection:
+  selection:
+    Image|endswith: \GatherOsState.exe
+    ImageLoaded|endswith: \slc.dll
+  filter:
+    ImageLoaded|startswith: C:\Windows\System32\
+  condition: selection and not filter
+mitre:
+- T1574.002
+level: high

@@ -1,0 +1,134 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 031-wordpress-wp2shell-chained-takeover-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - wordpress
+  - wp2shell
+  - cve-2026-60137
+  - cve-2026-63030
+  - web-exploitation
+  - chained-exploit
+  mitre_attack:
+  - T1190
+  severity: HIGH
+  package_id: pkg-031
+spec:
+  description: Responds to WP2Shell exploitation by patching the chained vulnerabilities, isolating affected sites, resetting
+    credentials and restoring from known-good backups. Post-takeover scope is treated as behavioral and validated through
+    investigation.
+  trigger:
+    source: BRAIN
+    conditions:
+    - field: alert.title
+      operator: contains
+      value: WordPress WP2Shell
+    - field: alert.severity
+      operator: gte
+      value: HIGH
+    cooldown: 2m
+  inputs:
+  - name: alert_id
+    type: string
+    required: true
+    description: Unique identifier for the triggering alert
+  - name: affected_asset
+    type: string
+    required: true
+    description: FQDN, IP, or identifier of the affected asset
+  - name: source_ip
+    type: string
+    required: false
+    description: Source IP address associated with the activity
+  steps:
+  - id: step-1
+    name: Patch chained vulnerabilities
+    action: patch_software
+    target: wordpress
+    parameters:
+      cves:
+      - CVE-2026-60137
+      - CVE-2026-63030
+    timeout: 1800
+    on_failure: escalate_to_web_team
+  - id: step-2
+    name: Isolate affected site
+    action: isolate_site
+    target: wordpress
+    parameters:
+      mode: maintenance_or_offline
+    timeout: 300
+    on_failure: escalate_to_web_team
+  - id: step-3
+    name: Deploy virtual patch / WAF rule
+    action: apply_waf_rule
+    target: waf
+    parameters:
+      signatures:
+      - wp2shell_chain
+    timeout: 300
+    on_failure: continue
+  - id: step-4
+    name: Reset WordPress and hosting credentials
+    action: rotate_credentials
+    target: wordpress
+    parameters:
+      include:
+      - admin_accounts
+      - db
+      - hosting
+      - api_keys
+    timeout: 900
+    on_failure: escalate_to_identity_team
+  - id: step-5
+    name: Preserve forensic evidence
+    action: collect_logs
+    target: wordpress
+    parameters:
+      sources:
+      - web_access
+      - waf
+      - application
+      - db
+    timeout: 300
+    on_failure: continue
+  - id: step-6
+    name: Investigate for behavioral takeover indicators
+    action: initiate_hunt
+    target: wordpress
+    parameters:
+      scope:
+      - admin_sessions
+      - content_changes
+      - outbound_connections
+    timeout: 900
+    on_failure: continue
+  - id: step-7
+    name: Restore from known-good backup
+    action: restore_backup
+    target: wordpress
+    parameters:
+      verify_integrity: true
+    timeout: 3600
+    on_failure: escalate_to_web_team
+  outputs:
+  - name: containment_status
+    type: string
+    description: Status of containment actions
+  - name: exploitation_confidence
+    type: string
+    description: Confidence level of successful exploitation
+  - name: affected_assets
+    type: array
+    description: List of impacted assets or accounts
+  rollback:
+    steps:
+    - id: rb-1
+      name: restore-service-availability
+      action: script
+    - id: rb-2
+      name: remove-temporary-isolation
+      action: api_call

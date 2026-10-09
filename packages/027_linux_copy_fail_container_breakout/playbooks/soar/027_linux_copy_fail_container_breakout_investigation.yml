@@ -1,0 +1,60 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 027-linux-copy-fail-container-breakout-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - linux
+  - kernel
+  - copy-fail
+  - cve-2026-31431
+  - af_alg
+  - container-breakout
+  mitre_attack:
+  - T1068
+  - T1611
+  - T1059
+  severity: HIGH
+  package_id: pkg-027
+spec:
+  steps:
+  - id: step-5
+    name: Preserve forensic logs
+    action: collect_logs
+    target: linux_node
+    parameters:
+      sources:
+      - auditd
+      - kernel
+      - container_runtime
+      - orchestration
+    timeout: 300
+    on_failure: continue
+  - id: step-6
+    name: Rebuild workloads on suspected escape
+    action: rebuild_workload
+    target: namespace
+    parameters:
+      from_clean_image: true
+    timeout: 1800
+    on_failure: escalate_to_platform_team
+  - id: step-7
+    name: Rotate workload credentials and tokens
+    action: rotate_credentials
+    target: workload
+    parameters:
+      include:
+      - service_account_tokens
+      - cloud_credentials
+    timeout: 600
+    on_failure: escalate_to_identity_team
+  - id: step-8
+    name: Hunt adjacent nodes
+    action: initiate_hunt
+    target: node_pool
+    parameters:
+      scope: same_cluster
+    timeout: 900
+    on_failure: continue

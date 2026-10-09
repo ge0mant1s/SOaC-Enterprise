@@ -1,0 +1,58 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 030-openclaw-clawhub-cve-2026-25253-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-030
+  mitre_attack:
+  - T1195.002
+  - T1204.001
+  - T1204.002
+  - T1059.004
+  - T1105
+  - T1190
+  - T1555
+  severity: HIGH
+  data_sources:
+  - EDR process telemetry
+  - Endpoint file/shell telemetry
+  - Network / WebSocket logs
+  - ClawHub / marketplace audit
+  - Cloud audit logs
+  tags:
+  - openclaw
+  - clawhub
+  - ai-agent
+  - supply-chain
+  - typosquatting
+  - amos
+spec:
+  hypothesis: A user installed a malicious ClawHub skill or an exposed Control UI was hijacked (CVE-2026-25253), leading to
+    host command execution or AMOS credential theft.
+  hunt_type: proactive
+  analysis_steps:
+  - id: step-030-001
+    name: Identify installed skills
+    description: Enumerate installed ClawHub skills and flag typosquatted or untrusted entries.
+    tools:
+    - ClawHub audit
+    - EDR
+  - id: step-030-002
+    name: Trace execution chain
+    description: Trace encoded-shell execution, archive retrieval and any AMOS credential access.
+    tools:
+    - EDR
+    - Shell history
+  - id: step-030-003
+    name: Assess Control-UI exposure
+    description: Determine whether the Control UI was network-exposed and whether CVE-2026-25253 was exploited.
+    tools:
+    - Network logs
+    - Config audit
+  success_criteria:
+  - Malicious skills are identified and removed
+  - Agents are upgraded to v2026.1.29
+  - Exposed credentials are rotated
+  - No active Control-UI hijack remains

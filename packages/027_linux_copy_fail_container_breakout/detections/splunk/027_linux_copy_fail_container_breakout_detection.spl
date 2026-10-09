@@ -1,0 +1,7 @@
+// Linux Copy Fail Privilege Escalation and Container Breakout — Splunk detection
+// MITRE: T1068, T1611, T1059
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=linux (sourcetype=linux:audit OR sourcetype=linux:container) 
+| transaction host process_lineage maxspan=5m 
+| search (syscall=socket socket_family=AF_ALG uid!=0) AND (uid=0 OR command IN ("nsenter","setns")) 
+| table _time host user process command parent_process

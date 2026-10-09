@@ -1,0 +1,15 @@
+title: Host-namespace access after container crypto-socket activity
+id: query-027-002
+status: hunt
+description: Namespace-escape primitives from container workloads are high-signal.
+logsource:
+  product: linux
+  category: process_creation
+detection:
+  selection:
+    CommandLine|contains:
+    - nsenter
+    - setns
+    - /proc/1/ns
+  condition: selection
+level: high

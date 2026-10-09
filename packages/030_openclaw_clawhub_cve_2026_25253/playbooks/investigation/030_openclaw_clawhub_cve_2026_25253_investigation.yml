@@ -1,0 +1,60 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 030-openclaw-clawhub-cve-2026-25253-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - openclaw
+  - clawhub
+  - ai-agent
+  - supply-chain
+  - typosquatting
+  - amos
+  mitre_attack:
+  - T1195.002
+  - T1204.001
+  - T1204.002
+  - T1059.004
+  - T1105
+  - T1190
+  - T1555
+  severity: HIGH
+  package_id: pkg-030
+spec:
+  steps:
+  - id: step-5
+    name: Revoke exposed credentials
+    action: rotate_credentials
+    target: identity
+    parameters:
+      include:
+      - browser
+      - api
+      - cloud
+      - crypto_wallet
+      - keychain
+    timeout: 900
+    on_failure: escalate_to_identity_team
+  - id: step-6
+    name: Preserve forensic evidence
+    action: collect_logs
+    target: endpoint
+    parameters:
+      sources:
+      - skill_md
+      - shell_history
+      - archives
+      - process
+      - network
+    timeout: 300
+    on_failure: continue
+  - id: step-7
+    name: Rebuild affected agents
+    action: rebuild_agent
+    target: endpoint
+    parameters:
+      from_clean_image: true
+    timeout: 3600
+    on_failure: escalate_to_ir_team

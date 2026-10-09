@@ -1,0 +1,37 @@
+package_id: pkg-025
+title: Citrix NetScaler ADC/Gateway RCE and Web-Shell Activity
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: edge-device-exploitation
+category: Network
+categories:
+- Network
+- Endpoint
+primary_category: Network
+mitre_techniques:
+- T1190
+- T1059
+- T1505.003
+- T1105
+- T1572
+- T1083
+- T1041
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- Network
+- Endpoint
+source_type: url
+source_urls:
+- https://support.citrix.com/external/article/CTX697096/citrix-netscaler-adc-and-citrix-netscale.html
+- https://community.citrix.com/forums/topic/259153-critical-update-citrix-netscaler-adc-and-citrix-netscaler-gateway-security-bulletin-for-cve-2026-88771-through-cve-2026-88778/
+- https://cloud.google.com/blog/topics/threat-intelligence/defending-against-active-exploitation-of-citrix-netscaler-adc-and-gateway-appliances
+- https://unit42.paloaltonetworks.com/netscaler-zero-days-exploited/
+confidence: 0.85
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

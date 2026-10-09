@@ -1,0 +1,235 @@
+{
+  "package_id": "pkg-026",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "Dell RecoverPoint for Virtual Machines Hardcoded Credential Exploitation",
+  "description": "CVE-2026-22769 is a critical hardcoded credential flaw (CVSS 10.0) in Dell RecoverPoint for Virtual Machines. An unauthenticated remote attacker who obtains the credential may access the underlying operating system and establish root-level persistence. Dell confirmed Google/Mandiant reports of limited active exploitation associated with UNC6201, a suspected PRC-nexus cluster deploying GRIMBOLT and BRICKSTORM backdoors. This package provides identity, appliance and virtualization-pivot detection, hunting and response.",
+  "difficulty": 4,
+  "tier": "Elite",
+  "package_family": "virtual-infrastructure-persistence",
+  "package_type": "instance",
+  "source_type": "url",
+  "source_urls": [
+    "https://www.dell.com/support/kbdoc/en-us/000426773/dsa-2026-079",
+    "https://www.dell.com/support/kbdoc/en-us/000426742/recoverpoint-for-vms-apply-the-remediation-script-for-dsa",
+    "https://cloud.google.com/blog/topics/threat-intelligence/unc6201-exploiting-dell-recoverpoint-zero-day"
+  ],
+  "confidence": 0.8,
+  "human_review_required": false,
+  "deployment_mode": "detect-and-respond",
+  "category": "Cloud",
+  "categories": [
+    "Cloud",
+    "Identity",
+    "Network"
+  ],
+  "primary_category": "Cloud",
+  "secondary_categories": [
+    "Identity",
+    "Network"
+  ],
+  "tags": [
+    "dell",
+    "recoverpoint",
+    "vmware",
+    "cve-2026-22769",
+    "hardcoded-credential",
+    "unc6201",
+    "brickstorm"
+  ],
+  "threat_actor": "UNC6201 (Google/Mandiant, suspected PRC-nexus; assessment, not definitive attribution)",
+  "campaign_name": "Dell RecoverPoint hardcoded-credential exploitation (2026)",
+  "github_path": "packages/026_dell_recoverpoint_hardcoded_credential",
+  "slug": "026_dell_recoverpoint_hardcoded_credential",
+  "roles": [
+    "Virtualization Security Engineer",
+    "Detection Engineer",
+    "Incident Responder",
+    "Identity Engineer",
+    "Vulnerability Manager"
+  ],
+  "mitre": [
+    "T1078",
+    "T1133",
+    "T1059",
+    "T1543",
+    "T1021"
+  ],
+  "mitre_techniques": [
+    "T1078",
+    "T1133",
+    "T1059",
+    "T1543",
+    "T1021"
+  ],
+  "mitre_version": "v16.1",
+  "stacks": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "Identity",
+    "Network"
+  ],
+  "platform_targets": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "Identity",
+    "Network"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Use hardcoded credential for remote access",
+      "description": "Attacker uses the hardcoded credential (CVE-2026-22769) to access a network-reachable RecoverPoint for VMs appliance.",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1078",
+        "T1133"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "Obtain operating-system access",
+      "description": "Attacker reaches the underlying OS and executes commands as a privileged user.",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1059"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Establish root persistence",
+      "description": "Attacker establishes root-level persistence; GRIMBOLT/BRICKSTORM backdoors reported. (T1543 enabled only if local validation confirms service creation \u2014 behavioral.)",
+      "role": "red_team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1543"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 4,
+      "title": "Pivot toward VMware infrastructure",
+      "description": "Attacker uses remote services to move into connected VMware virtual infrastructure.",
+      "role": "red_team",
+      "phase": "Lateral Movement",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1021"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 5,
+      "title": "Detect root access without maintenance ticket",
+      "description": "Blue team alerts on RecoverPoint access from an unapproved identity path and root sessions without a corresponding maintenance ticket.",
+      "role": "blue_team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1078"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 6,
+      "title": "Contain and rebuild appliance",
+      "description": "SOC blocks untrusted access, applies the fixed release / remediation script, treats root access as an integrity failure and rebuilds as appropriate.",
+      "role": "soc_team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Elite",
+  "family_metadata": {
+    "source_type": "url",
+    "source_urls": [
+      "https://www.dell.com/support/kbdoc/en-us/000426773/dsa-2026-079",
+      "https://www.dell.com/support/kbdoc/en-us/000426742/recoverpoint-for-vms-apply-the-remediation-script-for-dsa",
+      "https://cloud.google.com/blog/topics/threat-intelligence/unc6201-exploiting-dell-recoverpoint-zero-day"
+    ],
+    "cve_id": "CVE-2026-22769",
+    "advisory_title": "Dell DSA-2026-079 and Google/Mandiant UNC6201 reporting",
+    "affected_products": "Dell RecoverPoint for Virtual Machines (5.3 SP2\u2013SP4, 6.0\u20136.0 SP3 P1 and potentially earlier 5.3; RecoverPoint Classic not affected)",
+    "exposed_surface": "Network-reachable RecoverPoint for VMs appliance management",
+    "exploitability": "Dell-confirmed limited active exploitation (CVSS 10.0); KEV status not established",
+    "target_stacks": [
+      "Sigma",
+      "Sentinel",
+      "Splunk",
+      "Identity",
+      "Network"
+    ],
+    "posture": "detect_and_respond"
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://www.dell.com/support/kbdoc/en-us/000426773/dsa-2026-079",
+    "analysis_date": "2026-10-09"
+  }
+}

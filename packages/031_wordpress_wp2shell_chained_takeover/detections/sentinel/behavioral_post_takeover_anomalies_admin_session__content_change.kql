@@ -1,0 +1,6 @@
+// Behavioral: successful admin session followed by content change / outbound connection
+// NOTE: post-takeover techniques are behavioral; not asserted beyond initial access.
+W3CIISLog
+| where csUriStem has "/wp-admin/" and scStatus == 200
+| join kind=inner (W3CIISLog | where csUriStem has_any ("/wp-admin/post.php", "/wp-admin/theme-editor.php", "/wp-admin/plugin-editor.php")) on cIp
+| project TimeGenerated, cIp, csUriStem, csMethod

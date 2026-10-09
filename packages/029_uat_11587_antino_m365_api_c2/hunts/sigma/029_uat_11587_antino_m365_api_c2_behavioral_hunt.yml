@@ -1,0 +1,12 @@
+title: Mailbox tasks prefixed command_req_
+id: query-029-002
+status: hunt
+description: Mailbox items/tasks prefixed command_req_[session_id] are consistent with Antino tasking.
+logsource:
+  product: m365
+  service: exchange
+detection:
+  selection:
+    Subject|startswith: command_req_
+  condition: selection
+level: high

@@ -1,0 +1,12 @@
+// Container-to-host privilege transition correlation (Copy Fail, CVE-2026-31431)
+let alg_sockets = DeviceEvents
+| where ActionType has_any ("SocketCreate", "BindSocket") and AdditionalFields has "AF_ALG"
+| where InitiatingProcessAccountName != "root"
+| project Timestamp, DeviceId, DeviceName, InitiatingProcessId, InitiatingProcessAccountName;
+let priv_transition = DeviceProcessEvents
+| where AccountName == "root" or ProcessCommandLine has_any ("nsenter", "setns", "/proc/1/ns")
+| project PrivTime=Timestamp, DeviceId, PrivProcessId=ProcessId, ProcessCommandLine;
+alg_sockets
+| join kind=inner priv_transition on DeviceId
+| where PrivTime between (Timestamp .. (Timestamp + 5m))
+| project Timestamp, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, PrivTime

@@ -1,0 +1,9 @@
+{
+  "name": "Installation of compromised @asyncapi/* package versions",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1195.002"
+  ],
+  "severity": "HIGH",
+  "query_reference": "rule-028-001"
+}

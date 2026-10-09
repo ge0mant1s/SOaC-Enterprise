@@ -1,0 +1,56 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 024-panos-captive-portal-root-rce-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-024
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1105
+  - T1572
+  - T1087
+  - T1018
+  - T1070
+  severity: CRITICAL
+  data_sources:
+  - PAN-OS threat/system logs
+  - Firewall traffic logs
+  - Network flow
+  - Active Directory logs
+  tags:
+  - palo-alto
+  - pan-os
+  - captive-portal
+  - user-id
+  - cve-2026-0300
+  - cl-sta-1132
+spec:
+  hypothesis: An adversary exploited the User-ID Authentication Portal and is tunneling out of the firewall and enumerating
+    Active Directory from the appliance.
+  hunt_type: proactive
+  analysis_steps:
+  - id: as-024-001
+    name: Baseline firewall egress
+    description: Establish normal outbound destinations and ports for each firewall appliance.
+    tools:
+    - Network flow
+    - Sentinel
+  - id: as-024-002
+    name: Correlate portal events with tunnels
+    description: Join portal exploit/crash events with new long-lived outbound sessions and reverse SOCKS behavior.
+    tools:
+    - Sentinel
+    - Splunk
+  - id: as-024-003
+    name: Scope internal impact
+    description: Investigate Active Directory and internal systems contacted after the suspected exploitation time.
+    tools:
+    - AD logs
+    - EDR
+  success_criteria:
+  - Firewall egress reconciled against an approved baseline
+  - Any appliance-originated tunnels identified and scoped
+  - Internal systems contacted post-exploitation investigated

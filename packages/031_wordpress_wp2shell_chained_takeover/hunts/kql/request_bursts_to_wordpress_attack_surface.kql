@@ -1,0 +1,5 @@
+W3CIISLog
+| where csUriStem has_any ("/wp-admin/", "/xmlrpc.php", "/wp-json/", "/wp-login.php")
+| summarize reqs=count() by cIp, bin(TimeGenerated, 1m)
+| where reqs > 100
+| order by reqs desc

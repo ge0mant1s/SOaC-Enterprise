@@ -1,0 +1,4 @@
+DeviceProcessEvents
+| where InitiatingProcessFileName has "openclaw"
+| where ProcessCommandLine has_any ("base64 -d", "base64 --decode")
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine

@@ -1,0 +1,15 @@
+title: Public WebSocket to Control UI gatewayUrl
+id: query-030-002
+status: hunt
+description: Public WebSocket connections referencing gatewayUrl are consistent with CVE-2026-25253 abuse.
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  selection:
+    Initiated: 'true'
+    DestinationPortName: wss
+  keyword:
+  - gatewayUrl
+  condition: selection and keyword
+level: high

@@ -1,0 +1,59 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: 026-dell-recoverpoint-hardcoded-credential-mitigation
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-026
+  scope: package
+  tags:
+  - dell
+  - recoverpoint
+  - vmware
+  - cve-2026-22769
+  - hardcoded-credential
+  - unc6201
+spec:
+  description: Governance policy to deploy RecoverPoint only on a trusted, access-controlled internal network, restrict appliance
+    egress, centralize logs and require change-controlled administrative access.
+  environments:
+  - name: lab
+    mode: testing
+    data_handling: relaxed
+  - name: staging
+    mode: staging
+    data_handling: standard
+  - name: production
+    mode: production
+    data_handling: strict
+  access_control:
+    required_roles:
+    - Virtualization Security Engineer
+    - Incident Responder
+    - Identity Engineer
+    approval_workflow: true
+  compliance_frameworks:
+  - NIST CSF 2.0
+  - ISO/IEC 27001:2022
+  - MITRE ATT&CK
+  - CIS Controls v8
+  controls:
+  - name: Trusted-network deployment
+    description: Deploy RecoverPoint only on a trusted, access-controlled internal network; Dell states it is not intended
+      for public or untrusted networks.
+    enforcement: mandatory
+    evidence: Network segmentation and placement review
+  - name: Appliance egress restriction
+    description: Restrict appliance egress to normal replication and management peers.
+    enforcement: mandatory
+    evidence: Egress policy and network monitoring
+  - name: Change-controlled administration
+    description: Require change-controlled administrative access; root sessions must map to an approved maintenance record.
+    enforcement: mandatory
+    evidence: Change-management and access logs
+  - name: Vendor remediation
+    description: Apply version 6.0.3.1 HF1 or the appropriate upgrade path, or the Dell remediation script where upgrade cannot
+      occur immediately.
+    enforcement: mandatory
+    evidence: Patch/remediation records

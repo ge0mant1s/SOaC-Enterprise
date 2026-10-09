@@ -1,0 +1,15 @@
+title: Connections to Miasma decentralized C2 / relays
+id: query-028-002
+status: hunt
+description: Beaconing to Nostr/BitTorrent relays from build or dev hosts is suspicious.
+logsource:
+  category: dns_query
+  product: windows
+detection:
+  selection:
+    QueryName|contains:
+    - relay.damus.io
+    - relay.nostr.com
+    - router.bittorrent.com
+  condition: selection
+level: high

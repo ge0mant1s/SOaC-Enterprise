@@ -1,0 +1,10 @@
+{
+  "name": "OpenClaw skill spawning Base64-encoded shell",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1059.004",
+    "T1204.002"
+  ],
+  "severity": "HIGH",
+  "query_reference": "rule-030-001"
+}

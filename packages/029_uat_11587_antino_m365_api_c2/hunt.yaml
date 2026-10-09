@@ -1,0 +1,106 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 029-uat-11587-antino-m365-api-c2-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-029
+  mitre_attack:
+  - T1566
+  - T1204
+  - T1059.005
+  - T1059.007
+  - T1218.005
+  - T1574.002
+  - T1620
+  - T1102
+  - T1059.001
+  severity: HIGH
+  data_sources:
+  - M365 / Entra ID audit logs
+  - OAuth sign-in logs
+  - EDR process telemetry
+  - Email security logs
+  - DNS / proxy logs
+  tags:
+  - espionage
+  - china-nexus
+  - uat-11587
+  - antino
+  - m365
+  - outlook
+spec:
+  description: Hunts for the UAT-11587 Antino backdoor by surfacing DLL-sideloading sequences, signed-utility PowerShell proxying
+    and high-frequency Microsoft 365 API polling consistent with Outlook/OneDrive C2.
+  hypothesis: An endpoint is running the Antino backdoor, sideloading slc.dll via GatherOsState.exe and using Microsoft 365
+    Outlook/OneDrive APIs for C2.
+  hunt_type: proactive
+  telemetry_sources:
+  - EDR image-load & process telemetry
+  - M365 / Entra ID audit logs
+  - OAuth sign-in logs
+  - Email security logs
+  queries:
+  - id: query-029-001
+    name: Unexpected slc.dll loads by GatherOsState.exe
+    platform: kql
+    query: |-
+      DeviceImageLoadEvents
+      | where InitiatingProcessFileName =~ "GatherOsState.exe"
+      | where FileName =~ "slc.dll" and not(FolderPath startswith "C:\\Windows\\System32")
+      | project Timestamp, DeviceName, FolderPath, InitiatingProcessFolderPath
+    expected_results: slc.dll loaded from a non-system path is a strong sideloading indicator.
+    mitre:
+    - T1574.002
+  - id: query-029-002
+    name: Mailbox tasks prefixed command_req_
+    platform: sigma
+    query: |-
+      title: Antino M365 Task Naming (command_req_)
+      logsource:
+        product: m365
+        service: exchange
+      detection:
+        selection:
+          Subject|startswith: 'command_req_'
+        condition: selection
+    expected_results: Mailbox items/tasks prefixed command_req_[session_id] are consistent with Antino tasking.
+    mitre:
+    - T1102
+    logsource:
+      product: m365
+      service: exchange
+    sigma_detection:
+      selection:
+        Subject|startswith: command_req_
+      condition: selection
+  analysis_steps:
+  - id: step-029-001
+    name: Confirm sideloading chain
+    description: Validate the GatherOsState.exe -> slc.dll sideloading chain and any in-memory .NET execution.
+    tools:
+    - EDR
+    - Memory forensics
+  - id: step-029-002
+    name: Review M365 API activity
+    description: Review OAuth sign-ins and Outlook/OneDrive API access for high-frequency polling and command_req_ tasking.
+    tools:
+    - M365 audit
+    - Entra ID logs
+  - id: step-029-003
+    name: Scope affected identities and hosts
+    description: Enumerate all hosts with Antino artifacts and all identities whose tokens were exposed.
+    tools:
+    - EDR
+    - Identity logs
+  success_criteria:
+  - DLL-sideloading chain is detected and removed
+  - Malicious OAuth grants/tokens are revoked
+  - M365 API C2 is terminated
+  - No additional backdoor instances remain
+  escalation:
+    on_confirmed: 'Confirmed Antino backdoor: isolate hosts, revoke OAuth tokens, reset identities, reimage endpoints and
+      conduct a tenant-wide hunt.'
+    on_inconclusive: 'Inconclusive: preserve endpoint and M365 evidence, monitor the suspect identities and continue hunting
+      for sideloading and API-C2 patterns.'

@@ -1,0 +1,31 @@
+{
+  "source_type": "url",
+  "source_name": "https://aviatrix.ai/threat-research-center/openclaw-clawhub-malicious-skills-supply-chain-attack-2026/",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1195.002",
+    "T1204.001",
+    "T1204.002",
+    "T1059.004",
+    "T1105",
+    "T1190",
+    "T1555"
+  ],
+  "attack_chain": [
+    "Marketplace poisoning",
+    "Malicious skill install",
+    "Encoded shell & archive staging",
+    "AMOS credential theft",
+    "OR Control-UI WebSocket hijack",
+    "Host command execution"
+  ],
+  "platforms": [
+    "MISP",
+    "OpenCTI"
+  ],
+  "detection_surfaces": [
+    "Developer/user endpoints",
+    "OpenClaw Control UI",
+    "ClawHub marketplace"
+  ]
+}

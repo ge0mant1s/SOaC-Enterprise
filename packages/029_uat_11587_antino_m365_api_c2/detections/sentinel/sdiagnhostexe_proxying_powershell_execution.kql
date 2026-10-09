@@ -1,0 +1,5 @@
+// sdiagnhost.exe spawning PowerShell (Antino signed-utility proxy abuse)
+DeviceProcessEvents
+| where InitiatingProcessFileName =~ "sdiagnhost.exe"
+| where FileName in~ ("powershell.exe", "pwsh.exe")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, FileName, ProcessCommandLine

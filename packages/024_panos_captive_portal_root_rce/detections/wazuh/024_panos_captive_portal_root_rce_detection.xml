@@ -1,0 +1,18 @@
+<group name="soac,pkg-024,panos,">
+  <rule id="920241" level="12">
+    <decoded_as>json</decoded_as>
+    <field name="panos.threatid">510019</field>
+    <description>SOaC pkg-024: PAN-OS User-ID/Captive Portal exploitation (Threat ID 510019)</description>
+    <mitre>
+      <id>T1190</id>
+    </mitre>
+  </rule>
+  <rule id="920242" level="13">
+    <if_sid>920241</if_sid>
+    <field name="event.action">appliance_outbound_tunnel</field>
+    <description>SOaC pkg-024: PAN-OS appliance-originated reverse SOCKS tunnel after portal exploitation (behavioral)</description>
+    <mitre>
+      <id>T1572</id>
+    </mitre>
+  </rule>
+</group>

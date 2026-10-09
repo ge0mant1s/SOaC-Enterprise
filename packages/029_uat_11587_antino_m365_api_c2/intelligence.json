@@ -1,0 +1,34 @@
+{
+  "source_type": "url",
+  "source_name": "https://blog.talosintelligence.com/china-nexus-uat-11587-targets-government-and-policy-organizations-across-asia-with-antino-backdoor/",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1566",
+    "T1204",
+    "T1059.005",
+    "T1059.007",
+    "T1218.005",
+    "T1574.002",
+    "T1620",
+    "T1102",
+    "T1059.001"
+  ],
+  "attack_chain": [
+    "Spearphishing",
+    "HTA/WSF staging",
+    "In-memory .NET deserialization",
+    "DLL sideloading",
+    "PowerShell proxying",
+    "M365 API C2"
+  ],
+  "platforms": [
+    "MISP",
+    "OpenCTI"
+  ],
+  "detection_surfaces": [
+    "Windows endpoints",
+    "Microsoft 365 tenant",
+    "Identity provider",
+    "Email gateway"
+  ]
+}

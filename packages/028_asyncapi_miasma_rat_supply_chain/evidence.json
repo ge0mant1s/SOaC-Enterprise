@@ -1,0 +1,185 @@
+{
+  "test_id": "28-L3-001",
+  "package_id": "pkg-028",
+  "description": "Synthetic telemetry for AsyncAPI npm Supply-Chain Compromise & Miasma RAT",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Abuse privileged pull_request_target workflow",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1195.002"
+        ],
+        "description": "The attacker abuses a misconfigured, privileged GitHub Actions `pull_request_target` workflow to obtain secrets from an untrusted fork PR."
+      },
+      "expected_detection": "rule-028-001",
+      "mitre": [
+        "T1195.002"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Steal maintainer PAT and push malicious commits",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1552"
+        ],
+        "description": "Using the stolen PAT, the attacker pushes malicious commits to the next branch and triggers trusted publishing."
+      },
+      "expected_detection": "rule-028-002",
+      "mitre": [
+        "T1552"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Publish trojanized @asyncapi/* packages",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1195.002"
+        ],
+        "description": "Trojanized package versions are published to the public npm registry."
+      },
+      "expected_detection": "rule-028-003",
+      "mitre": [
+        "T1195.002"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Code execution on module import",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1059.007",
+          "T1105"
+        ],
+        "description": "On install/import, `sync.js` spawns a detached Node process that fetches second-stage payloads."
+      },
+      "expected_detection": "rule-028-001",
+      "mitre": [
+        "T1059.007",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Deploy Miasma RAT and harvest credentials",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1552"
+        ],
+        "description": "The Miasma RAT is deployed, harvesting environment variables, tokens and cloud credentials."
+      },
+      "expected_detection": "rule-028-002",
+      "mitre": [
+        "T1552"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Establish persistence",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1543.002",
+          "T1053.003"
+        ],
+        "description": "The RAT establishes persistence via systemd services, cron/scheduled tasks or registry run keys."
+      },
+      "expected_detection": "rule-028-003",
+      "mitre": [
+        "T1543.002",
+        "T1053.003"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-10-09T12:12:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Decentralized C2 and lateral discovery",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1102",
+          "T1018"
+        ],
+        "description": "C2 is conducted over IPFS / Nostr relays / BitTorrent DHT while the RAT performs remote-system discovery."
+      },
+      "expected_detection": "rule-028-001",
+      "mitre": [
+        "T1102",
+        "T1018"
+      ]
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2026-10-09T12:14:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect trojanized package execution",
+      "data": {
+        "step": 8,
+        "mitre": [
+          "T1195.002",
+          "T1105"
+        ],
+        "description": "Blue team detects post-install script execution spawning detached Node processes and connections to known C2 infrastructure."
+      },
+      "expected_detection": "rule-028-002",
+      "mitre": [
+        "T1195.002",
+        "T1105"
+      ]
+    },
+    {
+      "event_id": "evt-009",
+      "timestamp": "2026-10-09T12:16:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Contain and remediate supply-chain compromise",
+      "data": {
+        "step": 9,
+        "mitre": [],
+        "description": "SOC quarantines runners/endpoints, removes affected versions, revokes credentials and rebuilds from verified commits."
+      },
+      "expected_detection": "rule-028-003",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-028-001",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Installation of compromised @asyncapi/* package versions"
+    },
+    {
+      "detection_id": "rule-028-002",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "Miasma RAT C2 connection to 85.137.53.71"
+    },
+    {
+      "detection_id": "rule-028-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Detached Node process from npm post-install (sync.js)"
+    }
+  ]
+}

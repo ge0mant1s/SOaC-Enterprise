@@ -1,0 +1,7 @@
+// Behavioral: NetScaler appliance initiating internal scans or outbound sessions inconsistent with its ADC/Gateway role.
+CommonSecurityLog
+| where DeviceProduct has "NetScaler" or Computer has "netscaler"
+| where CommunicationDirection == "Outbound" or isempty(CommunicationDirection)
+| summarize Bytes=sum(SentBytes), Sessions=count() by DeviceName, DestinationIP, DestinationPort
+| where Sessions > 5 and Bytes > 500000
+| order by Bytes desc

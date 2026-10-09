@@ -1,0 +1,9 @@
+// Detect install/build of known-compromised @asyncapi/* versions (Miasma RAT)
+DeviceProcessEvents
+| where FileName in~ ("npm", "npm.exe", "node", "node.exe", "yarn", "pnpm")
+| where ProcessCommandLine has_any (
+    "@asyncapi/generator@3.3.1",
+    "@asyncapi/specs@6.11.2",
+    "@asyncapi/generator-helpers",
+    "@asyncapi/generator-components")
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessFileName

@@ -1,0 +1,147 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 029-uat-11587-antino-m365-api-c2-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - espionage
+  - china-nexus
+  - uat-11587
+  - antino
+  - m365
+  - outlook
+  mitre_attack:
+  - T1566
+  - T1204
+  - T1059.005
+  - T1059.007
+  - T1218.005
+  - T1574.002
+  - T1620
+  - T1102
+  - T1059.001
+  severity: HIGH
+  package_id: pkg-029
+spec:
+  description: Responds to the UAT-11587 Antino backdoor by isolating affected endpoints, revoking OAuth grants and tokens,
+    removing DLL-sideloading persistence and hunting for lateral movement and additional backdoor instances.
+  trigger:
+    source: BRAIN
+    conditions:
+    - field: alert.title
+      operator: contains
+      value: UAT-11587 Antino
+    - field: alert.severity
+      operator: gte
+      value: HIGH
+    cooldown: 2m
+  inputs:
+  - name: alert_id
+    type: string
+    required: true
+    description: Unique identifier for the triggering alert
+  - name: affected_asset
+    type: string
+    required: true
+    description: FQDN, IP, or identifier of the affected asset
+  - name: source_ip
+    type: string
+    required: false
+    description: Source IP address associated with the activity
+  steps:
+  - id: step-1
+    name: Isolate affected endpoints
+    action: isolate_host
+    target: endpoint
+    parameters:
+      scope: hosts_with_antino_artifacts
+    timeout: 300
+    on_failure: escalate_to_ir_team
+  - id: step-2
+    name: Revoke OAuth grants and tokens
+    action: revoke_oauth
+    target: identity
+    parameters:
+      scope:
+      - outlook
+      - onedrive
+      revoke_refresh_tokens: true
+    timeout: 600
+    on_failure: escalate_to_identity_team
+  - id: step-3
+    name: Reset affected user credentials
+    action: reset_credentials
+    target: identity
+    parameters:
+      require_mfa_reenrollment: true
+    timeout: 600
+    on_failure: escalate_to_identity_team
+  - id: step-4
+    name: Remove DLL-sideloading persistence
+    action: remove_persistence
+    target: endpoint
+    parameters:
+      artifacts:
+      - slc.dll
+      - GatherOsState.exe
+      - TestAssembly.dll
+    timeout: 600
+    on_failure: escalate_to_ir_team
+  - id: step-5
+    name: Block staging infrastructure
+    action: block_iocs
+    target: network
+    parameters:
+      categories:
+      - cloudflare_staging
+      - malicious_urls
+    timeout: 120
+    on_failure: continue
+  - id: step-6
+    name: Preserve forensic evidence
+    action: collect_logs
+    target: endpoint
+    parameters:
+      sources:
+      - process
+      - image_load
+      - m365_audit
+      - oauth_signin
+    timeout: 300
+    on_failure: continue
+  - id: step-7
+    name: Reimage compromised endpoints
+    action: reimage_host
+    target: endpoint
+    parameters:
+      from_clean_image: true
+    timeout: 3600
+    on_failure: escalate_to_ir_team
+  - id: step-8
+    name: Hunt for lateral movement
+    action: initiate_hunt
+    target: environment
+    parameters:
+      scope: tenant_and_endpoints
+    timeout: 900
+    on_failure: continue
+  outputs:
+  - name: containment_status
+    type: string
+    description: Status of containment actions
+  - name: exploitation_confidence
+    type: string
+    description: Confidence level of successful exploitation
+  - name: affected_assets
+    type: array
+    description: List of impacted assets or accounts
+  rollback:
+    steps:
+    - id: rb-1
+      name: restore-service-availability
+      action: script
+    - id: rb-2
+      name: remove-temporary-isolation
+      action: api_call

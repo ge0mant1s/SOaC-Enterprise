@@ -1,0 +1,7 @@
+// Behavioral: a single source authenticating to RecoverPoint management across multiple nodes.
+Syslog
+| where Computer has "recoverpoint"
+| where SyslogMessage has_any ("Accepted", "login")
+| extend src = extract(@"from ([0-9]{1,3}(?:\.[0-9]{1,3}){3})", 1, SyslogMessage)
+| summarize Nodes=dcount(Computer), NodeSet=make_set(Computer, 20) by src
+| where Nodes > 1
