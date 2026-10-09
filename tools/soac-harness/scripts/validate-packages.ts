@@ -16,7 +16,7 @@ interface PackageResult {
   warnings: string[];
 }
 
-function loadSchema(name: string): object {
+export function loadSchema(name: string): object {
   const schemaPath = path.join(SCHEMAS_DIR, name);
   if (!fs.existsSync(schemaPath)) {
     throw new Error(`Schema not found: ${schemaPath}`);
@@ -24,7 +24,7 @@ function loadSchema(name: string): object {
   return JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
 }
 
-function validateFile(
+export function validateFile(
   filePath: string,
   schema: object,
   ajv: Ajv,
@@ -209,4 +209,7 @@ function main() {
   }
 }
 
-main();
+// Only run the CLI when executed directly, so the module can be imported in tests.
+if (require.main === module) {
+  main();
+}
