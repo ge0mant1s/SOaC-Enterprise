@@ -1,0 +1,128 @@
+{
+  "test_id": "027-L3-001",
+  "package_id": "pkg-027",
+  "description": "Synthetic telemetry for Linux Copy Fail Privilege Escalation and Container Breakout",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Unprivileged local execution in container",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1059"
+        ],
+        "description": "An unprivileged local or containerized process begins the exploit attempt."
+      },
+      "expected_detection": "rule-027-001",
+      "mitre": [
+        "T1059"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "AF_ALG / algif_aead + splice() interaction",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1068"
+        ],
+        "description": "Process creates AF_ALG sockets and uses unusual cryptographic-socket and splice() sequences."
+      },
+      "expected_detection": "rule-027-002",
+      "mitre": [
+        "T1068"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Page-cache corruption to root",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1068"
+        ],
+        "description": "Controlled page-cache corruption yields root (UID 0) execution."
+      },
+      "expected_detection": "rule-027-003",
+      "mitre": [
+        "T1068"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Escape to host namespace",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1611"
+        ],
+        "description": "Because the page cache is shared, the attacker escapes the container boundary to the host."
+      },
+      "expected_detection": "rule-027-001",
+      "mitre": [
+        "T1611"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect container-to-host privilege transition",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1068",
+          "T1611"
+        ],
+        "description": "Blue team correlates container AF_ALG socket activity with subsequent root execution or host-namespace access by the same workload."
+      },
+      "expected_detection": "rule-027-002",
+      "mitre": [
+        "T1068",
+        "T1611"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Drain, patch and rebuild nodes",
+      "data": {
+        "step": 6,
+        "mitre": [],
+        "description": "SOC drains/isolates unpatched nodes, applies kernel updates, refreshes node images and rebuilds on suspected escape."
+      },
+      "expected_detection": "rule-027-003",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-027-001",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "AF_ALG socket creation by non-root container workload"
+    },
+    {
+      "detection_id": "rule-027-002",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Container AF_ALG activity followed by UID-0 or host-namespace access"
+    },
+    {
+      "detection_id": "rule-027-003",
+      "file": "detection.yaml",
+      "platform": "MDE",
+      "description": "Microsoft Defender CVE-2026-31431 alert correlation"
+    }
+  ]
+}

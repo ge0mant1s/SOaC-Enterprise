@@ -1,0 +1,58 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 025-citrix-netscaler-rce-webshells-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-025
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1505.003
+  - T1105
+  - T1572
+  - T1083
+  - T1041
+  severity: CRITICAL
+  data_sources:
+  - NetScaler web/audit/system logs
+  - Network flow
+  - Appliance file-system metadata
+  - Web-server logs
+  tags:
+  - citrix
+  - netscaler
+  - adc
+  - gateway
+  - cve-2026-88771
+  - web-shell
+spec:
+  hypothesis: An adversary exploited an unmitigated NetScaler appliance, deployed a PHP web shell and is tunneling or exfiltrating
+    through the appliance.
+  hunt_type: proactive
+  analysis_steps:
+  - id: as-025-001
+    name: Validate appliance web paths
+    description: Confirm appliance web-serving directories and process trees from Citrix forensic guidance before enabling
+      production file rules.
+    tools:
+    - Citrix forensic guidance
+    - File-integrity monitoring
+  - id: as-025-002
+    name: Correlate requests with process/file events
+    description: Join web/audit events with new file creation and process execution on the appliance.
+    tools:
+    - Sentinel
+    - Splunk
+  - id: as-025-003
+    name: Scope internal access
+    description: Investigate internal hosts accessed through the appliance and validate HA peers/backups.
+    tools:
+    - Network flow
+    - EDR
+  success_criteria:
+  - Appliance web roots validated and monitored
+  - Any web shells or tunnels identified and scoped
+  - HA peers and backups validated clean
+  - Internal hosts accessed through the appliance investigated

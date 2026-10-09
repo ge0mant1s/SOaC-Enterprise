@@ -1,0 +1,6 @@
+// UAT-11587 Antino Backdoor & Microsoft 365 API C2 — Splunk detection
+// MITRE: T1566, T1204, T1059.005, T1059.007, T1218.005, T1574.002, T1620, T1102, T1059.001
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=edr source="image_load" initiating_process=GatherOsState.exe loaded_image=slc.dll 
+| search NOT loaded_path="C:\\Windows\\System32\\*" 
+| table _time host initiating_process loaded_image loaded_path

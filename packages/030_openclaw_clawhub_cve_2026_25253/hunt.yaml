@@ -1,0 +1,110 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 030-openclaw-clawhub-cve-2026-25253-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-030
+  mitre_attack:
+  - T1195.002
+  - T1204.001
+  - T1204.002
+  - T1059.004
+  - T1105
+  - T1190
+  - T1555
+  severity: HIGH
+  data_sources:
+  - EDR process telemetry
+  - Endpoint file/shell telemetry
+  - Network / WebSocket logs
+  - ClawHub / marketplace audit
+  - Cloud audit logs
+  tags:
+  - openclaw
+  - clawhub
+  - ai-agent
+  - supply-chain
+  - typosquatting
+  - amos
+spec:
+  description: Hunts for OpenClaw/ClawHub compromise by surfacing encoded-shell execution from skills, password-protected
+    archive retrieval, AMOS credential access and anomalous Control-UI WebSocket connections.
+  hypothesis: A user installed a malicious ClawHub skill or an exposed Control UI was hijacked (CVE-2026-25253), leading to
+    host command execution or AMOS credential theft.
+  hunt_type: proactive
+  telemetry_sources:
+  - EDR process & file telemetry
+  - Shell history
+  - Network / WebSocket logs
+  - ClawHub installation audit
+  queries:
+  - id: query-030-001
+    name: Encoded shell from OpenClaw agent
+    platform: kql
+    query: |-
+      DeviceProcessEvents
+      | where InitiatingProcessFileName has "openclaw"
+      | where ProcessCommandLine has_any ("base64 -d", "base64 --decode")
+      | project Timestamp, DeviceName, AccountName, ProcessCommandLine
+    expected_results: Encoded shell from the agent after skill install warrants review.
+    mitre:
+    - T1059.004
+  - id: query-030-002
+    name: Public WebSocket to Control UI gatewayUrl
+    platform: sigma
+    query: |
+      title: Public WebSocket to OpenClaw Control UI gatewayUrl
+      logsource:
+        category: network_connection
+        product: windows
+      detection:
+        selection:
+          Initiated: 'true'
+          DestinationPortName: 'wss'
+        keyword:
+          - 'gatewayUrl'
+        condition: selection and keyword
+    expected_results: Public WebSocket connections referencing gatewayUrl are consistent with CVE-2026-25253 abuse.
+    mitre:
+    - T1190
+    logsource:
+      category: network_connection
+      product: windows
+    sigma_detection:
+      selection:
+        Initiated: 'true'
+        DestinationPortName: wss
+      keyword:
+      - gatewayUrl
+      condition: selection and keyword
+  analysis_steps:
+  - id: step-030-001
+    name: Identify installed skills
+    description: Enumerate installed ClawHub skills and flag typosquatted or untrusted entries.
+    tools:
+    - ClawHub audit
+    - EDR
+  - id: step-030-002
+    name: Trace execution chain
+    description: Trace encoded-shell execution, archive retrieval and any AMOS credential access.
+    tools:
+    - EDR
+    - Shell history
+  - id: step-030-003
+    name: Assess Control-UI exposure
+    description: Determine whether the Control UI was network-exposed and whether CVE-2026-25253 was exploited.
+    tools:
+    - Network logs
+    - Config audit
+  success_criteria:
+  - Malicious skills are identified and removed
+  - Agents are upgraded to v2026.1.29
+  - Exposed credentials are rotated
+  - No active Control-UI hijack remains
+  escalation:
+    on_confirmed: 'Confirmed compromise: isolate hosts, remove malicious skills, rotate all exposed credentials, upgrade agents
+      and rebuild from clean images.'
+    on_inconclusive: 'Inconclusive: preserve skill and shell evidence, restrict the Control UI to localhost and continue monitoring
+      for encoded-shell and WebSocket activity.'

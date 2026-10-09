@@ -1,0 +1,104 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 024-panos-captive-portal-root-rce
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-024
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1105
+  - T1572
+  - T1087
+  - T1018
+  - T1070
+  severity: CRITICAL
+  data_sources:
+  - PAN-OS threat/system logs
+  - Firewall traffic logs
+  - Network flow
+  - Active Directory logs
+spec:
+  description: 'Detects abnormal requests to User-ID Authentication Portal interfaces and post-exploitation behavior: appliance-originated
+    tunnels/reverse SOCKS, firewall-to-directory queries and log-service interruption. EarthWorm and ReverseSocks5 are named
+    artifacts; no hashes/paths/IPs are established, so tunnel and portal analytics are behavioral/engineering logic requiring
+    local baselining.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  inline_rules:
+  - id: rule-024-001
+    name: Firewall appliance initiating reverse SOCKS tunnel
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1572
+    - T1105
+    severity: high
+    query: |-
+      // Behavioral: PAN-OS appliance initiating sustained outbound sessions to previously unseen external destinations (reverse SOCKS/tunnel).
+      let fwAssets = dynamic(["pan-fw"]);
+      CommonSecurityLog
+      | where DeviceVendor == "Palo Alto Networks"
+      | where DeviceName has_any (fwAssets) or Computer has "pan"
+      | where CommunicationDirection == "Outbound" or isempty(CommunicationDirection)
+      | summarize Bytes=sum(SentBytes), Sessions=count(), Duration=max(todouble(column_ifexists("Duration", 0))) by DeviceName, DestinationIP, DestinationPort
+      | where Sessions > 5 and Bytes > 1000000
+      | order by Bytes desc
+  - id: rule-024-002
+    name: PAN-OS portal exploit alert followed by directory enumeration
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1190
+    - T1087
+    severity: high
+    sigma_description: Detects a PAN-OS portal threat/crash event followed by firewall-originated directory-service queries
+      (behavioral).
+    logsource:
+      category: firewall
+      product: panos
+    sigma_detection:
+      selection_portal:
+        threatid:
+        - '510019'
+        log_type:
+        - threat
+        - system
+      selection_dir:
+        dest_port:
+        - 389
+        - 636
+        - 3268
+        - 3269
+      condition: selection_portal or selection_dir
+    query: threatid 510019 OR dest_port in (389,636,3268,3269)
+  - id: rule-024-003
+    name: PAN-OS portal exploitation with Threat ID 510019
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1190
+    severity: high
+    query: |-
+      // Palo Alto Advanced Threat Prevention Threat ID 510019 (portal exploitation) correlated with appliance outbound to new destinations.
+      CommonSecurityLog
+      | where DeviceVendor == "Palo Alto Networks"
+      | where AdditionalExtensions has "510019" or DeviceEventClassID == "510019"
+      | project TimeGenerated, DeviceName, SourceIP, DestinationIP, Activity, AdditionalExtensions
+  test_cases:
+  - id: tc-024-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-024-002
+    name: PAN-OS Captive Portal exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-024-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

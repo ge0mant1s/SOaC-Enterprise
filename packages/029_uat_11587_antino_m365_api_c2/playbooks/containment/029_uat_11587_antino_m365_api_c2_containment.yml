@@ -1,0 +1,66 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 029-uat-11587-antino-m365-api-c2-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - espionage
+  - china-nexus
+  - uat-11587
+  - antino
+  - m365
+  - outlook
+  mitre_attack:
+  - T1566
+  - T1204
+  - T1059.005
+  - T1059.007
+  - T1218.005
+  - T1574.002
+  - T1620
+  - T1102
+  - T1059.001
+  severity: HIGH
+  package_id: pkg-029
+spec:
+  steps:
+  - id: step-1
+    name: Isolate affected endpoints
+    action: isolate_host
+    target: endpoint
+    parameters:
+      scope: hosts_with_antino_artifacts
+    timeout: 300
+    on_failure: escalate_to_ir_team
+  - id: step-2
+    name: Revoke OAuth grants and tokens
+    action: revoke_oauth
+    target: identity
+    parameters:
+      scope:
+      - outlook
+      - onedrive
+      revoke_refresh_tokens: true
+    timeout: 600
+    on_failure: escalate_to_identity_team
+  - id: step-3
+    name: Reset affected user credentials
+    action: reset_credentials
+    target: identity
+    parameters:
+      require_mfa_reenrollment: true
+    timeout: 600
+    on_failure: escalate_to_identity_team
+  - id: step-4
+    name: Remove DLL-sideloading persistence
+    action: remove_persistence
+    target: endpoint
+    parameters:
+      artifacts:
+      - slc.dll
+      - GatherOsState.exe
+      - TestAssembly.dll
+    timeout: 600
+    on_failure: escalate_to_ir_team

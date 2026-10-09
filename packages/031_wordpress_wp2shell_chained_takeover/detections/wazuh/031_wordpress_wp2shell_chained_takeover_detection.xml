@@ -1,0 +1,14 @@
+<group name="soac,wordpress,wp2shell,web_exploitation,">
+  <rule id="920311" level="10" frequency="100" timeframe="60">
+    <if_matched_sid>31100</if_matched_sid>
+    <url>/wp-admin/</url>
+    <description>WP2Shell: anomalous request burst against WordPress attack surface (behavioral).</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+  <rule id="920312" level="12">
+    <if_sid>920311</if_sid>
+    <url type="pcre2">/wp-admin/(theme|plugin)-editor\.php</url>
+    <description>WP2Shell: successful edit to theme/plugin files after request burst (behavioral takeover indicator).</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+</group>

@@ -1,0 +1,14 @@
+<group name="soac,espionage,uat_11587,antino,">
+  <rule id="920291" level="12">
+    <field name="image">GatherOsState.exe</field>
+    <field name="image_loaded">slc.dll</field>
+    <description>UAT-11587 Antino: GatherOsState.exe sideloading slc.dll (DLL sideloading).</description>
+    <mitre><id>T1574.002</id></mitre>
+  </rule>
+  <rule id="920292" level="13">
+    <field name="parent_process">sdiagnhost.exe</field>
+    <field name="process" type="pcre2">(?i)powershell|pwsh</field>
+    <description>UAT-11587 Antino: sdiagnhost.exe proxying PowerShell execution.</description>
+    <mitre><id>T1218</id><id>T1059.001</id></mitre>
+  </rule>
+</group>

@@ -1,0 +1,7 @@
+// PAN-OS User-ID Authentication Portal Root RCE — Splunk detection
+// MITRE: T1190, T1059, T1105, T1572, T1087, T1018, T1070
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=panos (threatid=510019 OR log_subtype=vulnerability OR action=reset-both)
+| append [ search index=panos sourcetype=pan:traffic dest_port IN (389,636,3268,3269,1080) ]
+| stats count values(dest_ip) as dest_ips values(dest_port) as dest_ports by host
+| where count>5

@@ -1,0 +1,9 @@
+{
+  "name": "Anomalous request burst against WordPress endpoints",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1190"
+  ],
+  "severity": "HIGH",
+  "query_reference": "rule-031-001"
+}

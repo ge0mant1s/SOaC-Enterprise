@@ -1,0 +1,15 @@
+title: Appliance log discontinuity after suspicious requests
+id: query-025-002
+status: hunt
+description: A log discontinuity following suspicious requests on the same appliance warrants investigation.
+logsource:
+  product: linux
+  service: syslog
+detection:
+  selection:
+    message|contains:
+    - log rotation
+    - audit stopped
+    - nslog restart
+  condition: selection
+level: high

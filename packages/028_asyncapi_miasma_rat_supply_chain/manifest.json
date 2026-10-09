@@ -1,0 +1,326 @@
+{
+  "package_id": "pkg-028",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "AsyncAPI npm Supply-Chain Compromise & Miasma RAT",
+  "description": "A supply-chain compromise of the AsyncAPI npm ecosystem in which a privileged `pull_request_target` workflow was abused to steal a maintainer PAT, push malicious commits and publish trojanized `@asyncapi/*` packages that deploy the Miasma RAT on module import. The RAT harvests credentials, establishes persistence and uses decentralized (IPFS / Nostr / BitTorrent DHT) infrastructure for command and control.",
+  "difficulty": 4,
+  "tier": "Elite",
+  "package_family": "Supply Chain",
+  "package_type": "instance",
+  "source_type": "url",
+  "source_urls": [
+    "https://safedep.io/asyncapi-generator-supply-chain-attack-miasma-rat/",
+    "https://www.stepsecurity.io/blog/compromised-next-branch-pushes-malicious-asyncapi-generator-generator-helpers-and-generator-components-to-npm",
+    "https://unit42.paloaltonetworks.com/monitoring-npm-supply-chain-attacks/"
+  ],
+  "confidence": 0.9,
+  "human_review_required": false,
+  "deployment_mode": "detect-and-respond",
+  "category": "CI/CD",
+  "categories": [
+    "CI/CD",
+    "Cloud",
+    "Endpoint"
+  ],
+  "primary_category": "CI/CD",
+  "secondary_categories": [
+    "Cloud",
+    "Endpoint"
+  ],
+  "tags": [
+    "supply-chain",
+    "npm",
+    "asyncapi",
+    "miasma-rat",
+    "pull-request-target",
+    "ipfs",
+    "nostr",
+    "credential-theft"
+  ],
+  "threat_actor": "Unattributed supply-chain threat actor",
+  "campaign_name": "AsyncAPI generator compromise (Miasma RAT), July 2026",
+  "github_path": "packages/028_asyncapi_miasma_rat_supply_chain",
+  "slug": "028_asyncapi_miasma_rat_supply_chain",
+  "roles": [
+    "DevSecOps Engineer",
+    "GitHub Administrator",
+    "Detection Engineer",
+    "Cloud Security Engineer",
+    "Incident Responder"
+  ],
+  "mitre": [
+    "T1195.002",
+    "T1552",
+    "T1059.007",
+    "T1105",
+    "T1543.002",
+    "T1053.003",
+    "T1018",
+    "T1102"
+  ],
+  "mitre_techniques": [
+    "T1195.002",
+    "T1552",
+    "T1059.007",
+    "T1105",
+    "T1543.002",
+    "T1053.003",
+    "T1018",
+    "T1102"
+  ],
+  "mitre_version": "v16.1",
+  "stacks": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "CrowdStrike",
+    "Wazuh",
+    "MDE",
+    "AWS",
+    "GitHub",
+    "CI/CD",
+    "Endpoint",
+    "Cloud"
+  ],
+  "platform_targets": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "CrowdStrike",
+    "Wazuh",
+    "MDE",
+    "AWS",
+    "GitHub",
+    "CI/CD",
+    "Endpoint",
+    "Cloud"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Abuse privileged pull_request_target workflow",
+      "description": "The attacker abuses a misconfigured, privileged GitHub Actions `pull_request_target` workflow to obtain secrets from an untrusted fork PR.",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1195.002"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "Steal maintainer PAT and push malicious commits",
+      "description": "Using the stolen PAT, the attacker pushes malicious commits to the next branch and triggers trusted publishing.",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1552"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Publish trojanized @asyncapi/* packages",
+      "description": "Trojanized package versions are published to the public npm registry.",
+      "role": "red_team",
+      "phase": "Resource Development",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1195.002"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 4,
+      "title": "Code execution on module import",
+      "description": "On install/import, `sync.js` spawns a detached Node process that fetches second-stage payloads.",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1059.007",
+        "T1105"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 5,
+      "title": "Deploy Miasma RAT and harvest credentials",
+      "description": "The Miasma RAT is deployed, harvesting environment variables, tokens and cloud credentials.",
+      "role": "red_team",
+      "phase": "Credential Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1552"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 6,
+      "title": "Establish persistence",
+      "description": "The RAT establishes persistence via systemd services, cron/scheduled tasks or registry run keys.",
+      "role": "red_team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1543.002",
+        "T1053.003"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 7,
+      "title": "Decentralized C2 and lateral discovery",
+      "description": "C2 is conducted over IPFS / Nostr relays / BitTorrent DHT while the RAT performs remote-system discovery.",
+      "role": "red_team",
+      "phase": "Command and Control",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1102",
+        "T1018"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 8,
+      "title": "Detect trojanized package execution",
+      "description": "Blue team detects post-install script execution spawning detached Node processes and connections to known C2 infrastructure.",
+      "role": "blue_team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1195.002",
+        "T1105"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 9,
+      "title": "Contain and remediate supply-chain compromise",
+      "description": "SOC quarantines runners/endpoints, removes affected versions, revokes credentials and rebuilds from verified commits.",
+      "role": "soc_team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Elite",
+  "family_metadata": {
+    "source_type": "url",
+    "source_urls": [
+      "https://safedep.io/asyncapi-generator-supply-chain-attack-miasma-rat/",
+      "https://www.stepsecurity.io/blog/compromised-next-branch-pushes-malicious-asyncapi-generator-generator-helpers-and-generator-components-to-npm",
+      "https://unit42.paloaltonetworks.com/monitoring-npm-supply-chain-attacks/"
+    ],
+    "cve_id": "N/A",
+    "advisory_title": "Compromised @asyncapi/* npm packages deliver Miasma RAT (July 2026)",
+    "affected_products": "@asyncapi/generator, @asyncapi/specs, @asyncapi/generator-helpers, @asyncapi/generator-components (npm)",
+    "exposed_surface": "Developer workstations, CI/CD runners and cloud workloads that install or build affected @asyncapi/* packages",
+    "exploitability": "Active; trojanized packages published to the public npm registry",
+    "target_stacks": [
+      "Sigma",
+      "Sentinel",
+      "Splunk",
+      "CrowdStrike",
+      "Wazuh",
+      "MDE",
+      "AWS",
+      "GitHub",
+      "CI/CD",
+      "Endpoint",
+      "Cloud"
+    ],
+    "posture": "detect_and_respond"
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://safedep.io/asyncapi-generator-supply-chain-attack-miasma-rat/",
+    "analysis_date": "2026-10-09"
+  }
+}

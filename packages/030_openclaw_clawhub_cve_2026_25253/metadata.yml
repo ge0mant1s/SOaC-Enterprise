@@ -1,0 +1,42 @@
+package_id: pkg-030
+title: OpenClaw / ClawHub Malicious Skills & Control-UI RCE (CVE-2026-25253)
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 3
+tier: Advanced
+package_family: Supply Chain
+category: Endpoint
+categories:
+- Endpoint
+- Cloud
+primary_category: Endpoint
+mitre_techniques:
+- T1195.002
+- T1204.001
+- T1204.002
+- T1059.004
+- T1105
+- T1190
+- T1555
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- CrowdStrike
+- Wazuh
+- MDE
+- GitHub
+- CI/CD
+- Endpoint
+- Cloud
+- Network
+source_type: url
+source_urls:
+- https://aviatrix.ai/threat-research-center/openclaw-clawhub-malicious-skills-supply-chain-attack-2026/
+- https://www.trendmicro.com/en_us/research/26/b/openclaw-skills-used-to-distribute-atomic-macos-stealer.html
+- https://docs.openclaw.ai/clawhub
+confidence: 0.8
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

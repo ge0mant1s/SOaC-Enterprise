@@ -1,0 +1,20 @@
+title: Miasma RAT C2 connection to 85.137.53.71
+id: rule-028-002
+status: experimental
+description: Detects network connections to the publicly reported Miasma RAT C2 server 85.137.53.71 on ports 8080, 8081 or
+  8091.
+logsource:
+  category: network_connection
+  product: windows
+detection:
+  selection:
+    DestinationIp: 85.137.53.71
+    DestinationPort:
+    - 8080
+    - 8081
+    - 8091
+  condition: selection
+mitre:
+- T1105
+- T1102
+level: high

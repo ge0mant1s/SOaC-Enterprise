@@ -1,0 +1,59 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: 028-asyncapi-miasma-rat-supply-chain-mitigation
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-028
+  scope: package
+  tags:
+  - supply-chain
+  - npm
+  - asyncapi
+  - miasma-rat
+  - pull-request-target
+  - ipfs
+spec:
+  description: 'Enforces supply-chain security controls for npm/GitHub pipelines: hardened pull_request_target usage, least-privilege
+    tokens, lockfile integrity, and verified/signed publishing to reduce exposure to trojanized-dependency attacks.'
+  environments:
+  - name: lab
+    mode: testing
+    data_handling: relaxed
+  - name: staging
+    mode: staging
+    data_handling: standard
+  - name: production
+    mode: production
+    data_handling: strict
+  access_control:
+    required_roles:
+    - DevSecOps Engineer
+    - GitHub Administrator
+    - Cloud Security Engineer
+    approval_workflow: true
+  compliance_frameworks:
+  - NIST CSF 2.0
+  - ISO/IEC 27001:2022
+  - MITRE ATT&CK
+  - CIS Controls v8
+  controls:
+  - name: Harden pull_request_target workflows
+    description: Privileged workflows must not expose secrets to untrusted fork PRs; use least-privilege GITHUB_TOKEN and
+      manual approval for forks.
+    enforcement: automated
+    evidence: GitHub Actions workflow policy scan results
+  - name: Enforce lockfile integrity and pinning
+    description: Dependencies are pinned and verified against lockfile hashes; builds fail on unexpected changes.
+    enforcement: automated
+    evidence: CI dependency-integrity check logs
+  - name: Least-privilege publishing tokens
+    description: npm and GitHub tokens are scoped, short-lived and stored in a secrets manager; trusted publishing requires
+      provenance.
+    enforcement: automated
+    evidence: Token inventory and provenance attestations
+  - name: Continuous dependency threat monitoring
+    description: Installed dependencies are continuously screened against known malicious-package intelligence.
+    enforcement: automated
+    evidence: SCA / malicious-package alerts

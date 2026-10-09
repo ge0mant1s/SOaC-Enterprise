@@ -1,0 +1,6 @@
+// Control UI gatewayUrl WebSocket hijack (CVE-2026-25253)
+DeviceNetworkEvents
+| where RemoteUrl has "gatewayUrl" or (Protocol == "Ws" or Protocol == "Wss")
+| where InitiatingProcessFileName has_any ("openclaw", "Control UI", "controlui")
+| where RemoteIPType == "Public"
+| project Timestamp, DeviceName, RemoteUrl, RemoteIP, InitiatingProcessFileName

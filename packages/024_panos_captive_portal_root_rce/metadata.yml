@@ -1,0 +1,35 @@
+package_id: pkg-024
+title: PAN-OS User-ID Authentication Portal Root RCE
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: firewall-rce
+category: Network
+categories:
+- Network
+- Endpoint
+primary_category: Network
+mitre_techniques:
+- T1190
+- T1059
+- T1105
+- T1572
+- T1087
+- T1018
+- T1070
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- Network
+- Endpoint
+source_type: url
+source_urls:
+- https://unit42.paloaltonetworks.com/captive-portal-zero-day/
+- https://security.paloaltonetworks.com/CVE-2026-0300
+confidence: 0.85
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

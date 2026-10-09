@@ -1,0 +1,14 @@
+<group name="soac,openclaw,clawhub,cve_2026_25253,">
+  <rule id="920301" level="12">
+    <field name="parent_process">openclaw</field>
+    <field name="command" type="pcre2">base64\s+(-d|--decode)</field>
+    <description>OpenClaw skill spawning Base64-encoded shell (behavioral; possible malicious skill).</description>
+    <mitre><id>T1059.004</id><id>T1204.002</id></mitre>
+  </rule>
+  <rule id="920302" level="13">
+    <field name="url" type="pcre2">gatewayUrl</field>
+    <field name="protocol" type="pcre2">(?i)wss?</field>
+    <description>OpenClaw Control UI gatewayUrl WebSocket connection (possible CVE-2026-25253 hijack).</description>
+    <mitre><id>T1190</id></mitre>
+  </rule>
+</group>

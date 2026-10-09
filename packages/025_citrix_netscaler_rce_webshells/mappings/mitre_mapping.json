@@ -1,0 +1,88 @@
+{
+  "package_id": "pkg-025",
+  "mappings": [
+    {
+      "technique_id": "T1190",
+      "detection_rules": [],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": [
+        "query-025-001"
+      ]
+    },
+    {
+      "technique_id": "T1059",
+      "detection_rules": [
+        "rule-025-001"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": [
+        "query-025-001"
+      ]
+    },
+    {
+      "technique_id": "T1505.003",
+      "detection_rules": [
+        "rule-025-001",
+        "rule-025-002"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1105",
+      "detection_rules": [],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1572",
+      "detection_rules": [
+        "rule-025-003"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1083",
+      "detection_rules": [],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    },
+    {
+      "technique_id": "T1041",
+      "detection_rules": [
+        "rule-025-003"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": []
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "test_id": "29-L3-001",
+  "package_id": "pkg-029",
+  "description": "Synthetic telemetry for UAT-11587 Antino Backdoor & Microsoft 365 API C2",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Spearphishing with HTML preview clones",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1566"
+        ],
+        "description": "Targets receive spearphishing emails with HTML attachment-preview clones linking to Cloudflare-hosted files."
+      },
+      "expected_detection": "rule-029-001",
+      "mitre": [
+        "T1566"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "User executes staged HTA/WSF",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1204",
+          "T1059.005"
+        ],
+        "description": "User interaction launches HTA/WSF staging scripts."
+      },
+      "expected_detection": "rule-029-002",
+      "mitre": [
+        "T1204",
+        "T1059.005"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "In-memory .NET deserialization",
+      "data": {
+        "step": 3,
+        "mitre": [
+          "T1620",
+          "T1059.007"
+        ],
+        "description": "Encrypted JavaScript/.NET payloads are deserialized and executed in memory."
+      },
+      "expected_detection": "rule-029-003",
+      "mitre": [
+        "T1620",
+        "T1059.007"
+      ]
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "DLL sideloading via signed utility",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1574.002",
+          "T1218.005"
+        ],
+        "description": "A signed utility (GatherOsState.exe) sideloads a malicious slc.dll."
+      },
+      "expected_detection": "rule-029-001",
+      "mitre": [
+        "T1574.002",
+        "T1218.005"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "PowerShell proxying and sleep masking",
+      "data": {
+        "step": 5,
+        "mitre": [
+          "T1059.001"
+        ],
+        "description": "sdiagnhost.exe proxies PowerShell execution and the backdoor uses sleep masking to evade detection."
+      },
+      "expected_detection": "rule-029-002",
+      "mitre": [
+        "T1059.001"
+      ]
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Microsoft 365 API command-and-control",
+      "data": {
+        "step": 6,
+        "mitre": [
+          "T1102"
+        ],
+        "description": "The Antino backdoor polls Outlook (~every 10s) and OneDrive (~every minute) via OAuth for tasking."
+      },
+      "expected_detection": "rule-029-003",
+      "mitre": [
+        "T1102"
+      ]
+    },
+    {
+      "event_id": "evt-007",
+      "timestamp": "2026-10-09T12:12:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect sideloading and M365 API C2",
+      "data": {
+        "step": 7,
+        "mitre": [
+          "T1574.002",
+          "T1102"
+        ],
+        "description": "Blue team detects GatherOsState.exe loading an unexpected slc.dll and anomalous OAuth polling of Outlook/OneDrive."
+      },
+      "expected_detection": "rule-029-001",
+      "mitre": [
+        "T1574.002",
+        "T1102"
+      ]
+    },
+    {
+      "event_id": "evt-008",
+      "timestamp": "2026-10-09T12:14:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Contain and evict the backdoor",
+      "data": {
+        "step": 8,
+        "mitre": [],
+        "description": "SOC isolates hosts, revokes OAuth grants/tokens, removes persistence and hunts for lateral movement."
+      },
+      "expected_detection": "rule-029-002",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-029-001",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "GatherOsState.exe sideloading unexpected slc.dll"
+    },
+    {
+      "detection_id": "rule-029-002",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "sdiagnhost.exe proxying PowerShell execution"
+    },
+    {
+      "detection_id": "rule-029-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Anomalous M365 OAuth polling of Outlook/OneDrive"
+    }
+  ]
+}

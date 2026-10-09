@@ -1,0 +1,97 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 025-citrix-netscaler-rce-webshells
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-025
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1505.003
+  - T1105
+  - T1572
+  - T1083
+  - T1041
+  severity: CRITICAL
+  data_sources:
+  - NetScaler web/audit/system logs
+  - Network flow
+  - Appliance file-system metadata
+  - Web-server logs
+spec:
+  description: 'Detects NetScaler exploitation behaviors: abnormal command-bearing requests, appliance web-service processes
+    spawning interpreters, new PHP content in web roots, appliance-originated tunnels and outbound exfiltration. WHIPSHOT
+    and SLAPSHOT are named artifacts; exact paths/hashes are not established, so file and process analytics are behavioral/engineering
+    logic requiring validation against Citrix forensic guidance.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  inline_rules:
+  - id: rule-025-001
+    name: NetScaler web-service process spawning interpreter
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1059
+    - T1505.003
+    severity: high
+    query: |-
+      // Behavioral: NetScaler web-service (nsppe/httpd/php) spawning a shell or Python interpreter.
+      DeviceProcessEvents
+      | where InitiatingProcessFileName in~ ("httpd", "nsppe", "php", "php-cgi")
+      | where FileName in~ ("sh", "bash", "python", "python3", "perl")
+      | project TimeGenerated, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine, AccountName
+  - id: rule-025-002
+    name: New PHP file created in NetScaler web root
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1505.003
+    severity: high
+    sigma_description: Detects creation of PHP content under appliance web-serving directories (behavioral; validate exact
+      paths against Citrix forensic guidance).
+    logsource:
+      product: linux
+      category: file_event
+    sigma_detection:
+      selection:
+        TargetFilename|endswith:
+        - .php
+        TargetFilename|contains:
+        - /netscaler/
+        - /var/vpn/
+        - /var/netscaler/logon/
+      condition: selection
+    query: TargetFilename endswith .php AND path contains netscaler
+  - id: rule-025-003
+    name: NetScaler appliance outbound tunnel/exfiltration
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1572
+    - T1041
+    severity: high
+    query: |-
+      // Behavioral: NetScaler appliance initiating internal scans or outbound sessions inconsistent with its ADC/Gateway role.
+      CommonSecurityLog
+      | where DeviceProduct has "NetScaler" or Computer has "netscaler"
+      | where CommunicationDirection == "Outbound" or isempty(CommunicationDirection)
+      | summarize Bytes=sum(SentBytes), Sessions=count() by DeviceName, DestinationIP, DestinationPort
+      | where Sessions > 5 and Bytes > 500000
+      | order by Bytes desc
+  test_cases:
+  - id: tc-025-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-025-002
+    name: Citrix NetScaler exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-025-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

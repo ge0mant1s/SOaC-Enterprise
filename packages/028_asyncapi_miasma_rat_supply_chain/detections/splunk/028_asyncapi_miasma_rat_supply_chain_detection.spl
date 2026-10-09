@@ -1,0 +1,7 @@
+// AsyncAPI npm Supply-Chain Compromise & Miasma RAT — Splunk detection
+// MITRE: T1195.002, T1552, T1059.007, T1105, T1543.002, T1053.003, T1018, T1102
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=edr (process_name=node* OR process_name=npm*) 
+| search (command="*@asyncapi/generator@3.3.1*" OR command="*@asyncapi/specs@6.11.2*" OR command="*sync.js*") 
+| join type=left host [ search index=network dest_ip="85.137.53.71" (dest_port=8080 OR dest_port=8081 OR dest_port=8091) ] 
+| table _time host user command dest_ip dest_port

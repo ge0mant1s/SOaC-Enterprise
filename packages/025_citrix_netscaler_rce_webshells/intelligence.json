@@ -1,0 +1,31 @@
+{
+  "source_type": "url",
+  "source_name": "https://support.citrix.com/external/article/CTX697096/citrix-netscaler-adc-and-citrix-netscale.html",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1190",
+    "T1059",
+    "T1505.003",
+    "T1105",
+    "T1572",
+    "T1083",
+    "T1041"
+  ],
+  "attack_chain": [
+    "Command-bearing request to NetScaler",
+    "Unauthenticated command execution",
+    "PHP web shell (WHIPSHOT)",
+    "SLAPSHOT Python tunneler",
+    "File/directory discovery",
+    "Exfiltration over C2"
+  ],
+  "platforms": [
+    "Citrix NetScaler ADC/Gateway",
+    "Network edge"
+  ],
+  "detection_surfaces": [
+    "NetScaler web/audit/system logs",
+    "Appliance file system",
+    "Network flow"
+  ]
+}

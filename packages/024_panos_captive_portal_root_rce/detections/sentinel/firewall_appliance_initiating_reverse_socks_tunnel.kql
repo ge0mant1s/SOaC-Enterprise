@@ -1,0 +1,9 @@
+// Behavioral: PAN-OS appliance initiating sustained outbound sessions to previously unseen external destinations (reverse SOCKS/tunnel).
+let fwAssets = dynamic(["pan-fw"]);
+CommonSecurityLog
+| where DeviceVendor == "Palo Alto Networks"
+| where DeviceName has_any (fwAssets) or Computer has "pan"
+| where CommunicationDirection == "Outbound" or isempty(CommunicationDirection)
+| summarize Bytes=sum(SentBytes), Sessions=count(), Duration=max(todouble(column_ifexists("Duration", 0))) by DeviceName, DestinationIP, DestinationPort
+| where Sessions > 5 and Bytes > 1000000
+| order by Bytes desc

@@ -1,0 +1,57 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 027-linux-copy-fail-container-breakout-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - linux
+  - kernel
+  - copy-fail
+  - cve-2026-31431
+  - af_alg
+  - container-breakout
+  mitre_attack:
+  - T1068
+  - T1611
+  - T1059
+  severity: HIGH
+  package_id: pkg-027
+spec:
+  steps:
+  - id: step-1
+    name: Drain and isolate unpatched node
+    action: isolate_node
+    target: linux_node
+    parameters:
+      cordon: true
+      drain: true
+    timeout: 300
+    on_failure: escalate_to_platform_team
+  - id: step-2
+    name: Apply kernel update and reboot
+    action: patch_kernel
+    target: linux_node
+    parameters:
+      cve: CVE-2026-31431
+      reboot: true
+    timeout: 1800
+    on_failure: escalate_to_platform_team
+  - id: step-3
+    name: Refresh managed node image
+    action: refresh_node_image
+    target: node_pool
+    parameters:
+      rolling: true
+    timeout: 3600
+    on_failure: escalate_to_platform_team
+  - id: step-4
+    name: Restrict AF_ALG socket creation while patching
+    action: apply_seccomp_profile
+    target: workload
+    parameters:
+      block_syscalls:
+      - socket(AF_ALG)
+    timeout: 120
+    on_failure: continue

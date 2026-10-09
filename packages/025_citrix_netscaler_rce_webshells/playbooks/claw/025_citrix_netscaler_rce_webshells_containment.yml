@@ -1,0 +1,72 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 025-citrix-netscaler-rce-webshells-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - citrix
+  - netscaler
+  - adc
+  - gateway
+  - cve-2026-88771
+  - web-shell
+  mitre_attack:
+  - T1190
+  - T1059
+  - T1505.003
+  - T1105
+  - T1572
+  - T1083
+  - T1041
+  severity: CRITICAL
+  package_id: pkg-025
+spec:
+  steps:
+  - id: step-1
+    name: remove-external-exposure
+    action: api_call
+    target: network_acl
+    parameters:
+      asset: unpatched_netscaler
+      action: remove_external_exposure
+    timeout: 120s
+    on_failure: escalate
+  - id: step-2
+    name: upgrade-fixed-release
+    action: api_call
+    target: patch_manager
+    parameters:
+      targets:
+      - 14.1-73.37+
+      - 13.1-64.23+
+      include_fips_ndcpp: true
+    timeout: 600s
+    on_failure: escalate
+  - id: step-3
+    name: preserve-appliance-evidence
+    action: script
+    target: evidence_collector
+    parameters:
+      artifacts:
+      - traffic
+      - audit_logs
+      - crash_data
+      - process_state
+      - filesystem_metadata
+    timeout: 300s
+    on_failure: continue
+  - id: step-4
+    name: hunt-webshells-tunnels
+    action: script
+    target: hunt_engine
+    parameters:
+      targets:
+      - php_webshells
+      - python_processes
+      - new_files
+      - outbound_tunnels
+      - internal_recon
+    timeout: 300s
+    on_failure: continue

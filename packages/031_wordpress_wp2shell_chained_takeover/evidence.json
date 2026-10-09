@@ -1,0 +1,118 @@
+{
+  "test_id": "31-L3-001",
+  "package_id": "pkg-031",
+  "description": "Synthetic telemetry for WordPress WP2Shell Chained Takeover (CVE-2026-60137 + CVE-2026-63030)",
+  "schema_version": "1.0.0",
+  "events": [
+    {
+      "event_id": "evt-001",
+      "timestamp": "2026-10-09T12:00:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Reconnaissance and vulnerability probing",
+      "data": {
+        "step": 1,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "Attackers probe externally facing WordPress sites for the chained vulnerabilities."
+      },
+      "expected_detection": "rule-031-001",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-002",
+      "timestamp": "2026-10-09T12:02:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Chained exploitation (CVE-2026-60137 + CVE-2026-63030)",
+      "data": {
+        "step": 2,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "The two vulnerabilities are chained to exploit the public-facing application."
+      },
+      "expected_detection": "rule-031-002",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-003",
+      "timestamp": "2026-10-09T12:04:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Successful takeover (behavioral)",
+      "data": {
+        "step": 3,
+        "mitre": [],
+        "description": "Behavioral indicators of takeover follow: anomalous successful admin sessions, unexpected content changes and outbound connections. Specific post-exploitation techniques are not asserted due to sparse public evidence."
+      },
+      "expected_detection": "rule-031-003",
+      "mitre": []
+    },
+    {
+      "event_id": "evt-004",
+      "timestamp": "2026-10-09T12:06:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect exploitation attempts",
+      "data": {
+        "step": 4,
+        "mitre": [
+          "T1190"
+        ],
+        "description": "Blue team detects anomalous request bursts and exploitation signatures against the WordPress attack surface."
+      },
+      "expected_detection": "rule-031-001",
+      "mitre": [
+        "T1190"
+      ]
+    },
+    {
+      "event_id": "evt-005",
+      "timestamp": "2026-10-09T12:08:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Detect post-takeover anomalies (behavioral)",
+      "data": {
+        "step": 5,
+        "mitre": [],
+        "description": "Blue team correlates successful admin sessions, content changes and outbound connections as behavioral takeover indicators."
+      },
+      "expected_detection": "rule-031-002",
+      "mitre": []
+    },
+    {
+      "event_id": "evt-006",
+      "timestamp": "2026-10-09T12:10:00.000Z",
+      "provider": "Sentinel",
+      "event_name": "Contain and remediate",
+      "data": {
+        "step": 6,
+        "mitre": [],
+        "description": "SOC patches the vulnerabilities, isolates affected sites, resets credentials and restores from known-good backups."
+      },
+      "expected_detection": "rule-031-003",
+      "mitre": []
+    }
+  ],
+  "expected_matches": [
+    {
+      "detection_id": "rule-031-001",
+      "file": "detection.yaml",
+      "platform": "Sigma",
+      "description": "Anomalous request burst against WordPress endpoints"
+    },
+    {
+      "detection_id": "rule-031-002",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "WordPress exploitation signature (chained CVEs)"
+    },
+    {
+      "detection_id": "rule-031-003",
+      "file": "detection.yaml",
+      "platform": "Sentinel",
+      "description": "Behavioral post-takeover anomalies (admin session + content change)"
+    }
+  ]
+}

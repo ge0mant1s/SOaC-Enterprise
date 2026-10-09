@@ -1,0 +1,241 @@
+{
+  "package_id": "pkg-027",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "Linux Copy Fail Privilege Escalation and Container Breakout",
+  "description": "CVE-2026-31431 (\"Copy Fail\") is a Linux kernel privilege-escalation flaw in the algif_aead component of the AF_ALG userspace cryptographic API. Microsoft reported that an unprivileged local user could corrupt the kernel page cache and obtain root access. Because the page cache is shared across containers on a host, the flaw can support container breakout and host compromise. This package provides container-to-host privilege-escalation detection, hunting and response content for Linux hosts, Kubernetes nodes and CI/CD runners.",
+  "difficulty": 4,
+  "tier": "Elite",
+  "package_family": "privilege-escalation",
+  "package_type": "instance",
+  "source_type": "url",
+  "source_urls": [
+    "https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/",
+    "https://learn.microsoft.com/en-us/azure/azure-linux/manage-cves"
+  ],
+  "confidence": 0.8,
+  "human_review_required": false,
+  "deployment_mode": "detect-and-respond",
+  "category": "Cloud",
+  "categories": [
+    "Cloud",
+    "Endpoint",
+    "CI/CD"
+  ],
+  "primary_category": "Cloud",
+  "secondary_categories": [
+    "Endpoint",
+    "CI/CD"
+  ],
+  "tags": [
+    "linux",
+    "kernel",
+    "copy-fail",
+    "cve-2026-31431",
+    "af_alg",
+    "container-breakout",
+    "privilege-escalation"
+  ],
+  "threat_actor": "Not established in reviewed sources",
+  "campaign_name": "Copy Fail Linux kernel privilege escalation (2026)",
+  "github_path": "packages/027_linux_copy_fail_container_breakout",
+  "slug": "027_linux_copy_fail_container_breakout",
+  "roles": [
+    "Cloud Security Engineer",
+    "Linux Engineer",
+    "Detection Engineer",
+    "DevSecOps Engineer",
+    "Incident Responder"
+  ],
+  "mitre": [
+    "T1068",
+    "T1611",
+    "T1059"
+  ],
+  "mitre_techniques": [
+    "T1068",
+    "T1611",
+    "T1059"
+  ],
+  "mitre_version": "v16.1",
+  "stacks": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "CrowdStrike",
+    "Wazuh",
+    "MDE",
+    "Endpoint",
+    "Cloud",
+    "CI/CD"
+  ],
+  "platform_targets": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "CrowdStrike",
+    "Wazuh",
+    "MDE",
+    "Endpoint",
+    "Cloud",
+    "CI/CD"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Unprivileged local execution in container",
+      "description": "An unprivileged local or containerized process begins the exploit attempt.",
+      "role": "red_team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1059"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "AF_ALG / algif_aead + splice() interaction",
+      "description": "Process creates AF_ALG sockets and uses unusual cryptographic-socket and splice() sequences.",
+      "role": "red_team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1068"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Page-cache corruption to root",
+      "description": "Controlled page-cache corruption yields root (UID 0) execution.",
+      "role": "red_team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1068"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 4,
+      "title": "Escape to host namespace",
+      "description": "Because the page cache is shared, the attacker escapes the container boundary to the host.",
+      "role": "red_team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1611"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 5,
+      "title": "Detect container-to-host privilege transition",
+      "description": "Blue team correlates container AF_ALG socket activity with subsequent root execution or host-namespace access by the same workload.",
+      "role": "blue_team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1068",
+        "T1611"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 6,
+      "title": "Drain, patch and rebuild nodes",
+      "description": "SOC drains/isolates unpatched nodes, applies kernel updates, refreshes node images and rebuilds on suspected escape.",
+      "role": "soc_team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Elite",
+  "family_metadata": {
+    "source_type": "url",
+    "source_urls": [
+      "https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/",
+      "https://learn.microsoft.com/en-us/azure/azure-linux/manage-cves"
+    ],
+    "cve_id": "CVE-2026-31431",
+    "advisory_title": "Microsoft Copy Fail (CVE-2026-31431) vulnerability analysis and remediation guidance",
+    "affected_products": "Linux hosts, containers, Kubernetes nodes, CI/CD runners and cloud workloads (vulnerable kernels)",
+    "exposed_surface": "Unprivileged local code execution on shared Linux hosts and nodes",
+    "exploitability": "High-severity (CVSS 7.8); KEV status pending primary-source validation",
+    "target_stacks": [
+      "Sigma",
+      "Sentinel",
+      "Splunk",
+      "CrowdStrike",
+      "Wazuh",
+      "MDE",
+      "Endpoint",
+      "Cloud",
+      "CI/CD"
+    ],
+    "posture": "detect_and_respond"
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/",
+    "analysis_date": "2026-10-09"
+  }
+}

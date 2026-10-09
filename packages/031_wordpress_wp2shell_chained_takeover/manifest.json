@@ -1,0 +1,223 @@
+{
+  "package_id": "pkg-031",
+  "version": "1.0.0",
+  "schema_version": "3.0",
+  "title": "WordPress WP2Shell Chained Takeover (CVE-2026-60137 + CVE-2026-63030)",
+  "description": "A chained WordPress takeover (\"WP2Shell\") combining CVE-2026-60137 and CVE-2026-63030, reported by Talos. Attackers chain the two vulnerabilities to exploit externally facing WordPress sites. Public evidence is sparse: the only concrete indicators are the \"WP2Shell\" name and the two CVE identifiers, so all post-exploitation behavior is modeled as behavioral rather than asserted.",
+  "difficulty": 3,
+  "tier": "Advanced",
+  "package_family": "Web Application",
+  "package_type": "instance",
+  "source_type": "url",
+  "source_urls": [
+    "https://blog.talosintelligence.com/dont-swing-at-everything/"
+  ],
+  "confidence": 0.6,
+  "human_review_required": false,
+  "deployment_mode": "detect-and-respond",
+  "category": "Cloud",
+  "categories": [
+    "Cloud",
+    "SaaS",
+    "Network"
+  ],
+  "primary_category": "Cloud",
+  "secondary_categories": [
+    "SaaS",
+    "Network"
+  ],
+  "tags": [
+    "wordpress",
+    "wp2shell",
+    "cve-2026-60137",
+    "cve-2026-63030",
+    "web-exploitation",
+    "chained-exploit"
+  ],
+  "threat_actor": "Unattributed",
+  "campaign_name": "WP2Shell chained WordPress exploitation (2026)",
+  "github_path": "packages/031_wordpress_wp2shell_chained_takeover",
+  "slug": "031_wordpress_wp2shell_chained_takeover",
+  "roles": [
+    "Web Security Engineer",
+    "Detection Engineer",
+    "Vulnerability Manager",
+    "Incident Responder",
+    "Cloud Security Engineer"
+  ],
+  "mitre": [
+    "T1190"
+  ],
+  "mitre_techniques": [
+    "T1190"
+  ],
+  "mitre_version": "v16.1",
+  "stacks": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "Wazuh",
+    "Cloud",
+    "SaaS",
+    "Network"
+  ],
+  "platform_targets": [
+    "Sigma",
+    "Sentinel",
+    "Splunk",
+    "Wazuh",
+    "Cloud",
+    "SaaS",
+    "Network"
+  ],
+  "simulation_steps": [
+    {
+      "step_index": 1,
+      "title": "Reconnaissance and vulnerability probing",
+      "description": "Attackers probe externally facing WordPress sites for the chained vulnerabilities.",
+      "role": "red_team",
+      "phase": "Reconnaissance",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 2,
+      "title": "Chained exploitation (CVE-2026-60137 + CVE-2026-63030)",
+      "description": "The two vulnerabilities are chained to exploit the public-facing application.",
+      "role": "red_team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 3,
+      "title": "Successful takeover (behavioral)",
+      "description": "Behavioral indicators of takeover follow: anomalous successful admin sessions, unexpected content changes and outbound connections. Specific post-exploitation techniques are not asserted due to sparse public evidence.",
+      "role": "red_team",
+      "phase": "Impact",
+      "pillar": "Offense",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "red_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 4,
+      "title": "Detect exploitation attempts",
+      "description": "Blue team detects anomalous request bursts and exploitation signatures against the WordPress attack surface.",
+      "role": "blue_team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "mitre_techniques": [
+        "T1190"
+      ],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 5,
+      "title": "Detect post-takeover anomalies (behavioral)",
+      "description": "Blue team correlates successful admin sessions, content changes and outbound connections as behavioral takeover indicators.",
+      "role": "blue_team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "blue_team",
+          "primary": true
+        },
+        {
+          "role": "soc_team",
+          "primary": false
+        }
+      ]
+    },
+    {
+      "step_index": 6,
+      "title": "Contain and remediate",
+      "description": "SOC patches the vulnerabilities, isolates affected sites, resets credentials and restores from known-good backups.",
+      "role": "soc_team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "mitre_techniques": [],
+      "roles": [
+        {
+          "role": "soc_team",
+          "primary": true
+        },
+        {
+          "role": "blue_team",
+          "primary": false
+        }
+      ]
+    }
+  ],
+  "difficulty_label": "Advanced",
+  "family_metadata": {
+    "source_type": "url",
+    "source_urls": [
+      "https://blog.talosintelligence.com/dont-swing-at-everything/"
+    ],
+    "cve_id": "CVE-2026-60137, CVE-2026-63030",
+    "advisory_title": "WP2Shell: chained WordPress exploitation via CVE-2026-60137 and CVE-2026-63030",
+    "affected_products": "WordPress sites vulnerable to CVE-2026-60137 and CVE-2026-63030",
+    "exposed_surface": "Externally facing WordPress sites and their hosting infrastructure",
+    "exploitability": "Active exploitation reported (chained)",
+    "target_stacks": [
+      "Sigma",
+      "Sentinel",
+      "Splunk",
+      "Wazuh",
+      "Cloud",
+      "SaaS",
+      "Network"
+    ],
+    "posture": "detect_and_respond"
+  },
+  "intelligence_driven": true,
+  "intelligence_source": {
+    "source_type": "url",
+    "source_name": "https://blog.talosintelligence.com/dont-swing-at-everything/",
+    "analysis_date": "2026-10-09"
+  }
+}

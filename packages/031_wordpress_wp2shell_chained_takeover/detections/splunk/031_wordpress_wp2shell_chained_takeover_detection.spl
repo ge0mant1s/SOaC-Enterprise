@@ -1,0 +1,7 @@
+// WordPress WP2Shell Chained Takeover (CVE-2026-60137 + CVE-2026-63030) — Splunk detection
+// MITRE: T1190
+// Behavioral/engineering logic unless an IOC is cited inline.
+index=web (uri_path="/wp-admin/*" OR uri_path="/xmlrpc.php" OR uri_path="/wp-json/*" OR uri_path="/wp-login.php") 
+| bucket _time span=1m | stats count by _time, src_ip 
+| where count > 100 
+| table _time src_ip count

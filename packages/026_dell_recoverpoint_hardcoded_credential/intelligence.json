@@ -1,0 +1,29 @@
+{
+  "source_type": "url",
+  "source_name": "https://www.dell.com/support/kbdoc/en-us/000426773/dsa-2026-079",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1078",
+    "T1133",
+    "T1059",
+    "T1543",
+    "T1021"
+  ],
+  "attack_chain": [
+    "Hardcoded credential remote access",
+    "Operating-system access",
+    "Root persistence (GRIMBOLT/BRICKSTORM)",
+    "Pivot toward VMware infrastructure"
+  ],
+  "platforms": [
+    "Dell RecoverPoint for VMs",
+    "VMware virtual infrastructure",
+    "Identity"
+  ],
+  "detection_surfaces": [
+    "RecoverPoint appliance/SSH logs",
+    "VMware management logs",
+    "Network flow",
+    "Identity"
+  ]
+}

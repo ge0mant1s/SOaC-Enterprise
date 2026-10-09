@@ -1,0 +1,14 @@
+title: Behavioral admin session + content change
+id: query-031-002
+status: hunt
+description: Successful edits to theme/plugin files are behavioral takeover indicators.
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-stem|contains:
+    - /wp-admin/theme-editor.php
+    - /wp-admin/plugin-editor.php
+    sc-status: 200
+  condition: selection
+level: high

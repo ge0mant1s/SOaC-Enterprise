@@ -1,0 +1,66 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 029-uat-11587-antino-m365-api-c2-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - espionage
+  - china-nexus
+  - uat-11587
+  - antino
+  - m365
+  - outlook
+  mitre_attack:
+  - T1566
+  - T1204
+  - T1059.005
+  - T1059.007
+  - T1218.005
+  - T1574.002
+  - T1620
+  - T1102
+  - T1059.001
+  severity: HIGH
+  package_id: pkg-029
+spec:
+  steps:
+  - id: step-5
+    name: Block staging infrastructure
+    action: block_iocs
+    target: network
+    parameters:
+      categories:
+      - cloudflare_staging
+      - malicious_urls
+    timeout: 120
+    on_failure: continue
+  - id: step-6
+    name: Preserve forensic evidence
+    action: collect_logs
+    target: endpoint
+    parameters:
+      sources:
+      - process
+      - image_load
+      - m365_audit
+      - oauth_signin
+    timeout: 300
+    on_failure: continue
+  - id: step-7
+    name: Reimage compromised endpoints
+    action: reimage_host
+    target: endpoint
+    parameters:
+      from_clean_image: true
+    timeout: 3600
+    on_failure: escalate_to_ir_team
+  - id: step-8
+    name: Hunt for lateral movement
+    action: initiate_hunt
+    target: environment
+    parameters:
+      scope: tenant_and_endpoints
+    timeout: 900
+    on_failure: continue

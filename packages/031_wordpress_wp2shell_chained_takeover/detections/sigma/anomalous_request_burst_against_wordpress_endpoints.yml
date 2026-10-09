@@ -1,0 +1,19 @@
+title: Anomalous request burst against WordPress endpoints
+id: rule-031-001
+status: experimental
+description: Detects anomalous bursts of requests to WordPress admin/XML-RPC/REST endpoints consistent with chained WP2Shell
+  exploitation (behavioral).
+logsource:
+  category: webserver
+detection:
+  selection:
+    cs-uri-stem|contains:
+    - /wp-admin/
+    - /xmlrpc.php
+    - /wp-json/
+    - /wp-login.php
+  timeframe: 1m
+  condition: selection | count() by c-ip > 100
+mitre:
+- T1190
+level: high

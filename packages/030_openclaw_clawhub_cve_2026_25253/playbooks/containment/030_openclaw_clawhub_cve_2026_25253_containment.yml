@@ -1,0 +1,59 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 030-openclaw-clawhub-cve-2026-25253-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - openclaw
+  - clawhub
+  - ai-agent
+  - supply-chain
+  - typosquatting
+  - amos
+  mitre_attack:
+  - T1195.002
+  - T1204.001
+  - T1204.002
+  - T1059.004
+  - T1105
+  - T1190
+  - T1555
+  severity: HIGH
+  package_id: pkg-030
+spec:
+  steps:
+  - id: step-1
+    name: Remove exposed Control UI from network
+    action: restrict_service
+    target: endpoint
+    parameters:
+      bind_to: 127.0.0.1
+    timeout: 120
+    on_failure: escalate_to_platform_team
+  - id: step-2
+    name: Upgrade OpenClaw to v2026.1.29
+    action: patch_software
+    target: endpoint
+    parameters:
+      product: openclaw
+      version: 2026.1.29
+    timeout: 1800
+    on_failure: escalate_to_platform_team
+  - id: step-3
+    name: Remove untrusted skills
+    action: remove_skills
+    target: endpoint
+    parameters:
+      scope: untrusted_or_typosquatted
+    timeout: 600
+    on_failure: continue
+  - id: step-4
+    name: Isolate affected hosts
+    action: isolate_host
+    target: endpoint
+    parameters:
+      scope: hosts_with_malicious_skills
+    timeout: 300
+    on_failure: escalate_to_ir_team

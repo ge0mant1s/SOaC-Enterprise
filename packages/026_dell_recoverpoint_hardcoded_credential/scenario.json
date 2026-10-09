@@ -1,0 +1,96 @@
+{
+  "package_id": "pkg-026",
+  "title": "Dell RecoverPoint for Virtual Machines Hardcoded Credential Exploitation",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Initial Access",
+      "pillar": "Offense",
+      "title": "Use hardcoded credential for remote access",
+      "text": "Attacker uses the hardcoded credential (CVE-2026-22769) to access a network-reachable RecoverPoint for VMs appliance.",
+      "description": "Attacker uses the hardcoded credential (CVE-2026-22769) to access a network-reachable RecoverPoint for VMs appliance.",
+      "mitre": [
+        "T1078",
+        "T1133"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1078, T1133 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Obtain operating-system access",
+      "text": "Attacker reaches the underlying OS and executes commands as a privileged user.",
+      "description": "Attacker reaches the underlying OS and executes commands as a privileged user.",
+      "mitre": [
+        "T1059"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1059 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Persistence",
+      "pillar": "Offense",
+      "title": "Establish root persistence",
+      "text": "Attacker establishes root-level persistence; GRIMBOLT/BRICKSTORM backdoors reported. (T1543 enabled only if local validation confirms service creation \u2014 behavioral.)",
+      "description": "Attacker establishes root-level persistence; GRIMBOLT/BRICKSTORM backdoors reported. (T1543 enabled only if local validation confirms service creation \u2014 behavioral.)",
+      "mitre": [
+        "T1543"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1543 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Lateral Movement",
+      "pillar": "Offense",
+      "title": "Pivot toward VMware infrastructure",
+      "text": "Attacker uses remote services to move into connected VMware virtual infrastructure.",
+      "description": "Attacker uses remote services to move into connected VMware virtual infrastructure.",
+      "mitre": [
+        "T1021"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1021 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "title": "Detect root access without maintenance ticket",
+      "text": "Blue team alerts on RecoverPoint access from an unapproved identity path and root sessions without a corresponding maintenance ticket.",
+      "description": "Blue team alerts on RecoverPoint access from an unapproved identity path and root sessions without a corresponding maintenance ticket.",
+      "mitre": [
+        "T1078"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1078 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "SOC Team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "title": "Contain and rebuild appliance",
+      "text": "SOC blocks untrusted access, applies the fixed release / remediation script, treats root access as an integrity failure and rebuilds as appropriate.",
+      "description": "SOC blocks untrusted access, applies the fixed release / remediation script, treats root access as an integrity failure and rebuilds as appropriate.",
+      "mitre": [],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Behavioral monitoring (no source-reported IOC)",
+      "playbookRefs": []
+    }
+  ]
+}

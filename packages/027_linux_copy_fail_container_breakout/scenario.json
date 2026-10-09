@@ -1,0 +1,96 @@
+{
+  "package_id": "pkg-027",
+  "title": "Linux Copy Fail Privilege Escalation and Container Breakout",
+  "version": "1.0.0",
+  "steps": [
+    {
+      "step_index": 1,
+      "role": "Red Team",
+      "phase": "Execution",
+      "pillar": "Offense",
+      "title": "Unprivileged local execution in container",
+      "text": "An unprivileged local or containerized process begins the exploit attempt.",
+      "description": "An unprivileged local or containerized process begins the exploit attempt.",
+      "mitre": [
+        "T1059"
+      ],
+      "expectedOutcome": "Step 1 completes successfully",
+      "detectionHints": "Monitor for T1059 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 2,
+      "role": "Red Team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "title": "AF_ALG / algif_aead + splice() interaction",
+      "text": "Process creates AF_ALG sockets and uses unusual cryptographic-socket and splice() sequences.",
+      "description": "Process creates AF_ALG sockets and uses unusual cryptographic-socket and splice() sequences.",
+      "mitre": [
+        "T1068"
+      ],
+      "expectedOutcome": "Step 2 completes successfully",
+      "detectionHints": "Monitor for T1068 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 3,
+      "role": "Red Team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "title": "Page-cache corruption to root",
+      "text": "Controlled page-cache corruption yields root (UID 0) execution.",
+      "description": "Controlled page-cache corruption yields root (UID 0) execution.",
+      "mitre": [
+        "T1068"
+      ],
+      "expectedOutcome": "Step 3 completes successfully",
+      "detectionHints": "Monitor for T1068 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 4,
+      "role": "Red Team",
+      "phase": "Privilege Escalation",
+      "pillar": "Offense",
+      "title": "Escape to host namespace",
+      "text": "Because the page cache is shared, the attacker escapes the container boundary to the host.",
+      "description": "Because the page cache is shared, the attacker escapes the container boundary to the host.",
+      "mitre": [
+        "T1611"
+      ],
+      "expectedOutcome": "Step 4 completes successfully",
+      "detectionHints": "Monitor for T1611 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 5,
+      "role": "Blue Team",
+      "phase": "Detection",
+      "pillar": "Detect",
+      "title": "Detect container-to-host privilege transition",
+      "text": "Blue team correlates container AF_ALG socket activity with subsequent root execution or host-namespace access by the same workload.",
+      "description": "Blue team correlates container AF_ALG socket activity with subsequent root execution or host-namespace access by the same workload.",
+      "mitre": [
+        "T1068",
+        "T1611"
+      ],
+      "expectedOutcome": "Step 5 completes successfully",
+      "detectionHints": "Monitor for T1068, T1611 indicators",
+      "playbookRefs": []
+    },
+    {
+      "step_index": 6,
+      "role": "SOC Team",
+      "phase": "Response",
+      "pillar": "Respond",
+      "title": "Drain, patch and rebuild nodes",
+      "text": "SOC drains/isolates unpatched nodes, applies kernel updates, refreshes node images and rebuilds on suspected escape.",
+      "description": "SOC drains/isolates unpatched nodes, applies kernel updates, refreshes node images and rebuilds on suspected escape.",
+      "mitre": [],
+      "expectedOutcome": "Step 6 completes successfully",
+      "detectionHints": "Behavioral monitoring (no source-reported IOC)",
+      "playbookRefs": []
+    }
+  ]
+}

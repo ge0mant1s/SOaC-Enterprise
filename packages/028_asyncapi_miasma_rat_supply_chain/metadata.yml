@@ -1,0 +1,44 @@
+package_id: pkg-028
+title: AsyncAPI npm Supply-Chain Compromise & Miasma RAT
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: Supply Chain
+category: CI/CD
+categories:
+- CI/CD
+- Cloud
+- Endpoint
+primary_category: CI/CD
+mitre_techniques:
+- T1195.002
+- T1552
+- T1059.007
+- T1105
+- T1543.002
+- T1053.003
+- T1018
+- T1102
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- CrowdStrike
+- Wazuh
+- MDE
+- AWS
+- GitHub
+- CI/CD
+- Endpoint
+- Cloud
+source_type: url
+source_urls:
+- https://safedep.io/asyncapi-generator-supply-chain-attack-miasma-rat/
+- https://www.stepsecurity.io/blog/compromised-next-branch-pushes-malicious-asyncapi-generator-generator-helpers-and-generator-components-to-npm
+- https://unit42.paloaltonetworks.com/monitoring-npm-supply-chain-attacks/
+confidence: 0.9
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

@@ -1,0 +1,6 @@
+// Behavioral: RecoverPoint appliance initiating connections to vCenter/ESXi management outside normal replication/management peers.
+CommonSecurityLog
+| where SourceHostName has "recoverpoint" or Computer has "recoverpoint"
+| where DestinationPort in (443, 902, 22)
+| summarize Count=count(), Dests=make_set(DestinationIP, 20) by SourceHostName, bin(TimeGenerated, 1h)
+| where Count > 5

@@ -1,0 +1,22 @@
+{
+  "source_type": "url",
+  "source_name": "https://blog.talosintelligence.com/dont-swing-at-everything/",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1190"
+  ],
+  "attack_chain": [
+    "Reconnaissance",
+    "Chained exploitation (CVE-2026-60137 + CVE-2026-63030)",
+    "Takeover (behavioral)"
+  ],
+  "platforms": [
+    "MISP",
+    "OpenCTI"
+  ],
+  "detection_surfaces": [
+    "WordPress sites",
+    "WAF",
+    "Hosting infrastructure"
+  ]
+}

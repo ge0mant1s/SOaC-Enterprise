@@ -1,0 +1,10 @@
+{
+  "name": "Firewall appliance initiating reverse SOCKS tunnel",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1572",
+    "T1105"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "rule-024-001"
+}

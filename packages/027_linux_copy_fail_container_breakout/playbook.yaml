@@ -1,0 +1,138 @@
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: 027-linux-copy-fail-container-breakout-response
+  version: 1.0.0
+  author: SOaC CLAW Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  tags:
+  - linux
+  - kernel
+  - copy-fail
+  - cve-2026-31431
+  - af_alg
+  - container-breakout
+  mitre_attack:
+  - T1068
+  - T1611
+  - T1059
+  severity: HIGH
+  package_id: pkg-027
+spec:
+  description: Responds to suspected Copy Fail (CVE-2026-31431) container-to-host escape by draining and isolating affected
+    Linux nodes, applying kernel updates, refreshing managed node images, and rebuilding workloads on suspected escape.
+  trigger:
+    source: BRAIN
+    conditions:
+    - field: alert.title
+      operator: contains
+      value: Copy Fail
+    - field: alert.severity
+      operator: gte
+      value: HIGH
+    cooldown: 2m
+  inputs:
+  - name: alert_id
+    type: string
+    required: true
+    description: Unique identifier for the triggering alert
+  - name: affected_asset
+    type: string
+    required: true
+    description: FQDN, IP, or identifier of the affected asset
+  - name: source_ip
+    type: string
+    required: false
+    description: Source IP address associated with the activity
+  steps:
+  - id: step-1
+    name: Drain and isolate unpatched node
+    action: isolate_node
+    target: linux_node
+    parameters:
+      cordon: true
+      drain: true
+    timeout: 300
+    on_failure: escalate_to_platform_team
+  - id: step-2
+    name: Apply kernel update and reboot
+    action: patch_kernel
+    target: linux_node
+    parameters:
+      cve: CVE-2026-31431
+      reboot: true
+    timeout: 1800
+    on_failure: escalate_to_platform_team
+  - id: step-3
+    name: Refresh managed node image
+    action: refresh_node_image
+    target: node_pool
+    parameters:
+      rolling: true
+    timeout: 3600
+    on_failure: escalate_to_platform_team
+  - id: step-4
+    name: Restrict AF_ALG socket creation while patching
+    action: apply_seccomp_profile
+    target: workload
+    parameters:
+      block_syscalls:
+      - socket(AF_ALG)
+    timeout: 120
+    on_failure: continue
+  - id: step-5
+    name: Preserve forensic logs
+    action: collect_logs
+    target: linux_node
+    parameters:
+      sources:
+      - auditd
+      - kernel
+      - container_runtime
+      - orchestration
+    timeout: 300
+    on_failure: continue
+  - id: step-6
+    name: Rebuild workloads on suspected escape
+    action: rebuild_workload
+    target: namespace
+    parameters:
+      from_clean_image: true
+    timeout: 1800
+    on_failure: escalate_to_platform_team
+  - id: step-7
+    name: Rotate workload credentials and tokens
+    action: rotate_credentials
+    target: workload
+    parameters:
+      include:
+      - service_account_tokens
+      - cloud_credentials
+    timeout: 600
+    on_failure: escalate_to_identity_team
+  - id: step-8
+    name: Hunt adjacent nodes
+    action: initiate_hunt
+    target: node_pool
+    parameters:
+      scope: same_cluster
+    timeout: 900
+    on_failure: continue
+  outputs:
+  - name: containment_status
+    type: string
+    description: Status of containment actions
+  - name: exploitation_confidence
+    type: string
+    description: Confidence level of successful exploitation
+  - name: affected_assets
+    type: array
+    description: List of impacted assets or accounts
+  rollback:
+    steps:
+    - id: rb-1
+      name: restore-service-availability
+      action: script
+    - id: rb-2
+      name: remove-temporary-isolation
+      action: api_call

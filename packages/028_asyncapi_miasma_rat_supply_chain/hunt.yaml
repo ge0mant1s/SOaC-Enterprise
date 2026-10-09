@@ -1,0 +1,113 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 028-asyncapi-miasma-rat-supply-chain-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-028
+  mitre_attack:
+  - T1195.002
+  - T1552
+  - T1059.007
+  - T1105
+  - T1543.002
+  - T1053.003
+  - T1018
+  - T1102
+  severity: HIGH
+  data_sources:
+  - GitHub audit logs
+  - npm registry / lockfiles
+  - CI/CD runner telemetry
+  - EDR process & network telemetry
+  - Cloud audit logs
+  tags:
+  - supply-chain
+  - npm
+  - asyncapi
+  - miasma-rat
+  - pull-request-target
+  - ipfs
+spec:
+  description: Hunts for evidence of the AsyncAPI / Miasma RAT compromise across build and endpoint telemetry, including affected
+    package installs, sync.js execution, decentralized C2 and the published network indicators.
+  hypothesis: A developer or CI runner installed a trojanized @asyncapi/* package, executing the Miasma RAT and beaconing
+    to decentralized C2 infrastructure.
+  hunt_type: proactive
+  telemetry_sources:
+  - GitHub audit logs
+  - npm lockfiles
+  - CI/CD runner telemetry
+  - EDR process & network telemetry
+  - Cloud audit logs
+  queries:
+  - id: query-028-001
+    name: Affected @asyncapi/* versions in lockfiles / installs
+    platform: kql
+    query: |-
+      DeviceProcessEvents
+      | where ProcessCommandLine has_any ("@asyncapi/generator@3.3.1", "@asyncapi/specs@6.11.2", "@asyncapi/generator-helpers", "@asyncapi/generator-components")
+      | summarize count() by DeviceName, AccountName, ProcessCommandLine
+    expected_results: Any match indicates exposure to the compromised versions.
+    mitre:
+    - T1195.002
+  - id: query-028-002
+    name: Connections to Miasma decentralized C2 / relays
+    platform: sigma
+    query: |-
+      title: Miasma RAT Decentralized C2 / Relay Connections
+      logsource:
+        category: dns_query
+        product: windows
+      detection:
+        selection:
+          QueryName|contains:
+            - 'relay.damus.io'
+            - 'relay.nostr.com'
+            - 'router.bittorrent.com'
+        condition: selection
+    expected_results: Beaconing to Nostr/BitTorrent relays from build or dev hosts is suspicious.
+    mitre:
+    - T1102
+    logsource:
+      category: dns_query
+      product: windows
+    sigma_detection:
+      selection:
+        QueryName|contains:
+        - relay.damus.io
+        - relay.nostr.com
+        - router.bittorrent.com
+      condition: selection
+  analysis_steps:
+  - id: step-028-001
+    name: Inventory affected dependencies
+    description: Search all repositories, lockfiles and build caches for the compromised @asyncapi/* versions.
+    tools:
+    - SCA tooling
+    - GitHub code search
+  - id: step-028-002
+    name: Trace execution and C2
+    description: Correlate sync.js execution and detached Node processes with connections to 85.137.53.71 and decentralized
+      relays.
+    tools:
+    - EDR
+    - Network telemetry
+  - id: step-028-003
+    name: Assess credential exposure
+    description: Determine which tokens, SSH keys and cloud credentials were accessible from compromised hosts and must be
+      rotated.
+    tools:
+    - Secrets manager
+    - Cloud audit logs
+  success_criteria:
+  - All affected package versions are identified and removed
+  - Exposed credentials are rotated
+  - No active C2 connections remain
+  - Unauthorized commits/releases are reverted
+  escalation:
+    on_confirmed: 'Confirmed Miasma RAT execution: reimage affected hosts, rotate all exposed credentials, revert unauthorized
+      changes and reissue packages from verified commits.'
+    on_inconclusive: 'Inconclusive: preserve build and endpoint evidence, keep affected versions quarantined and continue
+      monitoring for C2 activity.'

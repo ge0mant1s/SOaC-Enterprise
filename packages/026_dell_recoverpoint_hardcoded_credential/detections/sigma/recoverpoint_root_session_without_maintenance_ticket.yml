@@ -1,0 +1,19 @@
+title: RecoverPoint root session without maintenance ticket
+id: rule-026-002
+status: experimental
+description: Detects a root session or persistence-related service change on a RecoverPoint appliance absent a maintenance
+  change record (behavioral).
+logsource:
+  product: linux
+  service: auth
+detection:
+  selection:
+    message|contains:
+    - session opened for user root
+    - 'systemd: new service'
+    - service created
+  condition: selection
+mitre:
+- T1078
+- T1543
+level: high

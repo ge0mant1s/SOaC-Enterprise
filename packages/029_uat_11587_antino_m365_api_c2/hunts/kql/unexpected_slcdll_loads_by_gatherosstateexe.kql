@@ -1,0 +1,4 @@
+DeviceImageLoadEvents
+| where InitiatingProcessFileName =~ "GatherOsState.exe"
+| where FileName =~ "slc.dll" and not(FolderPath startswith "C:\\Windows\\System32")
+| project Timestamp, DeviceName, FolderPath, InitiatingProcessFolderPath

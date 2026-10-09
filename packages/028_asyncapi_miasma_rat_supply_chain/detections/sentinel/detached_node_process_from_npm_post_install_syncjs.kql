@@ -1,0 +1,7 @@
+// Detached Node process / sync.js execution spawned from npm install lifecycle
+DeviceProcessEvents
+| where InitiatingProcessFileName in~ ("npm", "npm.exe", "node", "node.exe")
+| where ProcessCommandLine has "sync.js"
+    or ProcessCommandLine has ".local/share/NodeJS/sync.js"
+    or (FileName in~ ("node","node.exe") and ProcessCommandLine has_any ("detached", "unref"))
+| project Timestamp, DeviceName, AccountName, ProcessCommandLine, InitiatingProcessCommandLine

@@ -1,0 +1,6 @@
+// Behavioral: firewall initiating LDAP/GC traffic to domain controllers inconsistent with its role.
+CommonSecurityLog
+| where DeviceVendor == "Palo Alto Networks"
+| where DestinationPort in (389, 636, 3268, 3269)
+| summarize Count=count(), Dests=make_set(DestinationIP, 20) by DeviceName, bin(TimeGenerated, 1h)
+| where Count > 10

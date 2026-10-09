@@ -1,0 +1,5 @@
+// Behavioral: NetScaler web-service (nsppe/httpd/php) spawning a shell or Python interpreter.
+DeviceProcessEvents
+| where InitiatingProcessFileName in~ ("httpd", "nsppe", "php", "php-cgi")
+| where FileName in~ ("sh", "bash", "python", "python3", "perl")
+| project TimeGenerated, DeviceName, InitiatingProcessFileName, FileName, ProcessCommandLine, AccountName

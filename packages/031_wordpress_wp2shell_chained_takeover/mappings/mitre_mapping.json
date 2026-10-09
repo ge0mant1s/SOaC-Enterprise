@@ -1,0 +1,22 @@
+{
+  "package_id": "pkg-031",
+  "mappings": [
+    {
+      "technique_id": "T1190",
+      "detection_rules": [
+        "rule-031-001",
+        "rule-031-002",
+        "rule-031-003"
+      ],
+      "playbook_refs": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
+      "hunt_queries": [
+        "query-031-001",
+        "query-031-002"
+      ]
+    }
+  ]
+}

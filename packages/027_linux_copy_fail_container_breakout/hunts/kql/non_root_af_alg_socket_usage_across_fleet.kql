@@ -1,0 +1,5 @@
+DeviceEvents
+| where ActionType has "Socket" and AdditionalFields has "AF_ALG"
+| where InitiatingProcessAccountName != "root"
+| summarize count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName
+| order by count_ desc

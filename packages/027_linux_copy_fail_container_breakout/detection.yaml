@@ -1,0 +1,109 @@
+apiVersion: soac.io/v1
+kind: DetectionRule
+metadata:
+  name: 027-linux-copy-fail-container-breakout
+  version: 1.0.0
+  author: SOaC Detection Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-027
+  mitre_attack:
+  - T1068
+  - T1611
+  - T1059
+  severity: HIGH
+  data_sources:
+  - Linux audit (auditd)
+  - Container runtime logs
+  - Kubernetes orchestration logs
+  - EDR process telemetry
+  - Microsoft Defender alerts
+spec:
+  description: 'Detects container-to-host privilege escalation via Copy Fail: unusual AF_ALG socket creation by non-root containerized
+    workloads, followed by UID-0 execution or host-namespace access. AF_ALG, algif_aead and the splice() interaction are public
+    technical artifacts, not malicious IOCs; detection is primarily behavioral/engineering logic. Microsoft Defender detections
+    for CVE-2026-31431 should also be enabled.'
+  platforms:
+  - Sentinel
+  - Splunk
+  - Sigma
+  - CrowdStrike
+  - Wazuh
+  - MDE
+  inline_rules:
+  - id: rule-027-001
+    name: AF_ALG socket creation by non-root container workload
+    format: sigma
+    platform: Sigma
+    mitre:
+    - T1068
+    severity: high
+    sigma_description: Detects creation of AF_ALG cryptographic sockets by a containerized, non-root workload (behavioral
+      precursor to Copy Fail exploitation; AF_ALG itself is a legitimate kernel feature).
+    logsource:
+      product: linux
+      category: network_connection
+    sigma_detection:
+      selection:
+        SocketDomain: AF_ALG
+      filter_root:
+        Uid: 0
+      condition: selection and not filter_root
+    query: |-
+      title: AF_ALG Socket Creation by Non-Root Container Workload
+      logsource:
+        product: linux
+        category: network_connection
+      detection:
+        selection:
+          SocketDomain: 'AF_ALG'
+        filter_root:
+          Uid: 0
+        condition: selection and not filter_root
+  - id: rule-027-002
+    name: Container AF_ALG activity followed by UID-0 or host-namespace access
+    format: kql
+    platform: Sentinel
+    mitre:
+    - T1068
+    - T1611
+    severity: high
+    query: |-
+      // Container-to-host privilege transition correlation (Copy Fail, CVE-2026-31431)
+      let alg_sockets = DeviceEvents
+      | where ActionType has_any ("SocketCreate", "BindSocket") and AdditionalFields has "AF_ALG"
+      | where InitiatingProcessAccountName != "root"
+      | project Timestamp, DeviceId, DeviceName, InitiatingProcessId, InitiatingProcessAccountName;
+      let priv_transition = DeviceProcessEvents
+      | where AccountName == "root" or ProcessCommandLine has_any ("nsenter", "setns", "/proc/1/ns")
+      | project PrivTime=Timestamp, DeviceId, PrivProcessId=ProcessId, ProcessCommandLine;
+      alg_sockets
+      | join kind=inner priv_transition on DeviceId
+      | where PrivTime between (Timestamp .. (Timestamp + 5m))
+      | project Timestamp, DeviceName, InitiatingProcessAccountName, ProcessCommandLine, PrivTime
+  - id: rule-027-003
+    name: Microsoft Defender CVE-2026-31431 alert correlation
+    format: kql
+    platform: MDE
+    mitre:
+    - T1068
+    severity: high
+    query: |-
+      // Correlate Defender alerts referencing CVE-2026-31431 (Copy Fail) with local privilege escalation telemetry
+      AlertInfo
+      | where Title has "CVE-2026-31431" or Title has "Copy Fail" or Category == "PrivilegeEscalation"
+      | join kind=inner AlertEvidence on AlertId
+      | where EntityType in ("Process", "File")
+      | project Timestamp, AlertId, Title, Severity, DeviceId, EntityType, FileName, ProcessCommandLine
+  test_cases:
+  - id: tc-027-001
+    name: Legitimate administrative activity
+    type: true_negative
+    expected_result: No alerts for normal authorized operations
+  - id: tc-027-002
+    name: Copy Fail exploitation simulation
+    type: true_positive
+    expected_result: Alert triggered for exploitation / behavioral indicators
+  - id: tc-027-003
+    name: Maintenance window activity
+    type: false_positive
+    expected_result: Alert suppressed during approved maintenance window

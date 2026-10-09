@@ -1,0 +1,33 @@
+{
+  "source_type": "url",
+  "source_name": "https://unit42.paloaltonetworks.com/captive-portal-zero-day/",
+  "analysis_date": "2026-10-09",
+  "ttps": [
+    "T1190",
+    "T1059",
+    "T1105",
+    "T1572",
+    "T1087",
+    "T1018",
+    "T1070"
+  ],
+  "attack_chain": [
+    "Crafted traffic to exposed portal",
+    "Unauthenticated root RCE",
+    "EarthWorm/ReverseSocks5 deployment",
+    "Active Directory enumeration",
+    "Lateral movement",
+    "Log cleanup"
+  ],
+  "platforms": [
+    "PAN-OS",
+    "Network edge",
+    "Active Directory"
+  ],
+  "detection_surfaces": [
+    "PAN-OS threat/system logs",
+    "Firewall traffic",
+    "Network flow",
+    "Directory authentication"
+  ]
+}

@@ -1,0 +1,106 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 027-linux-copy-fail-container-breakout-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-027
+  mitre_attack:
+  - T1068
+  - T1611
+  - T1059
+  severity: HIGH
+  data_sources:
+  - Linux audit (auditd)
+  - Container runtime logs
+  - Kubernetes orchestration logs
+  - EDR process telemetry
+  - Microsoft Defender alerts
+  tags:
+  - linux
+  - kernel
+  - copy-fail
+  - cve-2026-31431
+  - af_alg
+  - container-breakout
+spec:
+  description: Hunts for container-to-host privilege escalation via Copy Fail by surfacing non-root AF_ALG socket usage correlated
+    with subsequent root execution or host-namespace access.
+  hypothesis: An unprivileged containerized workload is abusing AF_ALG/algif_aead and splice() to corrupt the shared page
+    cache, gain root and escape to the host.
+  hunt_type: proactive
+  telemetry_sources:
+  - Linux audit (auditd)
+  - Container runtime logs
+  - Kubernetes orchestration logs
+  - EDR process telemetry
+  queries:
+  - id: query-027-001
+    name: Non-root AF_ALG socket usage across fleet
+    platform: kql
+    query: |-
+      DeviceEvents
+      | where ActionType has "Socket" and AdditionalFields has "AF_ALG"
+      | where InitiatingProcessAccountName != "root"
+      | summarize count() by DeviceName, InitiatingProcessAccountName, InitiatingProcessFileName
+      | order by count_ desc
+    expected_results: Rare; AF_ALG usage by non-root container workloads should be investigated.
+    mitre:
+    - T1068
+  - id: query-027-002
+    name: Host-namespace access after container crypto-socket activity
+    platform: sigma
+    query: |-
+      title: Host Namespace Access After Container Crypto-Socket Activity
+      logsource:
+        product: linux
+        category: process_creation
+      detection:
+        selection:
+          CommandLine|contains:
+            - 'nsenter'
+            - 'setns'
+            - '/proc/1/ns'
+        condition: selection
+    expected_results: Namespace-escape primitives from container workloads are high-signal.
+    mitre:
+    - T1611
+    logsource:
+      product: linux
+      category: process_creation
+    sigma_detection:
+      selection:
+        CommandLine|contains:
+        - nsenter
+        - setns
+        - /proc/1/ns
+      condition: selection
+  analysis_steps:
+  - id: step-027-001
+    name: Scope affected nodes
+    description: Identify hosts and node pools missing the CVE-2026-31431 kernel fix.
+    tools:
+    - Vulnerability scanner
+    - CMDB
+  - id: step-027-002
+    name: Reconstruct process lineage
+    description: Reconstruct the process lineage from the AF_ALG socket activity to any UID-0 execution or host-namespace
+      access.
+    tools:
+    - auditd
+    - EDR
+  - id: step-027-003
+    name: Assess blast radius
+    description: Determine whether the workload accessed host resources, other containers or cloud credentials.
+    tools:
+    - Cloud audit logs
+    - Container runtime logs
+  success_criteria:
+  - Container-to-host privilege transitions are detected
+  - Unpatched nodes are identified and drained
+  - No evidence of persistence on the host or adjacent nodes
+  escalation:
+    on_confirmed: 'Confirmed container escape to host: isolate the node, rebuild affected workloads, rotate credentials and
+      initiate a cluster-wide hunt.'
+    on_inconclusive: 'Inconclusive: preserve forensic logs, keep the node cordoned and continue monitoring for privilege transitions.'

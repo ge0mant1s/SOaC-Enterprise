@@ -1,0 +1,9 @@
+{
+  "name": "GatherOsState.exe sideloading unexpected slc.dll",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1574.002"
+  ],
+  "severity": "HIGH",
+  "query_reference": "rule-029-001"
+}

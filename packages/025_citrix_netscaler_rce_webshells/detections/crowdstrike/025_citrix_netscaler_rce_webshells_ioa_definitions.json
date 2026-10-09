@@ -1,0 +1,10 @@
+{
+  "name": "NetScaler web-service process spawning interpreter",
+  "ioa_type": "custom_ioa",
+  "mitre": [
+    "T1059",
+    "T1505.003"
+  ],
+  "severity": "CRITICAL",
+  "query_reference": "rule-025-001"
+}

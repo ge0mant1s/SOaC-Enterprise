@@ -1,0 +1,102 @@
+apiVersion: soac.io/v1
+kind: ThreatHunt
+metadata:
+  name: 031-wordpress-wp2shell-chained-takeover-hunt
+  version: 1.0.0
+  author: SOaC Hunt Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-031
+  mitre_attack:
+  - T1190
+  severity: HIGH
+  data_sources:
+  - Web server access logs
+  - WAF logs
+  - WordPress application logs
+  - Cloud audit logs
+  - Network flow logs
+  tags:
+  - wordpress
+  - wp2shell
+  - cve-2026-60137
+  - cve-2026-63030
+  - web-exploitation
+  - chained-exploit
+spec:
+  description: Hunts for WP2Shell exploitation by surfacing anomalous request bursts and exploit signatures against the WordPress
+    attack surface, and behavioral post-takeover indicators.
+  hypothesis: An externally facing WordPress site was taken over by chaining CVE-2026-60137 and CVE-2026-63030 (WP2Shell).
+  hunt_type: proactive
+  telemetry_sources:
+  - Web server access logs
+  - WAF logs
+  - WordPress application logs
+  - Network flow logs
+  queries:
+  - id: query-031-001
+    name: Request bursts to WordPress attack surface
+    platform: kql
+    query: |-
+      W3CIISLog
+      | where csUriStem has_any ("/wp-admin/", "/xmlrpc.php", "/wp-json/", "/wp-login.php")
+      | summarize reqs=count() by cIp, bin(TimeGenerated, 1m)
+      | where reqs > 100
+      | order by reqs desc
+    expected_results: High-rate bursts from single IPs indicate probing/exploitation.
+    mitre:
+    - T1190
+  - id: query-031-002
+    name: Behavioral admin session + content change
+    platform: sigma
+    query: |-
+      title: WordPress Admin Session Followed by Content Change (Behavioral)
+      logsource:
+        category: webserver
+      detection:
+        selection:
+          cs-uri-stem|contains:
+            - '/wp-admin/theme-editor.php'
+            - '/wp-admin/plugin-editor.php'
+          sc-status: 200
+        condition: selection
+    expected_results: Successful edits to theme/plugin files are behavioral takeover indicators.
+    mitre:
+    - T1190
+    logsource:
+      category: webserver
+    sigma_detection:
+      selection:
+        cs-uri-stem|contains:
+        - /wp-admin/theme-editor.php
+        - /wp-admin/plugin-editor.php
+        sc-status: 200
+      condition: selection
+  analysis_steps:
+  - id: step-031-001
+    name: Confirm vulnerability exposure
+    description: Determine whether the site is vulnerable to CVE-2026-60137 and CVE-2026-63030.
+    tools:
+    - Vulnerability scanner
+    - Version inventory
+  - id: step-031-002
+    name: Analyze exploitation attempts
+    description: Review web/WAF logs for exploit signatures and anomalous request bursts.
+    tools:
+    - Web logs
+    - WAF
+  - id: step-031-003
+    name: Validate takeover (behavioral)
+    description: Investigate admin-session anomalies, content changes and outbound connections to validate suspected takeover.
+    tools:
+    - Application logs
+    - Network logs
+  success_criteria:
+  - Chained vulnerabilities are patched
+  - Exploitation attempts are detected
+  - Suspected takeover is validated or ruled out
+  - Site restored from known-good backup if compromised
+  escalation:
+    on_confirmed: 'Confirmed takeover: isolate the site, patch, reset credentials, restore from known-good backup and conduct
+      a full investigation.'
+    on_inconclusive: 'Inconclusive: apply virtual patching, preserve logs and continue monitoring for behavioral takeover
+      indicators.'

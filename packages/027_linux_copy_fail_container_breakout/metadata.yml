@@ -1,0 +1,36 @@
+package_id: pkg-027
+title: Linux Copy Fail Privilege Escalation and Container Breakout
+version: 1.0.0
+schema_version: '3.0'
+difficulty: 4
+tier: Elite
+package_family: privilege-escalation
+category: Cloud
+categories:
+- Cloud
+- Endpoint
+- CI/CD
+primary_category: Cloud
+mitre_techniques:
+- T1068
+- T1611
+- T1059
+platform_targets:
+- Sigma
+- Sentinel
+- Splunk
+- CrowdStrike
+- Wazuh
+- MDE
+- Endpoint
+- Cloud
+- CI/CD
+source_type: url
+source_urls:
+- https://www.microsoft.com/en-us/security/blog/2026/05/01/cve-2026-31431-copy-fail-vulnerability-enables-linux-root-privilege-escalation/
+- https://learn.microsoft.com/en-us/azure/azure-linux/manage-cves
+confidence: 0.8
+deployment_mode: detect-and-respond
+author: SOaC Community
+created: '2026-10-09T12:00:00Z'
+generated_by: soac-package-builder

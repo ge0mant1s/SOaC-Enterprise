@@ -1,0 +1,57 @@
+apiVersion: soac.io/v1
+kind: Policy
+metadata:
+  name: 031-wordpress-wp2shell-chained-takeover-mitigation
+  version: 1.0.0
+  author: SOaC Policy Engineering Team
+  created: '2026-10-09T12:00:00Z'
+  package_id: pkg-031
+  scope: package
+  tags:
+  - wordpress
+  - wp2shell
+  - cve-2026-60137
+  - cve-2026-63030
+  - web-exploitation
+  - chained-exploit
+spec:
+  description: Enforces timely patching, WAF coverage and backup integrity for externally facing WordPress sites to reduce
+    exposure to chained web-application exploitation such as WP2Shell.
+  environments:
+  - name: lab
+    mode: testing
+    data_handling: relaxed
+  - name: staging
+    mode: staging
+    data_handling: standard
+  - name: production
+    mode: production
+    data_handling: strict
+  access_control:
+    required_roles:
+    - Web Security Engineer
+    - Vulnerability Manager
+    - Cloud Security Engineer
+    approval_workflow: true
+  compliance_frameworks:
+  - NIST CSF 2.0
+  - ISO/IEC 27001:2022
+  - MITRE ATT&CK
+  - CIS Controls v8
+  controls:
+  - name: Timely WordPress patching
+    description: WordPress core and plugins are patched promptly, including CVE-2026-60137 and CVE-2026-63030.
+    enforcement: automated
+    evidence: Patch-management records
+  - name: WAF coverage for public sites
+    description: Externally facing WordPress sites are protected by a WAF with current rulesets.
+    enforcement: automated
+    evidence: WAF configuration and rule-coverage reports
+  - name: Backup integrity and recovery testing
+    description: Known-good backups are maintained and recovery is periodically tested.
+    enforcement: manual
+    evidence: Backup and restore test records
+  - name: Attack-surface monitoring
+    description: Public WordPress endpoints are monitored for anomalous request patterns.
+    enforcement: automated
+    evidence: Web/WAF monitoring dashboards

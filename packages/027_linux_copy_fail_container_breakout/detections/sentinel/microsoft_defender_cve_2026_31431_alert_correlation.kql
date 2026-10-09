@@ -1,0 +1,6 @@
+// Correlate Defender alerts referencing CVE-2026-31431 (Copy Fail) with local privilege escalation telemetry
+AlertInfo
+| where Title has "CVE-2026-31431" or Title has "Copy Fail" or Category == "PrivilegeEscalation"
+| join kind=inner AlertEvidence on AlertId
+| where EntityType in ("Process", "File")
+| project Timestamp, AlertId, Title, Severity, DeviceId, EntityType, FileName, ProcessCommandLine
