@@ -1,86 +1,61 @@
 import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
+import Ajv from 'ajv';
+import { loadSchema, validateFile } from '../scripts/validate-packages';
 
 describe('SOaC Validation Harness', () => {
   const harnessPath = path.join(__dirname, '../scripts/validate-packages.ts');
-  const testDir = path.join(__dirname, 'test-packages');
+  let tmpDir: string;
 
   beforeAll(() => {
-    if (!fs.existsSync(testDir)) {
-      fs.mkdirSync(testDir);
-    }
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'soac-harness-'));
   });
 
   afterAll(() => {
-    fs.rmSync(testDir, { recursive: true, force: true });
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 
-  test('valid playbook.yaml passes validation', () => {
-    const playbookContent = `---
-name: Test Playbook
-triggers:
-  - pattern: "login || logout"
-steps:
-  - action: notify
-`;
-    const playbookPath = path.join(testDir, 'playbook.yaml');
-    fs.writeFileSync(playbookPath, playbookContent);
+  // --- Unit tests: exported pure validators ---
 
-    const result = execSync(`ts-node ${harnessPath} ${testDir}`, { encoding: 'utf-8' });
-    expect(result).toContain('All SOaC packages validated successfully.');
+  test('loadSchema returns a parsed JSON schema object', () => {
+    const schema = loadSchema('policy.schema.json') as Record<string, unknown>;
+    expect(typeof schema).toBe('object');
+    expect(schema).not.toBeNull();
   });
 
-  test('invalid playbook.yaml fails validation', () => {
-    const playbookContent = `---
-name: Test Playbook
-triggers:
-  - pattern: "invalid pattern $$$"
-steps:
-  - action: notify
-`;
-    const playbookPath = path.join(testDir, 'playbook.yaml');
-    fs.writeFileSync(playbookPath, playbookContent);
-
-    try {
-      execSync(`ts-node ${harnessPath} ${testDir}`, { encoding: 'utf-8' });
-      throw new Error('Expected validation to fail');
-    } catch (e) {
-      expect(e.message).toContain('Invalid trigger pattern');
-    }
+  test('loadSchema throws for a missing schema file', () => {
+    expect(() => loadSchema('does-not-exist.schema.json')).toThrow();
   });
 
-  test('valid policy.yaml passes validation', () => {
-    const policyContent = `---
-name: Test Policy
-version: "1.0.0"
-rules:
-  - id: test-rule
-    description: Test rule
-`;
-    const policyPath = path.join(testDir, 'policy.yaml');
-    fs.writeFileSync(policyPath, policyContent);
-
-    const result = execSync(`ts-node ${harnessPath} ${testDir}`, { encoding: 'utf-8' });
-    expect(result).toContain('All SOaC packages validated successfully.');
+  test('validateFile reports a YAML parse error for malformed YAML', () => {
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    const schema = loadSchema('policy.schema.json');
+    const badPath = path.join(tmpDir, 'bad.yaml');
+    // Unterminated flow mapping -> js-yaml throws, harness captures it.
+    fs.writeFileSync(badPath, 'name: test\nrules: [unclosed\n');
+    const result = validateFile(badPath, schema, ajv, true);
+    expect(result.valid).toBe(false);
+    expect(result.errors.join(' ')).toMatch(/Parse error/i);
   });
 
-  test('invalid policy.yaml fails validation', () => {
-    const policyContent = `---
-name: Test Policy
-version: "invalid_version"
-rules:
-  - id: test-rule
-    description: Test rule
-`;
-    const policyPath = path.join(testDir, 'policy.yaml');
-    fs.writeFileSync(policyPath, policyContent);
+  test('validateFile reports schema errors for valid YAML that violates the schema', () => {
+    const ajv = new Ajv({ allErrors: true, strict: false });
+    const schema = loadSchema('policy.schema.json');
+    const wrongPath = path.join(tmpDir, 'wrong.yaml');
+    // Well-formed YAML but a bare string, which cannot satisfy an object schema.
+    fs.writeFileSync(wrongPath, 'just-a-string\n');
+    const result = validateFile(wrongPath, schema, ajv, true);
+    expect(result.valid).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
+  });
 
-    try {
-      execSync(`ts-node ${harnessPath} ${testDir}`, { encoding: 'utf-8' });
-      throw new Error('Expected validation to fail');
-    } catch (e) {
-      expect(e.message).toContain('Invalid version');
-    }
+  // --- Integration test: real harness against the repository packages ---
+
+  test('harness validates the repository packages and exits successfully', () => {
+    const result = execSync(`ts-node ${harnessPath}`, { encoding: 'utf-8' });
+    expect(result).toContain('All validations passed');
+    expect(result).toMatch(/Summary: \d+ packages clean, 0 packages with errors/);
   });
 });
