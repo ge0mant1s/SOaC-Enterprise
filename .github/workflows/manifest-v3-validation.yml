@@ -8,6 +8,11 @@
 
 name: Manifest v3.0 Validation
 
+# Least-privilege default token: this workflow only reads repo contents and
+# uploads an artifact, so no write scopes are granted (OSPS Baseline CI control).
+permissions:
+  contents: read
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -40,7 +45,6 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
 
           VALID_TIERS='Foundations Intermediate Advanced Elite'
-          MITRE_PATTERN='^T[0-9]{4}'
           CONTROLLED_STACKS='Sigma Sentinel Splunk CrowdStrike Wazuh MDE AWS GitHub CI/CD Identity Endpoint Cloud SaaS Network'
 
           TOTAL=0
@@ -113,23 +117,36 @@ jobs:
 
       - name: Generate JSON report
         if: always()
+        shell: python
         run: |
-          python3 -c "
-import json, os, glob
-results = []
-for mf in sorted(glob.glob('packages/*/manifest.json')):
-    m = json.load(open(mf))
-    pkg_id = m.get('package_id', 'unknown')
-    errors = []
-    if m.get('tier') not in ['Foundations','Intermediate','Advanced','Elite']: errors.append('invalid tier')
-    if not isinstance(m.get('roles'), list) or len(m.get('roles',[])) == 0: errors.append('empty roles')
-    mitre = m.get('mitre', m.get('mitre_techniques', []))
-    if not isinstance(mitre, list) or len(mitre) == 0: errors.append('empty mitre')
-    if not isinstance(m.get('stacks'), list) or len(m.get('stacks',[])) == 0: errors.append('empty stacks')
-    results.append({'package_id': pkg_id, 'title': m.get('title',''), 'valid': len(errors)==0, 'errors': errors})
-report = {'total': len(results), 'pass': sum(1 for r in results if r['valid']), 'fail': sum(1 for r in results if not r['valid']), 'results': results}
-json.dump(report, open('/tmp/manifest-v3-report.json','w'), indent=2)
-"
+          import json, glob
+          results = []
+          for mf in sorted(glob.glob('packages/*/manifest.json')):
+              m = json.load(open(mf))
+              pkg_id = m.get('package_id', 'unknown')
+              errors = []
+              if m.get('tier') not in ['Foundations', 'Intermediate', 'Advanced', 'Elite']:
+                  errors.append('invalid tier')
+              if not isinstance(m.get('roles'), list) or len(m.get('roles', [])) == 0:
+                  errors.append('empty roles')
+              mitre = m.get('mitre', m.get('mitre_techniques', []))
+              if not isinstance(mitre, list) or len(mitre) == 0:
+                  errors.append('empty mitre')
+              if not isinstance(m.get('stacks'), list) or len(m.get('stacks', [])) == 0:
+                  errors.append('empty stacks')
+              results.append({
+                  'package_id': pkg_id,
+                  'title': m.get('title', ''),
+                  'valid': len(errors) == 0,
+                  'errors': errors,
+              })
+          report = {
+              'total': len(results),
+              'pass': sum(1 for r in results if r['valid']),
+              'fail': sum(1 for r in results if not r['valid']),
+              'results': results,
+          }
+          json.dump(report, open('/tmp/manifest-v3-report.json', 'w'), indent=2)
 
       - name: Upload validation report
         if: always()
