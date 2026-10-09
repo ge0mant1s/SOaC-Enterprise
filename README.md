@@ -74,7 +74,7 @@ We believe in **Open Security**. SOaC-Enterprise is built by the community, for 
 ---
 **"Stop Triage. Start Programming."**  
 © 2026 SOaC Community | SOaC-Enterprise Research Group
-- **License:** MIT License.
+- **License:** [Apache License 2.0](./LICENSE).
 - **Compliance:** Designed to meet **GDPR Article 32** and **EU AI Act** transparency requirements.
 
 **Last Updated:** 2026-03-10  
