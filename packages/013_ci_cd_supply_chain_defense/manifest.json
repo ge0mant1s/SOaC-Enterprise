@@ -8,6 +8,19 @@
   "status": "active",
   "severity": "critical",
   "difficulty": 4,
+  "tier": "Elite",
+  "roles": [
+    "Red Team",
+    "Blue Team",
+    "SOC"
+  ],
+  "stacks": [
+    "Sentinel",
+    "Sigma",
+    "Splunk",
+    "Wazuh",
+    "CrowdStrike"
+  ],
   "category": "supply-chain",
   "tags": [
     "ci-cd",

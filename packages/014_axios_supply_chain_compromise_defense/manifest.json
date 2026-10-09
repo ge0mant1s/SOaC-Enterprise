@@ -47,7 +47,6 @@
   ],
   "mitre_version": "v15.1",
   "stacks": [
-    "Supply Chain",
     "CI/CD",
     "Network",
     "Endpoint"
