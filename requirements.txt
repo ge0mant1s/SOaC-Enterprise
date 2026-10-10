@@ -19,7 +19,7 @@ boto3>=1.28.0
 # API & Web Interface (The Console)
 fastapi>=0.100.0
 uvicorn>=0.22.0
-jinja2>=3.1.0
+jinja2>=3.1.6
 
 # Security & Validation
 sigma-cli>=0.10.0
