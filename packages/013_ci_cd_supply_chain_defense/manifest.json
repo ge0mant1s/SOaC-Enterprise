@@ -4,7 +4,7 @@
   "slug": "013_ci_cd_supply_chain_defense",
   "version": "1.0.0",
   "schema_version": "3.0",
-  "mitre_version": "14.1",
+  "mitre_version": "v15.1",
   "status": "active",
   "severity": "critical",
   "difficulty": 4,
@@ -35,18 +35,15 @@
     "soc_manager"
   ],
   "platform_targets": [
-    "GitHub Actions",
-    "GitLab CI",
-    "Azure DevOps",
-    "Docker",
-    "AWS",
-    "Azure",
-    "GCP",
-    "Kubernetes"
+    "github_actions",
+    "gitlab_ci",
+    "linux",
+    "container_registry"
   ],
   "saas_targets": [
-    "GitHub",
-    "DockerHub"
+    "github",
+    "gitlab",
+    "docker_hub"
   ],
   "description": "Defends against CI/CD supply chain attacks involving version tag mutation, artifact poisoning, and secret harvesting from build runners. Grounded in the March 2026 Trivy-action compromise pattern.",
   "threat_pattern": "Adversaries steal privileged CI/CD tokens, mutate trusted tags, poison build artifacts, harvest runner secrets, and exfiltrate credentials or staged artifacts to attacker-controlled destinations.",
@@ -150,5 +147,13 @@
     }
   ],
   "linkedin_cta": "TRIVY",
-  "difficulty_label": "Elite"
+  "difficulty_label": "Elite",
+  "lab_scenarios": [
+    {
+      "id": "lab-013-full",
+      "title": "CI/CD Supply Chain Defense — Full Simulation",
+      "type": "full",
+      "estimated_minutes": 45
+    }
+  ]
 }
