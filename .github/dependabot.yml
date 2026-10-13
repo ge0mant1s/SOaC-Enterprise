@@ -21,6 +21,13 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
+    ignore:
+      # TypeScript 7.x is the native/Go compiler rewrite and is not yet
+      # compatible with the ts-node setup used by the validation harness
+      # (bump breaks `npm run validate`). Keep 4.x/5.x/6.x minor + patch
+      # security updates flowing; revisit the major when ts-node supports it.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
 
   # GitHub Actions used in workflows
   - package-ecosystem: "github-actions"
