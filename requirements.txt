@@ -3,7 +3,7 @@
 
 # Data Processing & Normalization
 pandas>=2.0.0
-numpy>=1.24.0
+numpy>=2.5.3
 pyyaml>=6.0.1
 
 # AI Reasoning (The Brain)
