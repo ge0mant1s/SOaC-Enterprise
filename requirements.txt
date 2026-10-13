@@ -7,7 +7,7 @@ numpy>=2.5.3
 pyyaml>=6.0.1
 
 # AI Reasoning (The Brain)
-openai>=1.0.0
+openai>=3.28.0
 anthropic>=1.13.0
 langchain>=1.4.4
 
