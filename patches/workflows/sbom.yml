@@ -1,0 +1,122 @@
+# ============================================================================
+# SBOM & Supply-Chain Transparency
+# ============================================================================
+# Keeps the machine-readable Software Bill of Materials for the managed
+# dependency tree (tools/soac-harness) fresh, uploads it as a build artifact,
+# attaches it to releases, and (on release) produces a signed, verifiable SBOM
+# attestation using GitHub's free OIDC-backed attestation service.
+#
+# Aligns with:
+#   - OpenSSF Security Baseline (supply-chain / SBOM controls)
+#   - CRA (Cyber Resilience Act) SBOM expectations
+#   - SLSA provenance / in-toto attestations (via actions/attest-sbom)
+#   - Security Slam Fall 2026 "Mechanizer" + "Defender" objectives
+#
+# All tooling is free and open source (npm-native `npm sbom`, GitHub Actions
+# attestation). No paid services.
+#
+# ---------------------------------------------------------------------------
+# To activate: copy this file to .github/workflows/sbom.yml on the default
+# branch (a repository with Workflows write access is required to add it).
+# ---------------------------------------------------------------------------
+name: SBOM & Attestation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/soac-harness/package.json'
+      - 'tools/soac-harness/package-lock.json'
+      - '.github/workflows/sbom.yml'
+  release:
+    types: [published]
+  schedule:
+    - cron: '41 6 * * 1'   # Weekly, Monday 06:41 UTC — catches transitive drift
+  workflow_dispatch:
+
+# Default to read-only; the job elevates only the scopes it needs.
+permissions: read-all
+
+jobs:
+  sbom:
+    name: Generate SBOM (+ freshness check, attestation on release)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Needed only for the attestation step (release / manual runs).
+      id-token: write
+      attestations: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+
+      - name: Install dependencies (clean, from lockfile)
+        run: npm ci
+        working-directory: tools/soac-harness
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/sbom"
+          npm sbom --sbom-format cyclonedx > "$GITHUB_WORKSPACE/sbom/soac-harness.cdx.json"
+        working-directory: tools/soac-harness
+
+      - name: Verify committed SBOM is in sync
+        # Compares the freshly generated SBOM against the committed snapshot,
+        # ignoring volatile fields (serialNumber + metadata.timestamp). Fails
+        # with instructions if a dependency change was not reflected in sbom/.
+        run: |
+          python3 - "$GITHUB_WORKSPACE/sbom/soac-harness.cdx.json" <<'PY'
+          import json, subprocess, sys
+          def norm(p):
+              d = json.load(open(p))
+              d.pop("serialNumber", None)
+              d.get("metadata", {}).pop("timestamp", None)
+              # component list order can vary; sort by purl/name
+              comps = d.get("components", [])
+              comps.sort(key=lambda c: (c.get("purl") or c.get("name") or ""))
+              return json.dumps(d, sort_keys=True)
+          fresh_path = sys.argv[1]
+          committed = subprocess.run(
+              ["git", "show", "HEAD:sbom/soac-harness.cdx.json"],
+              capture_output=True, text=True)
+          if committed.returncode != 0:
+              print("No committed SBOM at sbom/soac-harness.cdx.json yet — skipping sync check.")
+              sys.exit(0)
+          open("/tmp/committed.cdx.json", "w").write(committed.stdout)
+          if norm(fresh_path) != norm("/tmp/committed.cdx.json"):
+              print("::error::Committed SBOM is stale. Regenerate it:")
+              print("  cd tools/soac-harness && npm ci && npm sbom --sbom-format cyclonedx > ../../sbom/soac-harness.cdx.json")
+              print("  then commit sbom/soac-harness.cdx.json")
+              sys.exit(1)
+          print("Committed SBOM is in sync with the resolved dependency tree.")
+          PY
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: soac-harness-sbom-cyclonedx
+          path: sbom/soac-harness.cdx.json
+          if-no-files-found: error
+
+      # --- Attestation: only on release or manual dispatch ------------------
+      - name: Pack harness (attestation subject)
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        id: pack
+        run: |
+          TGZ=$(npm pack --silent)
+          echo "tgz=tools/soac-harness/${TGZ}" >> "$GITHUB_OUTPUT"
+        working-directory: tools/soac-harness
+
+      - name: Attest SBOM
+        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e # v4.1.0
+        with:
+          subject-path: ${{ steps.pack.outputs.tgz }}
+          sbom-path: sbom/soac-harness.cdx.json

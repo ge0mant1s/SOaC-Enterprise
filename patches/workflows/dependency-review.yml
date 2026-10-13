@@ -1,0 +1,47 @@
+# ============================================================================
+# Dependency Review
+# ============================================================================
+# On every pull request, inspects dependency manifest/lockfile changes and
+# fails the PR if it would introduce a dependency with a known vulnerability
+# at or above the configured severity, or a disallowed license. This is the
+# OpenSSF-recommended "shift-left" complement to Dependabot (which fixes what
+# is already merged); dependency-review blocks new risk BEFORE it lands.
+#
+# Aligns with: OpenSSF Security Baseline (vulnerability management), Security
+# Slam "Defender", and CRA due-diligence on third-party components.
+#
+# Free, first-party GitHub action. No paid services. (Dependency Review needs
+# the GitHub Dependency Graph, which is enabled by default on public repos.)
+#
+# ---------------------------------------------------------------------------
+# To activate: copy this file to .github/workflows/dependency-review.yml on
+# the default branch (Workflows write access is required to add it).
+# ---------------------------------------------------------------------------
+name: Dependency Review
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    name: Review dependency changes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          # Block PRs that introduce a HIGH or CRITICAL advisory.
+          fail-on-severity: high
+          # Surface a summary in the PR (comment requires pull-requests: write;
+          # kept off here to preserve least privilege — results appear in the
+          # Actions run summary and the check annotations).
+          comment-summary-in-pr: never

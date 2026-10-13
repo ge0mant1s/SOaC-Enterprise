@@ -43,6 +43,34 @@ We follow coordinated disclosure. We ask reporters to give us a reasonable windo
 to release a fix before any public disclosure. We will credit reporters who wish
 to be acknowledged.
 
+## Security advisories & notifications
+
+When a vulnerability affecting this project is confirmed and fixed, we publish a
+**GitHub Security Advisory (GHSA)** on the repository's
+[Security Advisories](https://github.com/ge0mant1s/SOaC-Enterprise/security/advisories)
+page. Advisories include the affected versions/paths, severity, and the fix.
+
+You can follow advisories through any of these channels:
+
+- **Watch the repository** → *Custom* → enable **Security alerts** to be notified
+  of new advisories.
+- **RSS/Atom:** subscribe to
+  `https://github.com/ge0mant1s/SOaC-Enterprise/security/advisories.atom`.
+- **Dependency consumers:** advisories published to the GitHub Advisory Database
+  (GHSA) flow automatically into Dependabot / `npm audit` for anyone depending on
+  an affected component.
+- **Website:** a summary is posted on the security page at
+  [soacframe.io](https://soacframe.io).
+
+We also maintain machine-readable supply-chain transparency so downstream users
+can assess impact themselves:
+
+- A **CycloneDX SBOM** for the validation harness in [`sbom/`](sbom/), kept in
+  sync by CI and signed with an attestation on release.
+- A **GitHub-native SPDX SBOM** for the whole repository (Insights → Dependency
+  graph → *Export SBOM*).
+- Supply-chain controls are documented in [`docs/SUPPLY_CHAIN.md`](docs/SUPPLY_CHAIN.md).
+
 ## Scope
 
 This policy covers the code, workflows, schemas, and detection/response content in
