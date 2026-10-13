@@ -35,6 +35,13 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    groups:
+      # All github/codeql-action sub-actions (init, analyze, upload-sarif, ...)
+      # MUST move together: CodeQL refuses to run if steps are on mixed major
+      # versions ("Loaded a configuration file for version X, running Y").
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
     labels:
       - "dependencies"
       - "github-actions"
