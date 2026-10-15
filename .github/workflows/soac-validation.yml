@@ -31,3 +31,4 @@ jobs:
       - name: Run SOaC validation
         run: npm run validate
         working-directory: tools/soac-harness
+
