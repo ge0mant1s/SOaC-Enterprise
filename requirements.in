@@ -1,0 +1,27 @@
+# SOaC-Enterprise Core Dependencies (source of truth)
+# Edit THIS file, then run: pip-compile --generate-hashes --output-file=requirements.txt requirements.in
+# Pinned, hash-verified requirements.txt is generated from this file.
+
+# Data Processing & Normalization
+pandas>=3.0.6
+numpy>=2.4.6
+pyyaml>=6.0.1
+
+# AI Reasoning (The Brain)
+openai>=3.28.0
+anthropic>=1.13.0
+langchain>=1.4.4
+
+# Telemetry & SIEM Integration (The Body)
+elasticsearch-dsl>=8.18.0
+azure-monitor-query>=2.0.0
+boto3>=1.43.111
+
+# API & Web Interface (The Console)
+fastapi>=0.143.0
+uvicorn>=0.54.0
+jinja2>=3.1.6
+
+# Security & Validation
+sigma-cli>=3.1.0
+pytest>=9.1.1
