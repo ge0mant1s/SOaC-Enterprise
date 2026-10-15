@@ -52,6 +52,9 @@ jobs:
           // Discover all package dirs
           const dirs = fs.readdirSync(PACKAGES_DIR)
             .filter(d => fs.statSync(path.join(PACKAGES_DIR, d)).isDirectory())
+            // Only threat-package dirs follow the NNN_slug convention; skip
+            // non-package folders such as vendor_packs/ (vendor integrations).
+            .filter(d => /^\d{3}_/.test(d))
             .sort();
 
           // Detect duplicates (same numeric prefix)
@@ -281,6 +284,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: existing.data[0].number,
+                title: `[SOaC Drift] ${issues.length} issue(s) detected`,
                 body: body
               });
               console.log(`Updated existing drift issue #${existing.data[0].number}`);
@@ -295,3 +299,31 @@ jobs:
               });
               console.log('Created new drift issue');
             }
+
+      - name: Close drift issue when clean
+        if: steps.drift.outputs.has_issues == 'false' || (steps.drift.outputs.critical_count == '0' && steps.drift.outputs.high_count == '0')
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const open = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'soac-drift'
+            });
+            for (const issue of open.data) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✓ No critical/high drift detected as of run ${context.runId}. Closing automatically.`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed'
+              });
+              console.log(`Closed drift issue #${issue.number}`);
+            }
+
