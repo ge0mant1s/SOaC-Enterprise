@@ -120,3 +120,4 @@ jobs:
         with:
           subject-path: ${{ steps.pack.outputs.tgz }}
           sbom-path: sbom/soac-harness.cdx.json
+
