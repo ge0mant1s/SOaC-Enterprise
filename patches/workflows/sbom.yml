@@ -78,6 +78,8 @@ jobs:
               d = json.load(open(p))
               d.pop("serialNumber", None)
               d.get("metadata", {}).pop("timestamp", None)
+              # npm CLI version varies with the runner's Node image, not deps
+              d.get("metadata", {}).pop("tools", None)
               # component list order can vary; sort by purl/name
               comps = d.get("components", [])
               comps.sort(key=lambda c: (c.get("purl") or c.get("name") or ""))
@@ -120,3 +122,4 @@ jobs:
         with:
           subject-path: ${{ steps.pack.outputs.tgz }}
           sbom-path: sbom/soac-harness.cdx.json
+
