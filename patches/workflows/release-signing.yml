@@ -27,23 +27,27 @@ on:
         description: 'Existing release tag to sign (e.g. v2.1.0)'
         required: true
 
+# Top-level token is read-only (OpenSSF Scorecard Token-Permissions);
+# write scopes are granted only to the job that needs them.
 permissions:
-  contents: write      # upload assets to the release
-  id-token: write      # keyless cosign + attestations (OIDC)
-  attestations: write  # actions/attest-build-provenance
+  contents: read
 
 jobs:
   sign:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write      # upload assets to the release
+      id-token: write      # keyless cosign + attestations (OIDC)
+      attestations: write  # actions/attest-build-provenance
     env:
       TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
     steps:
       - name: Checkout the released tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           ref: ${{ env.TAG }}
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: '20'
 
@@ -60,7 +64,7 @@ jobs:
           ls -l dist-release
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62 # v3.10.0
 
       - name: Sign artifacts (keyless)
         run: |
@@ -79,7 +83,7 @@ jobs:
             SHA256SUMS
 
       - name: Generate SLSA build provenance
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@ef244123eb79f2f7a7e75d99086184180e6d0018 # v1.4.4
         with:
           subject-path: 'dist-release/*.tgz, dist-release/*.tar.gz'
 
