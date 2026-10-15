@@ -45,3 +45,4 @@ jobs:
           # kept off here to preserve least privilege — results appear in the
           # Actions run summary and the check annotations).
           comment-summary-in-pr: never
+
