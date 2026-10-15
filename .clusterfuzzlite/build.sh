@@ -1,18 +1,15 @@
 #!/bin/bash -eu
 # ClusterFuzzLite build script — compiles the harness and installs the fuzz runtime.
 #
-# Keeps the required `validate` check pristine: Jazzer.js is installed here with
-# --no-save (it is NOT a project dependency), so package.json / package-lock.json
-# are never modified by fuzzing.
+# All dependencies, including the Jazzer.js fuzz runtime (an exact-pinned
+# devDependency), come from package-lock.json via `npm ci` - no floating installs
+# (OpenSSF Scorecard Pinned-Dependencies).
 
 cd "$SRC/soac/tools/soac-harness"
 
-# Install project deps (prod + dev) then compile scripts/ -> dist/ (validateFile).
-npm ci || npm install
+# Install locked deps (prod + dev, incl. @jazzer.js/core) then compile scripts/ -> dist/.
+npm ci
 npx tsc -p .
-
-# Fuzz runtime, installed only for the fuzzing build.
-npm install --no-save @jazzer.js/core@^2
 
 # Stage each fuzz target as an OSS-Fuzz/ClusterFuzzLite fuzzer.
 for target in fuzz/*.fuzz.js; do
