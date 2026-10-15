@@ -1,0 +1,52 @@
+# Dynamic Analysis — SOaC harness fuzz suite
+#
+# STAGED WORKFLOW. The GitHub App token used by automation cannot write to
+# .github/workflows/, so this file lives in patches/workflows/. A maintainer
+# copies it into .github/workflows/dynamic-analysis.yml (via the web UI or a PAT)
+# to activate it. It is intentionally identical in structure to the staged
+# dependency-review.yml and sbom.yml in this directory.
+#
+# What it does: runs the harness test suite (Jest), which includes the
+# property-based fuzz suite (__tests__/fuzz.test.ts). The fuzz suite drives the
+# validators with thousands of randomized inputs and checks the run-time
+# assertions in src/level1.ts and scripts/validate-packages.ts — i.e. dynamic
+# analysis with assertions enabled.
+
+name: Dynamic Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '27 4 * * 1' # weekly, Monday 04:27 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    name: Harness fuzz + assertions
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tools/soac-harness
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run test + fuzz suite (assertions enabled)
+        # A higher iteration count for the scheduled deep run; PRs use the default.
+        env:
+          FUZZ_ITERATIONS: ${{ github.event_name == 'schedule' && '50000' || '5000' }}
+        run: npm test

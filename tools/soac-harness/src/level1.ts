@@ -10,6 +10,7 @@
  *  - Banned terms are absent
  * ============================================================================ */
 
+import * as assert from 'node:assert';
 import {
   Finding, Kind, VALID_KINDS, SEVERITIES, TARGETS, TRIGGER_SOURCES,
   OPERATORS, FAILURE_MODES, BACKOFF_MODES, BLAST_RADIUS, AUDIT_LEVELS,
@@ -20,6 +21,34 @@ import {
 } from './types';
 
 type Ctx = { file: string; raw: string };
+
+/**
+ * Run-time invariant check on the findings a validator produces.
+ *
+ * These assertions document and enforce the contract every validator must
+ * uphold, and are exercised by the dynamic-analysis (fuzz) test suite, which
+ * feeds randomized inputs through the validators and checks that none of these
+ * invariants is ever violated. They are cheap (O(n) over findings) and safe to
+ * keep enabled in production.
+ */
+export function assertFindingInvariants(findings: Finding[]): void {
+  assert.ok(Array.isArray(findings), 'findings must be an array');
+  for (const f of findings) {
+    assert.ok(f && typeof f === 'object', 'each finding must be an object');
+    assert.ok(typeof f.file === 'string', 'finding.file must be a string');
+    assert.ok(
+      f.line === null || (typeof f.line === 'number' && f.line > 0),
+      'finding.line must be null or a positive number'
+    );
+    assert.ok(typeof f.field === 'string', 'finding.field must be a string');
+    assert.ok(typeof f.message === 'string', 'finding.message must be a string');
+    assert.ok(
+      ['error', 'warning', 'info'].includes(f.severity),
+      `finding.severity must be a valid Severity, got "${f.severity}"`
+    );
+    assert.ok(f.level === 1 || f.level === 2, 'finding.level must be 1 or 2');
+  }
+}
 
 function lineOf(raw: string, field: string): number | null {
   const leaf = field.split('.').pop() || field;
@@ -338,15 +367,18 @@ export function runLevel1(parsed: Record<string, unknown>, raw: string, file: st
   const kind = parsed.kind as string | undefined;
   if (!kind) {
     findings.push(err(ctx, 'kind', 'Missing required field: kind'));
+    assertFindingInvariants(findings);
     return { kind: null, findings };
   }
   if (!VALID_KINDS.includes(kind as Kind)) {
     findings.push(err(ctx, 'kind', `Unknown kind "${kind}". Expected: ${VALID_KINDS.join(', ')}`));
+    assertFindingInvariants(findings);
     return { kind: null, findings };
   }
 
   // Kind-specific validation
   findings.push(...VALIDATORS[kind as Kind](parsed, ctx));
 
+  assertFindingInvariants(findings);
   return { kind: kind as Kind, findings };
 }

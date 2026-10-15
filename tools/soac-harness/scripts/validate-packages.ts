@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import * as assert from 'node:assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
@@ -24,6 +25,29 @@ export function loadSchema(name: string): object {
   return JSON.parse(fs.readFileSync(schemaPath, 'utf-8'));
 }
 
+/**
+ * Invariant the validateFile contract must always satisfy. Exercised by the
+ * dynamic-analysis (fuzz) suite, which feeds randomized file contents through
+ * validateFile and asserts the result shape never breaks.
+ */
+function assertResultInvariants(result: { valid: boolean; errors: string[] }): {
+  valid: boolean;
+  errors: string[];
+} {
+  assert.ok(typeof result.valid === 'boolean', 'result.valid must be a boolean');
+  assert.ok(Array.isArray(result.errors), 'result.errors must be an array');
+  assert.ok(
+    result.errors.every((e) => typeof e === 'string'),
+    'every error must be a string'
+  );
+  // A valid result carries no errors; an invalid result must explain why.
+  assert.ok(
+    result.valid ? result.errors.length === 0 : result.errors.length > 0,
+    'valid results have no errors and invalid results have at least one'
+  );
+  return result;
+}
+
 export function validateFile(
   filePath: string,
   schema: object,
@@ -36,16 +60,16 @@ export function validateFile(
     const validate = ajv.compile(schema);
     const valid = validate(data);
     if (!valid && validate.errors) {
-      return {
+      return assertResultInvariants({
         valid: false,
         errors: validate.errors.map(
           (e) => `${e.instancePath || '/'} ${e.message}`
         ),
-      };
+      });
     }
-    return { valid: true, errors: [] };
+    return assertResultInvariants({ valid: true, errors: [] });
   } catch (err: any) {
-    return { valid: false, errors: [`Parse error: ${err.message}`] };
+    return assertResultInvariants({ valid: false, errors: [`Parse error: ${err.message}`] });
   }
 }
 
