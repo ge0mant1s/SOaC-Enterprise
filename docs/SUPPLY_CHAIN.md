@@ -61,6 +61,21 @@ See [`sbom/README.md`](../sbom/README.md). Summary:
 Current harness status: `npm audit` reports **0 known vulnerabilities** on the
 remediated tree.
 
+### Accepted risks (no upstream fix available)
+
+When a dependency has an open advisory with **no patched release anywhere in its
+supported range**, and the parent cannot be moved off it, we record a dated,
+reviewed risk acceptance here instead of leaving the alert silently open. Each
+entry is revisited whenever Dependabot re-flags it.
+
+| Advisory | Package | Path | Why unfixable | Why tolerable here | Accepted |
+|---|---|---|---|---|---|
+| [GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v) / PYSEC-2026-2447 | `diskcache 5.6.3` (CVSS 5.2, moderate) | transitive: `sigma-cli` → `pysigma` → `diskcache` | `diskcache 5.6.3` is the latest release and the advisory lists **no first-patched-version** (vulnerable `<= 5.6.3`). Latest `pysigma` (2.0.1) still pins `diskcache>=5.6.3`, so no upgrade removes it. | The issue is unsafe `pickle` deserialization of cache contents. `diskcache` is used only by `pysigma` to cache **SOaC's own Sigma-rule compilation output** in a local, process-owned directory; it never deserializes attacker-supplied cache data. Exploitation needs write access to that cache dir, which implies the host is already compromised. | 2026-10-15 |
+
+**Action on the GitHub alert:** dismiss the corresponding Dependabot alert with
+reason *"Risk is tolerable"*, linking this row. Re-open and upgrade as soon as a
+patched `diskcache` (or a `pysigma` that drops it) is published.
+
 ## Standards alignment
 
 - **OpenSSF Security Baseline** — supply-chain, vulnerability management, and
