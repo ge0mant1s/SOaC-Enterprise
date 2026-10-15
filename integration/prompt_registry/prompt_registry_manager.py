@@ -12,7 +12,16 @@ class PromptRegistryManager:
         pkg_path = os.path.join(self.base_path, package_id)
         if not os.path.exists(pkg_path):
             return []
-        return sorted([f for f in os.listdir(pkg_path) if f.endswith('.txt')])
+        # Numeric sort so v10.txt comes after v9.txt (plain string sort would not).
+        files = [f for f in os.listdir(pkg_path) if f.endswith('.txt')]
+        return sorted(files, key=self._version_num)
+
+    @staticmethod
+    def _version_num(filename: str) -> int:
+        try:
+            return int(filename.replace('v', '').replace('.txt', ''))
+        except ValueError:
+            return -1
 
     def get_latest_version(self, package_id: str) -> Optional[str]:
         versions = self.list_versions(package_id)
@@ -39,7 +48,7 @@ class PromptRegistryManager:
         versions = self.list_versions(package_id)
         if versions:
             last_version = versions[-1]
-            last_num = int(last_version.replace('v', '').replace('.txt', ''))
+            last_num = max(self._version_num(last_version), 0)
             new_version_num = last_num + 1
         else:
             new_version_num = 1
@@ -57,8 +66,7 @@ if __name__ == "__main__":
     latest = prm.get_latest_version(pkg)
     print(f"Latest version: {latest}")
     prompt = prm.get_prompt(pkg)
-    print(f"Prompt content (latest):
-{prompt}")
+    print(f"Prompt content (latest):\n{prompt}")
     new_prompt = "Analyze this alert with updated logic and provide JSON decision."
     new_ver = prm.add_prompt_version(pkg, new_prompt)
     print(f"Added new prompt version: {new_ver}")
