@@ -83,9 +83,15 @@ jobs:
             SHA256SUMS
 
       - name: Generate SLSA build provenance
+        id: provenance
         uses: actions/attest-build-provenance@ef244123eb79f2f7a7e75d99086184180e6d0018 # v1.4.4
         with:
           subject-path: 'dist-release/*.tgz, dist-release/*.tar.gz'
+
+      - name: Attach provenance to the release
+        # The attestation is also stored on GitHub (gh attestation verify); a copy
+        # is attached as *.intoto.jsonl so it travels with the artifacts.
+        run: cp "${{ steps.provenance.outputs.bundle-path }}" "dist-release/soac-enterprise-${TAG}.intoto.jsonl"
 
       - name: Upload signed assets to the release
         env:
@@ -93,4 +99,5 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "$TAG" dist-release/* --clobber
+
 
