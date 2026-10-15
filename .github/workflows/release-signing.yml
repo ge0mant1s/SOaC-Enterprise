@@ -1,0 +1,91 @@
+# ============================================================================
+# Signed Releases — cryptographically signed, provenance-attested artifacts
+# ============================================================================
+# On every published GitHub Release this builds the release artifacts, produces
+# SHA-256 checksums, signs everything with Sigstore cosign (keyless / OIDC),
+# generates SLSA build provenance, and uploads the signatures + provenance as
+# release assets. This is what OpenSSF Scorecard's "Signed-Releases" check
+# looks for (cosign *.sig/*.pem and in-toto/SLSA provenance on release assets).
+#
+# IMPORTANT: a release with NO signed assets scores low on Signed-Releases and
+# can DRAG the aggregate Scorecard score down. Activate this and re-publish the
+# latest release (or cut a new tag) so the artifacts get signed.
+#
+# All tooling is free and open source (cosign, GitHub OIDC attestations).
+#
+# ---------------------------------------------------------------------------
+# To activate: copy this file to .github/workflows/release-signing.yml on the
+# default branch (a token with Workflows write access is required to add it).
+# ---------------------------------------------------------------------------
+name: Sign Release Artifacts
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to sign (e.g. v2.1.0)'
+        required: true
+
+permissions:
+  contents: write      # upload assets to the release
+  id-token: write      # keyless cosign + attestations (OIDC)
+  attestations: write  # actions/attest-build-provenance
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
+    steps:
+      - name: Checkout the released tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build release artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p dist-release
+          # 1) Harness package tarball (reproducible npm pack).
+          ( cd tools/soac-harness && npm ci && npm pack --pack-destination "$GITHUB_WORKSPACE/dist-release" )
+          # 2) Source archive of the tagged tree.
+          git archive --format=tar.gz -o "dist-release/soac-enterprise-${TAG}-source.tar.gz" "$TAG"
+          # 3) Checksums over every artifact.
+          ( cd dist-release && sha256sum * > SHA256SUMS )
+          ls -l dist-release
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Sign artifacts (keyless)
+        run: |
+          set -euo pipefail
+          cd dist-release
+          for f in *; do
+            [ "$f" = "SHA256SUMS" ] && continue
+            cosign sign-blob --yes \
+              --output-signature "${f}.sig" \
+              --output-certificate "${f}.pem" \
+              "$f"
+          done
+          cosign sign-blob --yes \
+            --output-signature "SHA256SUMS.sig" \
+            --output-certificate "SHA256SUMS.pem" \
+            SHA256SUMS
+
+      - name: Generate SLSA build provenance
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: 'dist-release/*.tgz, dist-release/*.tar.gz'
+
+      - name: Upload signed assets to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" dist-release/* --clobber

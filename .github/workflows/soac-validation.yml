@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: '24'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
         working-directory: tools/soac-harness
       - name: Run SOaC validation
         run: npm run validate

@@ -1,0 +1,36 @@
+# ============================================================================
+# ClusterFuzzLite — scheduled batch fuzzing + corpus pruning
+# ============================================================================
+# Longer periodic fuzzing run that builds a persistent corpus (cached in the
+# repo's GitHub Actions cache) so PR runs start warm. Free/OSS tooling.
+#
+# ---------------------------------------------------------------------------
+# To activate: copy this file to .github/workflows/cflite-batch.yml on the
+# default branch (a token with Workflows write access is required to add it).
+# ---------------------------------------------------------------------------
+name: ClusterFuzzLite batch fuzzing
+on:
+  schedule:
+    - cron: '23 4 * * *'   # daily 04:23 UTC
+  workflow_dispatch:
+permissions: read-all
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer: [none]
+    steps:
+      - name: Build fuzzers
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: javascript
+          sanitizer: ${{ matrix.sanitizer }}
+      - name: Run fuzzers
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 900
+          mode: 'batch'
+          sanitizer: ${{ matrix.sanitizer }}
