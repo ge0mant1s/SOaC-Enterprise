@@ -1,0 +1,42 @@
+# ============================================================================
+# ClusterFuzzLite — PR fuzzing (continuous dynamic analysis)
+# ============================================================================
+# Runs the Jazzer.js fuzz targets in tools/soac-harness/fuzz/ on every pull
+# request for a short budget, catching crashes/regressions before merge.
+# This is the integration OpenSSF Scorecard's "Fuzzing" check detects.
+#
+# All tooling is free and open source (ClusterFuzzLite + Jazzer.js).
+#
+# ---------------------------------------------------------------------------
+# To activate: copy this file to .github/workflows/cflite-pr.yml on the default
+# branch (a token with Workflows write access is required to add it).
+# ---------------------------------------------------------------------------
+name: ClusterFuzzLite PR fuzzing
+on:
+  pull_request:
+    paths:
+      - 'tools/soac-harness/**'
+      - '.clusterfuzzlite/**'
+      - '.github/workflows/cflite-pr.yml'
+permissions: read-all
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: cflite-pr-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Build fuzzers
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@v1
+        with:
+          language: javascript
+          sanitizer: none
+      - name: Run fuzzers
+        uses: google/clusterfuzzlite/actions/run_fuzzers@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 300
+          mode: 'code-change'
+          sanitizer: none
+          output-sarif: true
