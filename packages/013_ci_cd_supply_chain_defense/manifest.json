@@ -47,6 +47,15 @@
   ],
   "description": "Defends against CI/CD supply chain attacks involving version tag mutation, artifact poisoning, and secret harvesting from build runners. Grounded in the March 2026 Trivy-action compromise pattern.",
   "threat_pattern": "Adversaries steal privileged CI/CD tokens, mutate trusted tags, poison build artifacts, harvest runner secrets, and exfiltrate credentials or staged artifacts to attacker-controlled destinations.",
+  "mitre": [
+    "T1195.002",
+    "T1552.001",
+    "T1552.004",
+    "T1078.004",
+    "T1567.001",
+    "T1528",
+    "T1550.001"
+  ],
   "mitre_techniques": [
     "T1195.002",
     "T1552.001",

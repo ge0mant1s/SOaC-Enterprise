@@ -16,6 +16,7 @@ FILES=(
   clusterfuzzlite-batch.yml
   dynamic-analysis.yml
   sbom.yml
+  soac-drift-detection.yml
 )
 
 for f in "${FILES[@]}"; do
