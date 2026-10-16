@@ -12,7 +12,7 @@
     "js-yaml": "^5.4.3"
   },
   "devDependencies": {
-    "@jazzer.js/core": "2.1.0",
+    "@jazzer.js/core": "4.0.0",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.5",
     "@types/node": "^26.6.5",
