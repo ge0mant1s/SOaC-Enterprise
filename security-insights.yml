@@ -155,9 +155,9 @@ repository:
         type: other
         comment: |
           Recurring OpenSSF OSPS Baseline evaluation (Security Slam Mechanizer,
-          Option 1). Staged in patches/workflows/osps-baseline.yml; active once
-          synced to .github/workflows/ and a read-only PVTR_GITHUB_TOKEN secret
-          is configured. Assesses Maturity Level 1 on a weekly schedule.
+          Option 1). Live in .github/workflows/osps-baseline.yml, authenticated
+          with the built-in read-only job token. Assesses Maturity Level 1 on
+          every push to main and on a weekly schedule.
         rulesets:
           - osps-baseline-2026-08
         integration:
