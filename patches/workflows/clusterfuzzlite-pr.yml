@@ -40,3 +40,4 @@ jobs:
           mode: 'code-change'
           sanitizer: address
           output-sarif: true
+
