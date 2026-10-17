@@ -87,6 +87,60 @@ npm test          # Jest unit + integration tests
 npm run validate  # validates all packages in packages/
 ```
 
+## Building from Source
+
+<!-- OSPS-DO-07.01: how to build the software, including required libraries and dependencies. -->
+
+SOaC-Enterprise has two parts that are built independently.
+
+**Prerequisites**
+
+- **Python 3.11+** and `pip` — for the framework runtime and the detection/response content under `packages/` and `integration/`.
+- **Node.js 20+** and `npm` — for the TypeScript validation harness under `tools/soac-harness/`.
+- `git` to clone the repository.
+
+**Build and verify the Python framework**
+
+```bash
+git clone https://github.com/ge0mant1s/SOaC-Enterprise.git
+cd SOaC-Enterprise
+pip install -r requirements.txt
+```
+
+**Build the validation harness**
+
+The harness is a TypeScript project executed through `ts-node`/`ts-jest`, so the
+build step is a type-check compile under `strict` mode followed by the validators.
+
+```bash
+cd tools/soac-harness
+npm ci               # install locked dependencies from package-lock.json
+npx tsc --noEmit     # compile/type-check the harness under strict mode
+npm test             # Jest unit + integration tests
+npm run validate     # validate every package in packages/
+```
+
+There is no separate release binary: releases are the signed source tree plus the
+CycloneDX SBOM in `sbom/` and the provenance attestation produced by the release
+workflow. See [`docs/SUPPLY_CHAIN.md`](docs/SUPPLY_CHAIN.md) for how to verify a
+release.
+
+## Dependency Management
+
+<!-- OSPS-DO-06.01: how dependencies are selected, obtained, and tracked. -->
+
+- **Python** dependencies are pinned in `requirements.txt`; **npm** dependencies
+  for the harness are locked in `tools/soac-harness/package-lock.json`. Always
+  install from the lockfile (`npm ci`) so builds are reproducible.
+- New dependencies must be actively maintained, carry an OSI-approved license
+  compatible with Apache-2.0, and be introduced through a pull request so the
+  Dependency Review check can flag any known HIGH/CRITICAL advisory before merge.
+- **Dependabot** keeps GitHub Actions and npm dependencies current (version
+  updates) and opens security-update pull requests for vulnerable transitive
+  dependencies.
+- Supply-chain controls, SBOM generation, and release signing are documented in
+  [`docs/SUPPLY_CHAIN.md`](docs/SUPPLY_CHAIN.md).
+
 ## Reporting Security Vulnerabilities
 
 Do **not** open public issues for security problems. Follow [SECURITY.md](SECURITY.md) and report privately via GitHub Private Vulnerability Reporting.

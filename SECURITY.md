@@ -10,6 +10,10 @@ the `main` branch, which is the only actively supported line.
 | `main` (latest) | ✅ |
 | older tags / snapshots | ❌ |
 
+## EU Cyber Resilience Act (CRA) Readiness
+
+We do not anticipate this project being used in commercial products. See [LF-Supported Projects and CRA Readiness](https://openssf.org/wp-content/uploads/2026/09/LF-Supported-Projects-and-CRA-Readiness-2026-09-10.pdf) for more information.
+
 ## Reporting a Vulnerability
 
 **Please do not open a public issue for security vulnerabilities.**
