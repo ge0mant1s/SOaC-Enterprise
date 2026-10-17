@@ -1,0 +1,79 @@
+# OSPS Baseline results published to grc.store, for the Security Slam
+# Mechanizer badge (Option 2) and the REQUIRED evidence for the Defender badge.
+#
+# DO NOT sync this into .github/workflows/ yet. It only runs green once a
+# grc.store namespace exists and this repository is bound as a trusted publisher.
+# Owner steps (see reports/21-security-slam-badges-handoff.md, Defender section):
+#   1. Obtain a grc.store account inside a steward/enterprise (or request access).
+#   2. Create an enterprise-owned namespace; put its slug below in NAMESPACE.
+#   3. Bind ge0mant1s/SOaC-Enterprise as a trusted publisher on that namespace,
+#      ref refs/heads/main.
+#   4. Replace NAMESPACE below, add this file to tools/sync-workflows.sh FILES,
+#      run the sync script, commit, then trigger once with `gh workflow run`.
+#
+# Pinning note: the only `uses:` is the publish workflow, which the hub REQUIRES
+# by tag (@v1), not SHA — a SHA-pinned call fails the hub's identity check.
+name: Publish OSPS Baseline results to grc.store
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Run the scan but publish nothing (bundles land in the pvtr-bundles artifact)"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "17 6 * * 1" # Weekly, Mondays 06:17 UTC
+  # Never push or pull_request: the hub stores one log per target and catalog
+  # every ten minutes and refuses the rest with rate_limited, which fails the
+  # run. After merging a fix, publish with `gh workflow run` instead.
+
+permissions: {}
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # Read the latest release tag
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Latest release tag
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName 2>/dev/null || echo v0.0.0)
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
+  results:
+    needs: version
+    permissions:
+      contents: read # The scanner reads this repository through the job token
+      id-token: write # Trusted publishing to the hub and the Sigstore signing identity
+      security-events: write
+    # By tag, not SHA, on purpose: the hub compares the signing certificate's
+    # workflow ref to this exact tag and rejects a SHA-pinned call.
+    uses: revanite-io/pvtr-publish-results/.github/workflows/publish.yml@v1 # zizmor: ignore[unpinned-uses] the hub requires the tag
+    with:
+      target: NAMESPACE/soac-enterprise@${{ needs.version.outputs.version }}
+      license: CC0-1.0 # SPDX expression the result is published under
+      dry-run: ${{ inputs.dry-run == true }}
+    secrets:
+      # Inline because the plugin reads its token only from these config vars.
+      # The job token is read-only and scoped to this repository; settings it
+      # cannot read (org MFA, some admin settings) report "Needs Review".
+      config: |
+        targets:
+          soac-enterprise:
+            plugin: openssf/github-repo
+            policy:
+              catalogs:
+                - osps-baseline
+              applicability:
+                - maturity-1 # The project's Baseline level
+            vars:
+              owner: ge0mant1s
+              repo: SOaC-Enterprise
+              token: ${{ secrets.GITHUB_TOKEN }}

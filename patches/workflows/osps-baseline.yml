@@ -1,0 +1,55 @@
+# OSPS Baseline evaluation for the Security Slam Mechanizer badge (Option 1: the scanner action).
+# Actions pinned to full commit SHAs resolved from the GitHub API on 2026-10-17.
+# Staged here because the PR connector cannot write .github/workflows/*; run
+# tools/sync-workflows.sh to copy it into .github/workflows/.
+#
+# One-time owner setup before this runs green: create a fine-grained, READ-ONLY
+# personal access token limited to this repository and store it as the repository
+# secret PVTR_GITHUB_TOKEN (the action's built-in GITHUB_TOKEN is not accepted).
+name: OSPS Baseline
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Weekly, Mondays 09:00 UTC
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  # Never cancel a scan partway through; let the running one finish
+  cancel-in-progress: false
+
+jobs:
+  assess:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      security-events: write # Only needed when upload-sarif is "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: OSPS Baseline scan
+        uses: revanite-io/osps-baseline-action@1af7ff8b44af83f120b20cc5f63b877286849257 # v1.5.2
+        with:
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          # Fine-grained read-only PAT scoped to this repository.
+          token: ${{ secrets.PVTR_GITHUB_TOKEN }}
+          catalog: "osps-baseline-2026-08"
+          upload-sarif: "true"
+          fail-on-error: "true"
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: osps-baseline-results-${{ github.run_number }}
+          path: evaluation_results/
+          retention-days: 30
