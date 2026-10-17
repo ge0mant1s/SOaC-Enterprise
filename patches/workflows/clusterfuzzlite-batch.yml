@@ -34,3 +34,4 @@ jobs:
           fuzz-seconds: 900
           mode: 'batch'
           sanitizer: ${{ matrix.sanitizer }}
+

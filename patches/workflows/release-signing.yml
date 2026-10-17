@@ -43,11 +43,11 @@ jobs:
       TAG: ${{ github.event.release.tag_name || github.event.inputs.tag }}
     steps:
       - name: Checkout the released tag
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.TAG }}
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '20'
 
@@ -64,7 +64,7 @@ jobs:
           ls -l dist-release
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@d7543c93d881b35a8faa02e8e3605f69b7a1ce62 # v3.10.0
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Sign artifacts (keyless)
         run: |
@@ -99,4 +99,5 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "$TAG" dist-release/* --clobber
+
 
