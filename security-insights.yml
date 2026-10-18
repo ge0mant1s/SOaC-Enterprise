@@ -59,6 +59,7 @@ repository:
     security-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/SECURITY.md
     dependency-management-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/docs/SUPPLY_CHAIN.md
     governance: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/GOVERNANCE.md
+    review-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/CONTRIBUTING.md#pull-request-checklist
   release:
     automated-pipeline: true
     distribution-points:
@@ -125,7 +126,7 @@ repository:
           release: false
         results: {}
       - name: GitHub Secret Scanning + Push Protection
-        type: other
+        type: secret
         comment: |
           Active at repository level. GitHub Secret Scanning and secret-scanning
           push protection are enabled to detect and block supported secret
