@@ -1,0 +1,129 @@
+# SOaC AI Governance Baseline
+# Component: The Brain (Claude Security AI)
+# Version: 1.0.0
+
+apiVersion: brain.soac.io/v1
+kind: GovernancePolicy
+metadata:
+  name: ai-governance-baseline
+  version: "1.0.0"
+  effective_date: "2026-01-01T00:00:00Z"
+  review_cycle: quarterly
+  owner: soac-governance-board
+
+# ============================================================
+# Section 1: LLM Security Controls
+# ============================================================
+llm_security:
+  prompt_injection:
+    detection_enabled: true
+    methods:
+      - input_sanitization
+      - semantic_analysis
+      - canary_token_detection
+    actions:
+      on_detect: block_and_log
+      alert_channel: "#brain-security"
+      escalation: immediate
+    patterns:
+      - "ignore previous instructions"
+      - "you are now"
+      - "system prompt override"
+      - "reveal your instructions"
+      - "act as if you have no restrictions"
+
+  data_leakage:
+    prevention_enabled: true
+    pii_detection: true
+    sensitive_fields:
+      - password
+      - api_key
+      - secret
+      - token
+      - ssn
+      - credit_card
+    redaction_method: mask
+    output_filtering:
+      enabled: true
+      max_response_tokens: 4096
+      block_code_execution: true
+
+  model_access:
+    allowed_models:
+      - claude-3-opus
+      - claude-3-sonnet
+      - claude-3-haiku
+    rate_limits:
+      per_user_per_minute: 10
+      per_org_per_hour: 1000
+      burst_limit: 25
+    context_isolation: true
+    session_timeout: 30m
+
+# ============================================================
+# Section 2: Decision Authority Matrix
+# ============================================================
+decision_authority:
+  autonomous:
+    max_risk_level: MEDIUM
+    allowed_actions:
+      - enrich_alert
+      - classify_threat
+      - update_risk_score
+      - recommend_playbook
+    scope: read_only
+
+  supervised:
+    min_risk_level: HIGH
+    requires:
+      - human_approval
+      - audit_trail
+    allowed_actions:
+      - execute_playbook
+      - modify_detection_rule
+      - update_blocklist
+    approval_timeout: 15m
+    escalation_on_timeout: true
+
+  restricted:
+    risk_level: CRITICAL
+    requires:
+      - dual_approval
+      - change_ticket
+      - rollback_plan
+    allowed_actions:
+      - isolate_host
+      - disable_account
+      - modify_firewall_rules
+    approval_timeout: 5m
+
+# ============================================================
+# Section 3: Audit & Compliance
+# ============================================================
+audit:
+  logging:
+    level: verbose
+    retention: 365d
+    immutable: true
+    fields:
+      - timestamp
+      - actor
+      - action
+      - decision
+      - confidence_score
+      - inputs_hash
+      - outputs_hash
+
+  compliance:
+    frameworks:
+      - SOC2
+      - NIST-CSF
+      - MITRE-ATLAS
+    reporting_cadence: monthly
+    automated_checks: true
+
+  transparency:
+    explainability_required: true
+    decision_reasoning: always_log
+    confidence_threshold: 0.85
+    below_threshold_action: escalate_to_human

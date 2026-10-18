@@ -1,0 +1,171 @@
+# CLAW Playbook: Isolate Compromised Host
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: isolate-compromised-host
+  version: "1.1.0"
+  author: soac-core-team
+  created: "2026-02-01T00:00:00Z"
+  tags:
+    - endpoint
+    - containment
+    - ransomware
+  mitre_attack:
+    - T1486  # Data Encrypted for Impact
+    - T1059  # Command and Scripting Interpreter
+    - T1068  # Exploitation for Privilege Escalation
+  severity: CRITICAL
+
+spec:
+  description: >
+    Isolates a compromised endpoint detected by CrowdStrike or
+    Microsoft Defender. Applies network containment, kills malicious
+    processes, and preserves forensic artifacts.
+
+  trigger:
+    source: BODY
+    conditions:
+      - field: detection_type
+        operator: contains
+        value: "ransomware"
+      - field: confidence
+        operator: gt
+        value: 85
+    cooldown: 2m
+
+  inputs:
+    - name: host_id
+      type: string
+      required: true
+      source: detection
+    - name: hostname
+      type: string
+      required: true
+      source: detection
+    - name: malicious_pids
+      type: array
+      required: false
+      source: detection
+    - name: threat_actor
+      type: string
+      required: false
+      source: enrichment
+
+  steps:
+    - id: verify_host
+      name: Verify Host Identity
+      action: api_call
+      target: crowdstrike
+      params:
+        endpoint: /devices/entities/devices/v2
+        method: GET
+        filter: "device_id:'${host_id}'"
+      timeout: 10s
+      on_failure: abort
+
+    - id: contain_host
+      name: Network Contain Host
+      action: api_call
+      target: crowdstrike
+      params:
+        endpoint: /devices/entities/devices-actions/v2
+        method: POST
+        action_name: contain
+        ids:
+          - ${host_id}
+      timeout: 30s
+      retry:
+        max_attempts: 3
+        backoff: exponential
+      on_failure: escalate
+
+    - id: kill_processes
+      name: Kill Malicious Processes
+      action: script
+      target: crowdstrike_rtr
+      params:
+        command: kill
+        pids: ${malicious_pids}
+      timeout: 20s
+      conditions:
+        - when: malicious_pids != null
+          then: execute
+      on_failure: continue
+
+    - id: snapshot_memory
+      name: Capture Memory Snapshot
+      action: script
+      target: crowdstrike_rtr
+      params:
+        command: memdump
+        output: /forensics/${hostname}_${timestamp}.raw
+      timeout: 120s
+      on_failure: continue
+
+    - id: push_edge_block
+      name: Edge Firewall Block
+      action: api_call
+      target: edge_enforcement
+      params:
+        action: block_host
+        scope: network
+        identifier: ${host_id}
+        ip_addresses: ${host_ips}
+        duration: 48h
+        hmac_signed: true
+      timeout: 5s
+      on_failure: escalate
+
+    - id: create_ticket
+      name: Create IR Ticket
+      action: api_call
+      target: jira
+      params:
+        project: SOC
+        issue_type: Incident
+        priority: Critical
+        summary: "[CLAW] Host Isolated: ${hostname}"
+        description: >
+          Automated containment executed.
+          Host: ${hostname}
+          Threat Actor: ${threat_actor}
+          Detection Confidence: ${confidence}%
+      on_failure: continue
+
+  outputs:
+    - name: containment_status
+      type: string
+      source: contain_host
+    - name: forensic_artifact
+      type: string
+      source: snapshot_memory
+    - name: ticket_id
+      type: string
+      source: create_ticket
+
+  rollback:
+    enabled: true
+    steps:
+      - id: lift_containment
+        name: Remove Network Containment
+        action: api_call
+        target: crowdstrike
+        params:
+          endpoint: /devices/entities/devices-actions/v2
+          method: POST
+          action_name: lift_containment
+          ids:
+            - ${host_id}
+      - id: remove_edge_block
+        name: Remove Edge Firewall Block
+        action: api_call
+        target: edge_enforcement
+        params:
+          action: unblock_host
+          identifier: ${host_id}
+
+  governance:
+    requires_approval: false
+    max_blast_radius: single_user
+    audit_level: verbose
+    brain_oversight: true

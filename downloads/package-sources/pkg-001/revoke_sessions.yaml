@@ -1,0 +1,138 @@
+# CLAW Playbook: Revoke Compromised Sessions
+apiVersion: claw.soac.io/v1
+kind: Playbook
+metadata:
+  name: revoke-compromised-sessions
+  version: "1.2.0"
+  author: soac-core-team
+  created: "2026-01-15T00:00:00Z"
+  tags:
+    - session-hijack
+    - identity
+    - aitm
+  mitre_attack:
+    - T1557.001  # Adversary-in-the-Middle
+    - T1078.004  # Valid Accounts: Cloud
+  severity: CRITICAL
+
+spec:
+  description: >
+    Revokes all active sessions for a compromised user account detected
+    via AitM phishing or session token theft. Enforces re-authentication
+    across all connected identity providers.
+
+  trigger:
+    source: BODY
+    conditions:
+      - field: detection_type
+        operator: eq
+        value: "aitm_session_hijack"
+      - field: risk_score
+        operator: eq
+        value: "CRITICAL"
+    cooldown: 5m
+
+  inputs:
+    - name: actor_email
+      type: string
+      required: true
+      source: detection
+    - name: session_ids
+      type: array
+      required: true
+      source: detection
+    - name: source_ips
+      type: array
+      required: false
+      source: enrichment
+
+  steps:
+    - id: enrich_user
+      name: Enrich User Context
+      action: api_call
+      target: okta
+      params:
+        endpoint: /api/v1/users/${actor_email}
+        method: GET
+      timeout: 10s
+      retry:
+        max_attempts: 3
+        backoff: exponential
+      on_failure: abort
+
+    - id: revoke_okta_sessions
+      name: Revoke All Okta Sessions
+      action: api_call
+      target: okta
+      params:
+        endpoint: /api/v1/users/${user_id}/sessions
+        method: DELETE
+      timeout: 15s
+      retry:
+        max_attempts: 2
+        backoff: linear
+      on_failure: escalate
+
+    - id: revoke_azure_tokens
+      name: Revoke Azure AD Refresh Tokens
+      action: api_call
+      target: microsoft_graph
+      params:
+        endpoint: /v1.0/users/${actor_email}/revokeSignInSessions
+        method: POST
+      timeout: 15s
+      retry:
+        max_attempts: 2
+        backoff: linear
+      on_failure: continue
+
+    - id: notify_edge
+      name: Push Block to Edge Enforcement
+      action: api_call
+      target: edge_enforcement
+      params:
+        action: block_session
+        scope: user
+        identifier: ${actor_email}
+        duration: 24h
+        hmac_signed: true
+      timeout: 5s
+      on_failure: escalate
+
+    - id: notify_soc
+      name: Alert SOC Team
+      action: notify
+      target: slack
+      params:
+        channel: "#soc-critical"
+        message: >
+          🚨 CLAW Playbook Executed: revoke-compromised-sessions
+          User: ${actor_email}
+          Sessions Revoked: ${session_count}
+          Risk: CRITICAL
+      on_failure: continue
+
+  outputs:
+    - name: sessions_revoked
+      type: number
+      source: revoke_okta_sessions
+    - name: enforcement_id
+      type: string
+      source: notify_edge
+
+  rollback:
+    enabled: true
+    steps:
+      - id: restore_sessions
+        name: Re-enable User Sessions
+        action: api_call
+        target: okta
+        params:
+          endpoint: /api/v1/users/${user_id}/lifecycle/activate
+          method: POST
+
+  governance:
+    requires_approval: false
+    max_blast_radius: single_user
+    audit_level: verbose
+    brain_oversight: true

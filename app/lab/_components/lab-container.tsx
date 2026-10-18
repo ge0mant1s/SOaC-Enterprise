@@ -10,6 +10,7 @@ import type { ScenarioData } from './lab-terminal';
 import LabGraph from './lab-graph';
 import scenariosJson from '@/data/scenarios.json';
 import packagesData from '@/data/packages.json';
+import { GITHUB_RELEASE_LATEST_DOWNLOAD_BASE } from '@/lib/constants';
 
 interface LabContainerProps {
   pkgId?: string | null;
@@ -95,7 +96,7 @@ export default function LabContainer({ pkgId }: LabContainerProps) {
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   {session ? (
                     <a
-                      href={`/api/downloads/file?path=${encodeURIComponent(`downloads/packages/${pkg.id}.zip`)}`}
+                      href={`${GITHUB_RELEASE_LATEST_DOWNLOAD_BASE}/${pkg.id}.zip`}
                       download={`${pkg.id}.zip`}
                       className="flex items-center gap-2 px-4 py-2 rounded-md bg-terminal/20 text-terminal text-sm font-mono border border-terminal/30 hover:bg-terminal/30 transition-all"
                     >

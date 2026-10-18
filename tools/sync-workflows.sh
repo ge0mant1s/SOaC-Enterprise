@@ -10,22 +10,38 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"
 
+MODE="${1:-apply}"
+if [[ "$MODE" != "apply" && "$MODE" != "--check" ]]; then
+  echo "usage: bash tools/sync-workflows.sh [apply|--check]" >&2
+  exit 2
+fi
+
 FILES=(
   release-signing.yml
+  dependency-review.yml
   clusterfuzzlite-pr.yml
   clusterfuzzlite-batch.yml
   dynamic-analysis.yml
   sbom.yml
   soac-drift-detection.yml
   osps-baseline.yml
+  soac-validation.yml
   # publish-results.yml is intentionally NOT listed: it must not go live until a
   # grc.store namespace exists and this repo is bound as a trusted publisher.
   # Add it here only after that setup (see the Defender handoff).
 )
 
 for f in "${FILES[@]}"; do
-  cp "patches/workflows/$f" ".github/workflows/$f"
-  echo "copied patches/workflows/$f -> .github/workflows/$f"
+  if [[ "$MODE" == "--check" ]]; then
+    if ! cmp -s "patches/workflows/$f" ".github/workflows/$f"; then
+      echo "MISMATCH: patches/workflows/$f != .github/workflows/$f" >&2
+      exit 1
+    fi
+    echo "match: $f"
+  else
+    cp "patches/workflows/$f" ".github/workflows/$f"
+    echo "copied patches/workflows/$f -> .github/workflows/$f"
+  fi
 done
 
 echo
@@ -43,7 +59,7 @@ else
 fi
 
 echo
-echo "All good. Now commit and push:"
+echo "All good. Now commit and push (or run with --check in CI):"
 echo "  git add .github/workflows/"
 echo '  git commit -m "fix(scorecard): apply pinned/least-privilege workflow fixes to live workflows"'
 echo "  git push"

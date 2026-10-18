@@ -1,7 +1,7 @@
 header:
   schema-version: 2.2.0
-  last-updated: '2026-10-17'
-  last-reviewed: '2026-10-17'
+  last-updated: '2026-10-18'
+  last-reviewed: '2026-10-18'
   url: https://github.com/ge0mant1s/SOaC-Enterprise/raw/main/security-insights.yml
   comment: |
     OpenSSF Security Insights for SOaC-Enterprise. Single-repository file
@@ -124,6 +124,23 @@ repository:
           ci: false
           release: false
         results: {}
+      - name: GitHub Secret Scanning + Push Protection
+        type: other
+        comment: |
+          Active at repository level. GitHub Secret Scanning and secret-scanning
+          push protection are enabled to detect and block supported secret
+          patterns before they land on the default branch.
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: false
+          release: false
+        results:
+          ci:
+            name: Repository secret-scanning settings
+            predicate-uri: https://docs.github.com/code-security/secret-scanning/about-secret-scanning
+            location: https://github.com/ge0mant1s/SOaC-Enterprise/settings/security_analysis
       - name: Dependency Review
         type: SCA
         comment: |

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Package, ExternalLink, Terminal, Download, Lock, Info, FileArchive, Loader2, ShieldCheck } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import packagesData from '@/data/packages.json';
-import { GITHUB_REPO } from '@/lib/constants';
+import { GITHUB_REPO, GITHUB_RELEASE_LATEST_DOWNLOAD_BASE } from '@/lib/constants';
 import { trackGithubPivot, trackPackageDownload } from '@/lib/analytics';
 import PackageBundler from './package-bundler';
 
@@ -26,10 +26,8 @@ export default function PackagesContent() {
     setDownloadingId(pkgId);
     trackPackageDownload(pkgId);
 
-    // Try local file first, fall back to GitHub repo
-    const localPath = `downloads/packages/${pkgId}.zip`;
     const a = document.createElement('a');
-    a.href = `/api/downloads/file?path=${encodeURIComponent(localPath)}`;
+    a.href = `${GITHUB_RELEASE_LATEST_DOWNLOAD_BASE}/${pkgId}.zip`;
     a.download = `${pkgId}.zip`;
     document.body.appendChild(a);
     a.click();

@@ -1,0 +1,8 @@
+# Package archives are release assets, not repository contents.
+*.zip
+*.tar
+*.tgz
+*.gz
+
+# Keep this placeholder tracked.
+!.gitignore

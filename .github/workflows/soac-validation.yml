@@ -28,6 +28,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
         working-directory: tools/soac-harness
+
+      - name: Ensure no committed package archives in repository
+        run: |
+          set -euo pipefail
+          if find downloads/packages -type f \( -name '*.zip' -o -name '*.tar' -o -name '*.tgz' -o -name '*.gz' \) | grep -q .; then
+            echo "Committed package archives are not allowed under downloads/packages/."
+            echo "Build and publish pkg-001..pkg-011 as release assets instead."
+            find downloads/packages -type f
+            exit 1
+          fi
+
       - name: Run SOaC validation
         run: npm run validate
         working-directory: tools/soac-harness

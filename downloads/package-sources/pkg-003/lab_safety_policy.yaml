@@ -1,0 +1,120 @@
+# SOaC Lab Safety Policy
+# Component: Policy as Code
+# Version: 1.0.0
+
+apiVersion: policy.soac.io/v1
+kind: SafetyPolicy
+metadata:
+  name: lab-safety-policy
+  version: "1.0.0"
+  scope: simulation_environment
+  effective_date: "2026-01-01T00:00:00Z"
+
+# ============================================================
+# Lab vs Production Enforcement
+# ============================================================
+environments:
+  lab:
+    description: >
+      Simulation environment for training, testing, and demonstration.
+      All actions are non-destructive and produce synthetic telemetry.
+    enforcement_mode: simulate
+    data_source: synthetic
+    network_access: isolated
+    persistence: ephemeral
+    max_session_duration: 4h
+    concurrent_users: 50
+
+  staging:
+    description: >
+      Pre-production validation environment with sanitized real data.
+    enforcement_mode: dry_run
+    data_source: sanitized_production
+    network_access: restricted
+    persistence: temporary
+    max_session_duration: 8h
+    requires_approval: true
+
+  production:
+    description: >
+      Live security operations environment.
+    enforcement_mode: enforce
+    data_source: live
+    network_access: full
+    persistence: permanent
+    requires_approval: true
+    dual_control: true
+
+# ============================================================
+# Simulation Safety Rules
+# ============================================================
+simulation_rules:
+  allowed_actions:
+    - generate_synthetic_alerts
+    - simulate_playbook_execution
+    - test_detection_rules
+    - preview_enforcement_actions
+    - run_tabletop_exercises
+
+  blocked_actions:
+    - modify_production_rules
+    - access_real_credentials
+    - execute_live_containment
+    - modify_firewall_rules
+    - access_pii_data
+
+  synthetic_data:
+    ip_ranges:
+      - 10.0.0.0/8
+      - 192.168.0.0/16
+    domains:
+      - "*.lab.soac.internal"
+    users:
+      prefix: "sim_user_"
+      count: 100
+    threats:
+      actors:
+        - "SIM-APT-Alpha"
+        - "SIM-Ransomware-Beta"
+        - "SIM-Insider-Gamma"
+
+# ============================================================
+# Access Control
+# ============================================================
+access_control:
+  roles:
+    lab_user:
+      permissions:
+        - run_simulations
+        - view_results
+        - export_reports
+    lab_admin:
+      permissions:
+        - all_lab_user_permissions
+        - create_scenarios
+        - modify_synthetic_data
+        - manage_sessions
+    security_engineer:
+      permissions:
+        - all_lab_admin_permissions
+        - promote_to_staging
+        - review_playbooks
+
+  authentication:
+    method: sso
+    mfa_required: true
+    session_binding: ip_and_user_agent
+
+# ============================================================
+# Audit & Monitoring
+# ============================================================
+audit:
+  all_actions_logged: true
+  log_retention: 90d
+  alerting:
+    production_access_attempt:
+      severity: CRITICAL
+      action: block_and_notify
+    data_exfiltration_attempt:
+      severity: HIGH
+      action: terminate_session
