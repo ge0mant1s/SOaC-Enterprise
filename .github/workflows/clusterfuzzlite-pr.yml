@@ -1,43 +1,86 @@
 # ============================================================================
-# ClusterFuzzLite — PR fuzzing (continuous dynamic analysis)
+# PR fuzzing (Jazzer.js) — continuous dynamic analysis
 # ============================================================================
-# Runs the Jazzer.js fuzz targets in tools/soac-harness/fuzz/ on every pull
-# request for a short budget, catching crashes/regressions before merge.
-# This is the integration OpenSSF Scorecard's "Fuzzing" check detects.
+# Runs the Jazzer.js fuzz targets in tools/soac-harness/fuzz/ on pull requests
+# that touch the harness, for a short budget, starting from the corpus the daily
+# batch run keeps in the Actions cache (restore only; PRs never write it).
 #
-# All tooling is free and open source (ClusterFuzzLite + Jazzer.js).
+# The ClusterFuzzLite actions are not used because they cannot fuzz JavaScript
+# (sanitizer mismatch; see clusterfuzzlite-batch.yml). The .clusterfuzzlite/
+# build config stays in the repo for Scorecard's Fuzzing check.
 #
-# ---------------------------------------------------------------------------
-# To activate: copy this file to .github/workflows/cflite-pr.yml on the default
-# branch (a token with Workflows write access is required to add it).
-# ---------------------------------------------------------------------------
+# Staged in patches/workflows/; applied by tools/sync-workflows.sh.
 name: ClusterFuzzLite PR fuzzing
 on:
   pull_request:
     paths:
       - 'tools/soac-harness/**'
       - '.clusterfuzzlite/**'
-      - '.github/workflows/cflite-pr.yml'
-permissions: read-all
+      - '.github/workflows/clusterfuzzlite-pr.yml'
+permissions:
+  contents: read
 jobs:
   fuzz:
+    name: fuzz (jazzer.js)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     concurrency:
       group: cflite-pr-${{ github.ref }}
       cancel-in-progress: true
+    defaults:
+      run:
+        working-directory: tools/soac-harness
+    env:
+      FUZZ_SECONDS_PER_TARGET: 300
+      CORPUS_DIR: ${{ github.workspace }}/.fuzz-corpus
+      ARTIFACT_DIR: ${{ github.workspace }}/.fuzz-artifacts
     steps:
-      - name: Build fuzzers
-        id: build
-        uses: google/clusterfuzzlite/actions/build_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          language: javascript
-          sanitizer: address
-      - name: Run fuzzers
-        uses: google/clusterfuzzlite/actions/run_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          fuzz-seconds: 300
-          mode: 'code-change'
-          sanitizer: address
-          output-sarif: true
+          persist-credentials: false
 
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '20'
+
+      - name: Restore corpus from the batch run
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .fuzz-corpus
+          key: jazzer-corpus-pr-${{ github.run_id }}
+          restore-keys: jazzer-corpus-
+
+      - name: Install locked dependencies and build
+        run: |
+          npm ci
+          npx tsc -p .
+
+      - name: Fuzz
+        run: |
+          set -uo pipefail
+          mkdir -p "$ARTIFACT_DIR"
+          status=0
+          for target in fuzz/*.fuzz.js; do
+            name="$(basename "$target" .fuzz.js)"
+            mkdir -p "$CORPUS_DIR/$name"
+            echo "::group::fuzz $name (${FUZZ_SECONDS_PER_TARGET}s)"
+            npx jazzer "$target" --sync -- "$CORPUS_DIR/$name" \
+              -max_total_time="$FUZZ_SECONDS_PER_TARGET" \
+              -artifact_prefix="$ARTIFACT_DIR/$name-" || status=$?
+            echo "::endgroup::"
+          done
+          if [ "$status" -ne 0 ]; then
+            echo "::error::Fuzzing found a crash (exit $status). Reproducer uploaded as the fuzz-crashes artifact."
+          fi
+          exit "$status"
+
+      - name: Upload crash reproducers
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: fuzz-crashes
+          path: .fuzz-artifacts/
+          if-no-files-found: ignore
+          retention-days: 30
