@@ -1,0 +1,67 @@
+apiVersion: soac.io/v1
+kind: PackageMetadata
+
+package:
+  id: "pkg-009"
+  name: "Data Exfiltration & Staging"
+  version: "1.0.0"
+  description: "Detect data staging, compression, and exfiltration over C2 channels and legitimate cloud services."
+  author: "SOaC Community"
+  created: "2026-03-16T00:00:00Z"
+  updated: "2026-03-16T00:00:00Z"
+  status: "released"
+  license: "Apache-2.0"
+
+threat:
+  mitre_attack:
+    - technique_id: "T1560"
+      technique_name: "Archive Collected Data"
+      tactic: "Collection"
+    - technique_id: "T1041"
+      technique_name: "Exfiltration Over C2 Channel"
+      tactic: "Exfiltration"
+    - technique_id: "T1567"
+      technique_name: "Exfiltration Over Web Service"
+      tactic: "Exfiltration"
+  threat_actors: []
+  severity: "CRITICAL"
+
+artifacts:
+  detections:
+    - path: "detection.yaml"
+      name: "data-exfiltration-staging-detection"
+      platforms: ["sigma"]
+  playbooks:
+    - path: "playbook.yaml"
+      name: "data-exfiltration-containment"
+      severity: "CRITICAL"
+  policies:
+    - path: "policy.yaml"
+      name: "data-exfiltration-lab-policy"
+      scope: "package"
+  simulations:
+    - scenario_id: "pkg-009"
+      name: "Data Exfiltration & Staging Lab Scenario"
+
+stakeholders:
+  - role: "soc"
+    relevance: "primary"
+  - role: "detection"
+    relevance: "primary"
+  - role: "ciso"
+    relevance: "secondary"
+
+signals_required:
+  - name: "DLP logs"
+    type: "log"
+  - name: "Network flow data"
+    type: "network"
+  - name: "Cloud storage audit logs"
+    type: "cloud"
+
+dependencies: []
+
+validation:
+  harness_level: 2
+  last_validated: "2026-03-16T00:00:00Z"
+  evidence_bundle: ""

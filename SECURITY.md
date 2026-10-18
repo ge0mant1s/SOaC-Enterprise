@@ -82,3 +82,14 @@ this repository. The security simulation and "abuse defense" packages (for
 example `packages/011_genai_llm_abuse_defense`) intentionally contain **synthetic,
 non-functional** sample artifacts for training and detection testing; these are
 not live secrets or exploits.
+
+
+## Secret scanning and push protection
+
+Repository-level **GitHub Secret Scanning** and **Secret Scanning Push Protection**
+are enabled for this repository. This blocks commits that contain supported
+secret patterns unless the committer explicitly bypasses the block in GitHub.
+
+- Settings page: <https://github.com/ge0mant1s/SOaC-Enterprise/settings/security_analysis>
+- Coverage note: push protection validates supported provider and partner
+  patterns; additional manual review still applies for non-provider patterns.

@@ -1,0 +1,40 @@
+| ============================================================
+| SOaC Detection Rule: AitM Phishing - Okta Session Hijack
+| Component: The Body (Detection Library)
+| Platform: Splunk Enterprise Security
+| MITRE ATT&CK: T1557.001 (AitM), T1078.004 (Cloud Accounts)
+| Threat Actors: 0APT, Crimson Collective
+| Version: 1.2.0
+| ============================================================
+
+index=okta sourcetype=OktaIM2:log
+| spath output=eventType path=eventType
+| spath output=actor_email path=actor.alternateId
+| spath output=client_ip path=client.ipAddress
+| spath output=client_geo path=client.geographicalContext.country
+| spath output=auth_provider path=authenticationContext.externalSessionId
+| spath output=user_agent path=client.userAgent.rawUserAgent
+| spath output=outcome path=outcome.result
+| where eventType IN ("user.session.start", "user.authentication.sso")
+| stats
+    dc(client_ip) as unique_ips,
+    dc(client_geo) as unique_geos,
+    values(client_ip) as ip_list,
+    values(client_geo) as geo_list,
+    values(user_agent) as ua_list,
+    count as event_count,
+    earliest(_time) as first_seen,
+    latest(_time) as last_seen
+    by actor_email, auth_provider
+| eval time_window_seconds = last_seen - first_seen
+| where unique_ips > 2 AND unique_geos > 1 AND time_window_seconds < 300
+| eval risk_score = case(
+    unique_geos >= 3, "CRITICAL",
+    unique_ips >= 4, "HIGH",
+    1=1, "MEDIUM"
+  )
+| eval detection_id = "BODY-AITM-OKTA-" . md5(actor_email . auth_provider)
+| table detection_id, actor_email, risk_score, unique_ips, unique_geos,
+        ip_list, geo_list, ua_list, event_count, time_window_seconds,
+        first_seen, last_seen
+| sort - risk_score

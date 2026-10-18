@@ -4,7 +4,7 @@
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/15446/badge)](https://www.bestpractices.dev/projects/15446)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ge0mant1s/SOaC-Enterprise/badge)](https://scorecard.dev/viewer/?uri=github.com/ge0mant1s/SOaC-Enterprise)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Version](https://img.shields.io/badge/Version-2.1.0-green.svg)](https://github.com/ge0mant1s/SOaC-Enterprise/releases/tag/v2.1.0)
+[![Version](https://img.shields.io/badge/Version-2.1.2-green.svg)](https://github.com/ge0mant1s/SOaC-Enterprise/releases/latest)
 [![Framework](https://img.shields.io/badge/Framework-SOaC--Standard-orange.svg)]()
 
 **SOaC-Enterprise** is a scientific, vendor-agnostic framework designed to transform the Security Operations Center (SOC) from a reactive monitoring hub into an autonomous, code-driven defense engine. By treating security logic as **First-Class Software**, we resolve the "Linear Defense Paradox" and collapse breakout times to under 5 minutes.

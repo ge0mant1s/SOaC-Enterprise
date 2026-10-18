@@ -59,8 +59,11 @@ jobs:
           ( cd tools/soac-harness && npm ci && npm pack --pack-destination "$GITHUB_WORKSPACE/dist-release" )
           # 2) Source archive of the tagged tree.
           git archive --format=tar.gz -o "dist-release/soac-enterprise-${TAG}-source.tar.gz" "$TAG"
-          # 3) Checksums over every artifact.
-          ( cd dist-release && sha256sum * > SHA256SUMS )
+          # 3) Package ZIP assets (pkg-001..pkg-011), built reproducibly from tracked source.
+          python3 tools/package-zips/build_release_zips.py --output-dir dist-release
+          rm -f dist-release/package-zips-manifest.json
+          # 4) Checksums over every artifact.
+          ( cd dist-release && sha256sum ./* > SHA256SUMS )
           ls -l dist-release
 
       - name: Install cosign
@@ -70,11 +73,12 @@ jobs:
         run: |
           set -euo pipefail
           cd dist-release
-          for f in *; do
-            [ "$f" = "SHA256SUMS" ] && continue
+          for f in ./*; do
+            b="${f#./}"
+            [ "$b" = "SHA256SUMS" ] && continue
             cosign sign-blob --yes \
-              --output-signature "${f}.sig" \
-              --output-certificate "${f}.pem" \
+              --output-signature "${b}.sig" \
+              --output-certificate "${b}.pem" \
               "$f"
           done
           cosign sign-blob --yes \
