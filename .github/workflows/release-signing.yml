@@ -79,11 +79,13 @@ jobs:
             cosign sign-blob --yes \
               --output-signature "${b}.sig" \
               --output-certificate "${b}.pem" \
+              --bundle "${b}.sigstore.json" \
               "$f"
           done
           cosign sign-blob --yes \
             --output-signature "SHA256SUMS.sig" \
             --output-certificate "SHA256SUMS.pem" \
+            --bundle "SHA256SUMS.sigstore.json" \
             SHA256SUMS
 
       - name: Generate SLSA build provenance
