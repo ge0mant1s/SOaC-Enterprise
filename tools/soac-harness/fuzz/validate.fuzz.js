@@ -9,7 +9,8 @@
  * leak a parser/validator exception to the caller.
  *
  * Run locally:   npx jazzer fuzz/validate.fuzz.js
- * Run in CI:     via ClusterFuzzLite (see .clusterfuzzlite/).
+ * Run in CI:     .github/workflows/clusterfuzzlite-{pr,batch}.yml run Jazzer.js
+ *                directly (build config for OSS-Fuzz/ClusterFuzzLite: .clusterfuzzlite/).
  */
 'use strict';
 const fs = require('fs');
