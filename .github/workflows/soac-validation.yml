@@ -40,11 +40,15 @@ jobs:
           fi
 
 
-      - name: Ensure Security Insights mirror is in sync
+      - name: Ensure Security Insights mirrors are in sync
         run: |
           set -euo pipefail
           cmp -s security-insights.yml .github/security-insights.yml || {
             echo "security-insights.yml and .github/security-insights.yml must be byte-identical"
+            exit 1
+          }
+          cmp -s security-insights.yml github/security-insights.yml || {
+            echo "security-insights.yml and github/security-insights.yml must be byte-identical"
             exit 1
           }
 
