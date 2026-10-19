@@ -1,0 +1,189 @@
+header:
+  schema-version: 2.2.0
+  last-updated: '2026-10-18'
+  last-reviewed: '2026-10-18'
+  url: https://github.com/ge0mant1s/SOaC-Enterprise/raw/main/security-insights.yml
+  comment: |
+    OpenSSF Security Insights for SOaC-Enterprise. Single-repository file
+    containing project, repository, and security sections. Maintainers should
+    update contact details and review this file at least annually.
+
+project:
+  name: SOaC-Enterprise
+  homepage: https://soacframe.io
+  administrators:
+    - name: ge0mant1s
+      affiliation: SOaC Community
+      email: 14939233+ge0mant1s@users.noreply.github.com
+      social: https://github.com/ge0mant1s
+      primary: true
+  repositories:
+    - name: SOaC-Enterprise
+      url: https://github.com/ge0mant1s/SOaC-Enterprise
+      comment: |
+        Core repository for the Security-Operations-as-Code framework.
+  documentation:
+    detailed-guide: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/README.md
+    quickstart-guide: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/README.md
+    signature-verification: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/docs/SUPPLY_CHAIN.md
+    support-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/SECURITY.md
+  vulnerability-reporting:
+    reports-accepted: true
+    bug-bounty-available: false
+    policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/SECURITY.md
+    contact:
+      name: ge0mant1s
+      email: 14939233+ge0mant1s@users.noreply.github.com
+      primary: true
+    comment: >-
+      Report vulnerabilities privately through GitHub Private Vulnerability
+      Reporting:
+      https://github.com/ge0mant1s/SOaC-Enterprise/security/advisories/new
+
+repository:
+  url: https://github.com/ge0mant1s/SOaC-Enterprise
+  status: active
+  accepts-change-request: true
+  accepts-automated-change-request: true
+  core-team:
+    - name: ge0mant1s
+      affiliation: SOaC Community
+      email: 14939233+ge0mant1s@users.noreply.github.com
+      social: https://github.com/ge0mant1s
+      primary: true
+  license:
+    url: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/LICENSE
+    expression: Apache-2.0
+  documentation:
+    contributing-guide: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/CONTRIBUTING.md
+    security-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/SECURITY.md
+    dependency-management-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/docs/SUPPLY_CHAIN.md
+    governance: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/GOVERNANCE.md
+    review-policy: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/CONTRIBUTING.md#pull-request-checklist
+  release:
+    automated-pipeline: true
+    distribution-points:
+      - uri: https://github.com/ge0mant1s/SOaC-Enterprise/releases
+        comment: |
+          Signed, tagged releases (v2.1.x) published through GitHub Releases with
+          provenance attestations.
+    changelog: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/CHANGELOG.md
+    attestations:
+      - name: SOaC validation harness CycloneDX SBOM
+        location: https://github.com/ge0mant1s/SOaC-Enterprise/raw/main/sbom/soac-harness.cdx.json
+        predicate-uri: https://cyclonedx.org/
+        comment: |
+          CycloneDX SBOM for the validation harness, kept in sync by CI and
+          attested with OIDC-backed provenance on release.
+  security:
+    assessments:
+      self:
+        evidence: https://github.com/ge0mant1s/SOaC-Enterprise/blob/main/docs/SECURITY_SELF_ASSESSMENT.md
+        date: '2026-10-17'
+        comment: |
+          OSPS self-assessment covering the validation harness, threat packages,
+          and CI/release pipeline, following the OpenSSF security-assessments
+          outline. Reviewed by the maintainer.
+    tools:
+      - name: OpenSSF Scorecard
+        type: SCA
+        comment: |
+          Active. Weekly + on-push workflow publishes results to the public
+          Scorecard API and uploads SARIF to GitHub code scanning.
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results:
+          ci:
+            name: OpenSSF Scorecard
+            predicate-uri: https://github.com/ossf/scorecard
+            location: https://api.securityscorecards.dev/projects/github.com/ge0mant1s/SOaC-Enterprise
+      - name: CodeQL
+        type: SAST
+        comment: |
+          Active. Analyzes JavaScript/TypeScript and Python on PRs, pushes to
+          the default branch, and on a schedule; results in GitHub code scanning.
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results: {}
+      - name: Dependabot
+        type: SCA
+        comment: |
+          Active. Version updates (GitHub Actions + npm) and security updates
+          are enabled; vulnerability alerts are on.
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: false
+          release: false
+        results: {}
+      - name: GitHub Secret Scanning + Push Protection
+        type: secret
+        comment: |
+          Active at repository level. GitHub Secret Scanning and secret-scanning
+          push protection are enabled to detect and block supported secret
+          patterns before they land on the default branch.
+        rulesets:
+          - default
+        integration:
+          adhoc: true
+          ci: false
+          release: false
+        results:
+          ci:
+            name: Repository secret-scanning settings
+            predicate-uri: https://docs.github.com/code-security/secret-scanning/about-secret-scanning
+            location: https://github.com/ge0mant1s/SOaC-Enterprise/settings/security_analysis
+      - name: Dependency Review
+        type: SCA
+        comment: |
+          Staged in patches/workflows/dependency-review.yml; active once copied
+          to .github/workflows/. Blocks pull requests that introduce a known
+          HIGH or CRITICAL advisory before merge.
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results: {}
+      - name: npm sbom + actions/attest-sbom
+        type: other
+        comment: |
+          CycloneDX SBOM for the validation harness is generated and committed
+          under sbom/. The automation (CI freshness check + OIDC-backed
+          attestation on release) is staged in patches/workflows/sbom.yml and
+          active once copied to .github/workflows/.
+        rulesets:
+          - default
+        integration:
+          adhoc: false
+          ci: true
+          release: true
+        results: {}
+      - name: OSPS Baseline Scanner
+        type: other
+        comment: |
+          Recurring OpenSSF OSPS Baseline evaluation (Security Slam Mechanizer,
+          Option 1). Live in .github/workflows/osps-baseline.yml, authenticated
+          with the built-in read-only job token. Assesses Maturity Level 1 on
+          every push to main and on a weekly schedule.
+        rulesets:
+          - osps-baseline-2026-08
+        integration:
+          adhoc: false
+          ci: true
+          release: false
+        results:
+          ci:
+            name: OSPS Baseline evaluation
+            predicate-uri: https://github.com/revanite-io/osps-baseline-action
+            location: https://github.com/ge0mant1s/SOaC-Enterprise/actions/workflows/osps-baseline.yml
