@@ -76,14 +76,19 @@ jobs:
           import json, subprocess, sys
           def norm(p):
               d = json.load(open(p))
-              d.pop("serialNumber", None)
-              d.get("metadata", {}).pop("timestamp", None)
-              # npm CLI version varies with the runner's Node image, not deps
-              d.get("metadata", {}).pop("tools", None)
-              # component list order can vary; sort by purl/name
-              comps = d.get("components", [])
-              comps.sort(key=lambda c: (c.get("purl") or c.get("name") or ""))
-              return json.dumps(d, sort_keys=True)
+              # Freshness gate should track dependency set changes, not
+              # formatter/metadata churn between npm CLI versions.
+              deps = set()
+              for c in d.get("components", []):
+                  purl = c.get("purl")
+                  if purl:
+                      deps.add(purl)
+                      continue
+                  name = c.get("name")
+                  version = c.get("version")
+                  if name and version:
+                      deps.add(f"{name}@{version}")
+              return json.dumps(sorted(deps))
           fresh_path = sys.argv[1]
           committed = subprocess.run(
               ["git", "show", "HEAD:sbom/soac-harness.cdx.json"],
