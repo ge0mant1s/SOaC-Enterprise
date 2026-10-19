@@ -50,7 +50,7 @@ jobs:
           # Built-in repository-scoped job token (read-only via the permissions
           # block above). No secret required. Swap for secrets.PVTR_GITHUB_TOKEN
           # (a fine-grained read-only PAT) to also read org-level settings.
-          token: ${{ github.token }}
+          token: ${{ secrets.PVTR_GITHUB_TOKEN != '' && secrets.PVTR_GITHUB_TOKEN || github.token }}
           catalog: "osps-baseline-2026-08"
           upload-sarif: "true"
           fail-on-error: "false"
