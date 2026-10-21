@@ -1,5 +1,5 @@
 # OSPS Baseline evaluation for the Security Slam Mechanizer badge (Option 1: the scanner action).
-# Actions pinned to full commit SHAs resolved from the GitHub API on 2026-10-17.
+# Actions pinned to full commit SHAs resolved from the GitHub API on 2026-10-21.
 # Staged here because the PR connector cannot write .github/workflows/*; run
 # tools/sync-workflows.sh to copy it into .github/workflows/.
 #
@@ -43,7 +43,7 @@ jobs:
           persist-credentials: false
 
       - name: OSPS Baseline scan
-        uses: revanite-io/osps-baseline-action@1af7ff8b44af83f120b20cc5f63b877286849257 # v1.5.2
+        uses: revanite-io/osps-baseline-action@d0d850b592f1788b2631f1dfdf84d80ea8c720f5 # v1.5.3
         with:
           owner: ${{ github.repository_owner }}
           repo: ${{ github.event.repository.name }}
