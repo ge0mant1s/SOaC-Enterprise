@@ -108,7 +108,7 @@ SOaC-Enterprise launches with a comprehensive library of 11 packages, each targe
 - **Identity & Cloud:** Packages 001 (Identity), 002 (Cloud Control Plane), and 003 (SaaS Pivot) form the "Identity-Led Defense" core.
 - **Endpoint & Perimeter:** Packages 004 (RMM Abuse) and 005 (Perimeter Exploit) address initial access vectors.
 - **Emerging Threats:** Package 006 (GenAI Abuse) is the industry's first SOaC package for LLM-specific threats.
-- **Sector-Specific:** Packages 007-011 provide specialized defense for ICS/SCADA, Financial Services, and Healthcare.
+- **Sector-Specific:** Packages 007-011 provide specialized defense for ICS/SCADA, Financial Services, and other critical sectors.
 
 ---
 

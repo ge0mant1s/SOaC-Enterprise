@@ -16,7 +16,7 @@ bypassing multi-factor authentication.
 
 - **2024 — Microsoft 365 Mass Harvesting**: Multiple threat actors used
   EvilProxy to harvest Microsoft 365 credentials at scale, targeting
-  organizations in financial services and healthcare. Attacks combined
+  organizations in financial services and other regulated sectors. Attacks combined
   AitM phishing with MFA fatigue to compromise accounts resistant to
   standard phishing.
 

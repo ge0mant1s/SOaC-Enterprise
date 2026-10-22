@@ -17,8 +17,8 @@
 
 ### 3. Strategic ROI
 *   **Efficiency:** Reduces SOC alert fatigue by [X]% through AI reasoning.
-*   **Resilience:** Automated "Emergency Stop" protocols for critical data (PHI/PCI).
-*   **Compliance:** Provides verifiable audit trails for [GDPR/HIPAA/DORA].
+*   **Resilience:** Automated "Emergency Stop" protocols for critical data (PII/PCI).
+*   **Compliance:** Provides verifiable audit trails for [GDPR/DORA/NIS2].
 
 ### 4. Implementation Roadmap
 *   **Phase 1:** Integration with existing SIEM/EDR.
