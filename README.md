@@ -73,7 +73,7 @@ python quick_start_validation.py
 | **030** | OpenClaw / ClawHub CVE-2026-25253 | Open-Source Platform Exploitation |
 | **031** | WordPress WP2Shell Chained Takeover | CMS Exploitation Chain |
 | **032** | Windows September 2026 EoP Exploitation | Endpoint Privilege Escalation |
-| **...** | *See /packages for the full 32-package list* | *Healthcare, Finance, ICS/SCADA* |
+| **...** | *See /packages for the full 32-package list* | *Finance, ICS/SCADA, Cloud, Identity* |
 
 ---
 

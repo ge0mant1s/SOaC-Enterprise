@@ -6,4 +6,4 @@ DeviceProcessEvents
     CloudAppEvents
     | where ActionType == "GetBucketLogging" or ActionType == "ListBuckets"
 ) on DeviceId
-| extend DiscoveryType = "Healthcare_SupplyChain_Pivot"
+| extend DiscoveryType = "RMM_Cloud_Credential_Pivot"
