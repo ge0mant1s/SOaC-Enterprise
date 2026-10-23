@@ -10,7 +10,7 @@ pyyaml>=6.0.1
 # AI Reasoning (The Brain)
 openai>=3.28.0
 anthropic>=1.13.0
-langchain>=1.4.4
+langchain>=1.4.6
 
 # Telemetry & SIEM Integration (The Body)
 elasticsearch-dsl>=8.18.0
