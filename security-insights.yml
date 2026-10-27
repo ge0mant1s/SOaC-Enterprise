@@ -1,7 +1,7 @@
 header:
   schema-version: 2.2.0
-  last-updated: '2026-10-21'
-  last-reviewed: '2026-10-21'
+  last-updated: '2026-10-27'
+  last-reviewed: '2026-10-27'
   url: https://github.com/ge0mant1s/SOaC-Enterprise/raw/main/security-insights.yml
   comment: |
     OpenSSF Security Insights for SOaC-Enterprise. Single-repository file
@@ -126,7 +126,7 @@ repository:
           release: false
         results: {}
       - name: GitHub Secret Scanning + Push Protection
-        type: secret-scanning
+        type: secret
         comment: |
           Active at repository level. GitHub Secret Scanning and secret-scanning
           push protection are enabled to detect and block supported secret
