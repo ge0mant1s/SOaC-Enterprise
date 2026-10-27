@@ -51,10 +51,6 @@ jobs:
             echo "security-insights.yml and github/security-insights.yml must be byte-identical"
             exit 1
           }
-          cmp -s security-insights.yml security-insights.yaml || {
-            echo "security-insights.yml and security-insights.yaml must be byte-identical"
-            exit 1
-          }
           cmp -s security-insights.yml .github/security-insights.yaml || {
             echo "security-insights.yml and .github/security-insights.yaml must be byte-identical"
             exit 1
