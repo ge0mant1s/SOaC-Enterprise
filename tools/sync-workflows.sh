@@ -26,9 +26,7 @@ FILES=(
   soac-drift-detection.yml
   osps-baseline.yml
   soac-validation.yml
-  # publish-results.yml is intentionally NOT listed: it must not go live until a
-  # grc.store namespace exists and this repo is bound as a trusted publisher.
-  # Add it here only after that setup (see the Defender handoff).
+  publish-results.yml # grc.store namespace "soac" (Defender)
 )
 
 for f in "${FILES[@]}"; do
