@@ -20,7 +20,7 @@ on:
         type: boolean
         default: false
   schedule:
-    - cron: "17 6 * * 1" # Weekly, Mondays 06:17 UTC
+    - cron: "17 6 * * *" # Daily 06:17 UTC: keeps the grc.store record recurring (Defender: runs on 2+ days)
   push:
     branches: [main]
   # Never pull_request: the hub stores one log per target and catalog every ten
