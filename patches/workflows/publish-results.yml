@@ -1,20 +1,12 @@
 # OSPS Baseline results published to grc.store, for the Security Slam
 # Mechanizer badge (Option 2) and the REQUIRED evidence for the Defender badge.
 #
-# DO NOT sync this into .github/workflows/ yet. It only runs green once a
-# grc.store namespace exists and this repository is bound as a trusted publisher.
-# Follows https://securityslam.com/library/grc-store-setup. Owner steps:
-#   1. Get a grc.store account (request access at https://grc.store/request-access).
-#   2. Create a namespace for the project. A personal namespace ("Owned by: Me")
-#      is fine for the Slam evaluator, which checks only that the target is
-#      verified by GitHub OIDC and bound to this repository. Do NOT use any
-#      employer enterprise. The slug cannot be changed after creation.
-#   3. Namespace admin page -> Trusted publishers -> add ge0mant1s/SOaC-Enterprise
-#      (ref refs/heads/main).
-#   4. Replace NAMESPACE below, add this file to tools/sync-workflows.sh FILES,
-#      run the sync script and commit. The first run registers the target at
-#      https://grc.store/targets/NAMESPACE/soac-enterprise. Defender needs
-#      trusted runs on 2+ different days.
+# Publishes to grc.store namespace "soac" (personal namespace owned by
+# ge0mant1s, created 2026-10-27), with ge0mant1s/SOaC-Enterprise bound as its
+# trusted publisher (OIDC, no secret). Target page:
+#   https://grc.store/targets/soac/soac-enterprise
+# Setup guide: https://securityslam.com/library/grc-store-setup
+# Defender needs trusted runs on 2+ different days, the newest within 30 days.
 #
 # Pinning note: the only `uses:` is the publish workflow, which the hub REQUIRES
 # by tag (@v1), not SHA — a SHA-pinned call fails the hub's identity check.
@@ -63,7 +55,7 @@ jobs:
     # workflow ref to this exact tag and rejects a SHA-pinned call.
     uses: revanite-io/pvtr-publish-results/.github/workflows/publish.yml@v1 # zizmor: ignore[unpinned-uses] the hub requires the tag
     with:
-      target: NAMESPACE/soac-enterprise@${{ needs.version.outputs.version }}
+      target: soac/soac-enterprise@${{ needs.version.outputs.version }}
       license: CC0-1.0 # SPDX expression the result is published under
       dry-run: ${{ inputs.dry-run == true }}
     secrets:
