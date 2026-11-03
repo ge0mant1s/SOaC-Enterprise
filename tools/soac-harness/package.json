@@ -25,6 +25,8 @@
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "^4.3.2"
     },
-    "tar": "7.5.22"
+    "tar": "7.5.22",
+    "minimatch": "11.0.4",
+    "glob": "14.0.3"
   }
 }
