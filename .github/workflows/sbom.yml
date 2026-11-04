@@ -28,6 +28,16 @@ on:
       - 'tools/soac-harness/package.json'
       - 'tools/soac-harness/package-lock.json'
       - '.github/workflows/sbom.yml'
+  # Also on PRs, so a dependency bump that forgets to refresh sbom/ is caught
+  # before merge (stale SBOMs make OSV-Scanner and Scorecard report fixed
+  # vulnerabilities). The attestation step is release/dispatch-only.
+  pull_request:
+    branches: [main]
+    paths:
+      - 'tools/soac-harness/package.json'
+      - 'tools/soac-harness/package-lock.json'
+      - 'sbom/**'
+      - '.github/workflows/sbom.yml'
   release:
     types: [published]
   schedule:
