@@ -9,6 +9,9 @@ CVE/GHSA identifier when one has been assigned.
 
 ## [Unreleased]
 
+### Security
+- `sigma-cli` 3.1.0 -> 4.0.0 (`pysigma` 1.5.1 -> 2.0.2) in `requirements.txt`. This removes `diskcache` 5.6.3 (GHSA-w8v5-vhqr-4h9v / CVE-2025-69872 / PYSEC-2026-2447, unsafe pickle deserialization, no upstream fix); `pysigma` now uses `diskcache-community` 5.8.3 with `SafeDisk`.
+
 ## [2.1.1] - 2026-10-15
 
 Security-hardening release. No changes to threat packages or detection content.

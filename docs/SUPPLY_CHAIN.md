@@ -70,12 +70,17 @@ entry is revisited whenever Dependabot re-flags it.
 
 | Advisory | Package | Path | Why unfixable | Why tolerable here | Accepted |
 |---|---|---|---|---|---|
-| [GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v) / CVE-2025-69872 / PYSEC-2026-2447 | `diskcache 5.6.3` (moderate) | transitive: `sigma-cli 3.1.0` → `pysigma 1.5.1` → `diskcache` (see `requirements.txt`) | `diskcache 5.6.3` is the latest release and the advisory lists **no first-patched-version** (vulnerable `<= 5.6.3`). Every `pysigma` release from 1.0.1 through the latest 2.0.1 declares `diskcache>=5.6.3,<6`, and `sigma-cli 3.1.0` requires `pysigma<2`, so no version bump removes it. | The issue is unsafe `pickle` deserialization of cache contents. In `pysigma`, `diskcache` is used only by `sigma.data.mitre_attack` / `sigma.data.mitre_d3fend` to cache MITRE ATT&CK / D3FEND reference data under the invoking user's `~/.cache/pysigma/` (configurable via `set_cache_dir()`). No SOaC first-party code imports `pysigma` or `diskcache`, and no CI workflow or container installs `requirements.txt`. Exploitation needs write access to that user-owned cache dir, which means the account is already compromised. Operators who run `sigma-cli` on shared hosts should keep `~/.cache/pysigma` at mode `0700`. | 2026-10-15 (re-verified 2026-10-21) |
 | [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4) | `deepmerge 4.3.1` (low) | dev-only, transitive: `jest 30.5.2` → `jest-config` → `deepmerge` (`tools/soac-harness`) | `4.3.1` is the latest release and the advisory lists **no first-patched-version** (vulnerable `>= 4.2.0, <= 4.3.1`); `jest` 30.5.2 is the latest release and still depends on it. | Prototype poisoning in `mergeObject()` needs attacker-controlled source objects. Here it only merges this repository's own jest configuration during local or CI test runs; it is not shipped, and no untrusted input reaches it. Listed in `tools/soac-harness/osv-scanner.toml` and `sbom/osv-scanner.toml` with `ignoreUntil = 2027-02-01`, so OSV-Scanner and the Scorecard Vulnerabilities check force a re-review. Dependabot alert #9 dismissed as *tolerable risk*. | 2026-11-04 |
 
 **Action on the GitHub alert:** dismiss the corresponding Dependabot alert with
 reason *"Risk is tolerable"*, linking this row. Re-open and upgrade as soon as a
-patched `diskcache` (or a `pysigma` that drops it) is published.
+patched release is published.
+
+### Resolved risk acceptances
+
+| Advisory | Package | Resolution | Resolved |
+|---|---|---|---|
+| [GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v) / CVE-2025-69872 / PYSEC-2026-2447 | `diskcache 5.6.3` (moderate; unsafe `pickle` deserialization of cache contents, no patched `diskcache` release) | Accepted as a risk on 2026-10-15 while it came in through `sigma-cli 3.1.0` → `pysigma 1.5.1` → `diskcache`. Removed by moving to `sigma-cli 4.0.0` → `pysigma 2.0.2`, which replaced `diskcache` with the maintained fork `diskcache-community 5.8.3`. That fork carries the fix path for CVE-2025-69872: `pysigma` now opens its MITRE ATT&CK / D3FEND cache with `disk=SafeDisk` (unpickling restricted to built-in types) and the fork creates cache directories with mode `0700`. `diskcache` is no longer in `requirements.txt`, so no OSV ignore was needed. | 2026-11-04 |
 
 ## Standards alignment
 
