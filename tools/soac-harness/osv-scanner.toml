@@ -1,0 +1,9 @@
+# OSV-Scanner configuration (also honoured by the OpenSSF Scorecard
+# Vulnerabilities check). Only genuinely unfixable advisories in development
+# tooling are listed. Each entry has a reason and an expiry date that forces a
+# re-review. The full risk analysis is in docs/SUPPLY_CHAIN.md.
+
+[[IgnoredVulns]]
+id = "GHSA-gcqx-w48m-w2h4"
+ignoreUntil = 2027-02-01
+reason = "deepmerge 4.3.1 (latest; no patched release). Dev-only: pulled in by jest-config to merge this repository's own jest configuration; no untrusted input reaches mergeObject(). Not shipped. Dependabot alert #9 dismissed as tolerable risk. Re-review by 2027-02-01 or when a fix ships."
