@@ -3,7 +3,7 @@
 # Pinned, hash-verified requirements.txt is generated from this file.
 
 # Data Processing & Normalization
-pandas>=3.0.6
+pandas>=3.1.0
 numpy>=2.4.6
 pyyaml>=6.0.1
 
