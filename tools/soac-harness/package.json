@@ -15,7 +15,7 @@
     "@jazzer.js/core": "4.0.0",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.5",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "jest": "^30.5.2",
     "ts-jest": "^29.4.15",
     "ts-node": "^10.9.1",
