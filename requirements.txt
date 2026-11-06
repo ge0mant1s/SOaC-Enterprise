@@ -44,13 +44,13 @@ azure-monitor-query==2.0.0 \
     --hash=sha256:7b05f2fcac4fb67fc9f77a7d4c5d98a0f3099fb73b57c69ec1b080773994671b \
     --hash=sha256:8f52d581271d785e12f49cd5aaa144b8910fb843db2373855a7ef94c7fc462ea
     # via -r requirements.in
-boto3==1.43.115 \
-    --hash=sha256:6667a0c21d48dc125dbba88444bc8a601ce881a99341a0e6169f9333898e620d \
-    --hash=sha256:c0f35e5f9cdf0edb365195e306d5586d3970b224660a11a87a4ec361ec3d7168
+boto3==1.43.123 \
+    --hash=sha256:055fabb990c5d2f31fce4ca569255bd640cdd11a3ca68c9ecad35f4f8a5b83b5 \
+    --hash=sha256:d18d66e1e13faa0c25d0b1b8c5ce946e29fb5fc0b6456b655a93a678ff4cc313
     # via -r requirements.in
-botocore==1.43.118 \
-    --hash=sha256:7f3f9d88cc9e847587690f82a42e3c3c292c3026c92c1e60d68a9310018e003f \
-    --hash=sha256:a45d7ae570674161e4a3542d8c68633bf7503f92d1de781ef7361b79488eda6f
+botocore==1.43.125 \
+    --hash=sha256:e3969c8191d3435440037310187d324f37c00da53987ea31df2eceff19a2795a \
+    --hash=sha256:e3ae5ebbfa8033015958a9cb16cef67a0592902ca8afb46ef06e8ae77475183f
     # via
     #   boto3
     #   s3transfer
