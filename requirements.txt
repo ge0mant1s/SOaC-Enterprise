@@ -31,6 +31,7 @@ anyio==4.15.1 \
     --hash=sha256:9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94
     # via
     #   anthropic
+    #   fastapi
     #   httpx
     #   httpx2
     #   langsmith
@@ -272,9 +273,9 @@ elasticsearch-dsl==8.18.0 \
     --hash=sha256:0522c5bb20c7abae69855109e650bf1166d486cbf706b5e1b29c28936a9102a3 \
     --hash=sha256:763465dba9eae166add10567e924c65730aa122819b08bfe9a077e91b13b30d1
     # via -r requirements.in
-fastapi==0.152.0 \
-    --hash=sha256:8356eab05470647405cf280fa51b34f7693527b9d2e43288d6425970e43db768 \
-    --hash=sha256:ecea8d7b0d00a7a4f4ababc1848593441e6c344cbf40615f5390ce1572f43d78
+fastapi==0.162.7 \
+    --hash=sha256:b7503029c8ef2d2d5fea9049294cf8d0f2805c6621f4677ede269fce19f01efb \
+    --hash=sha256:fa3be857122ec8d91d4d234e86ac19acf4ef23f5c6c3dfcce78ec0c27c0c5ab4
     # via -r requirements.in
 google-re2==1.1.20251105 \
     --hash=sha256:03156291269f145eccddff63118f2df02d395792f51fc039f09955818943815a \
