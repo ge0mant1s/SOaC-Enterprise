@@ -43,4 +43,10 @@ def execute_playbook(alert_id):
     return jsonify({"status": "success", "message": f"Playbook executed for {alert_id}"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Local demo only. The Werkzeug debugger allows arbitrary code execution,
+    # so it is off unless explicitly enabled, and the server binds to loopback.
+    app.run(
+        host=os.environ.get("SOAC_CONSOLE_HOST", "127.0.0.1"),
+        port=int(os.environ.get("SOAC_CONSOLE_PORT", "5000")),
+        debug=os.environ.get("FLASK_DEBUG", "0") == "1",
+    )

@@ -21,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -49,6 +51,12 @@ jobs:
             echo "Keep only the root security-insights.yml (Security Slam Cleaner); remove: $extra"
             exit 1
           fi
+
+      - name: Ensure workflow mirrors match live workflows
+        # Dependabot only edits .github/workflows/; this catches the mirror in
+        # patches/workflows/ drifting. Fix with: bash tools/sync-workflows.sh
+        # after copying the live file into patches/workflows/.
+        run: bash tools/sync-workflows.sh --check
 
       - name: Run SOaC validation
         run: npm run validate

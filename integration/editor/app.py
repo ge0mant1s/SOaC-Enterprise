@@ -39,4 +39,10 @@ def generate_yaml():
     return jsonify({"yaml": yaml_content})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # Local demo only. The Werkzeug debugger allows arbitrary code execution,
+    # so it is off unless explicitly enabled, and the server binds to loopback.
+    app.run(
+        host=os.environ.get("SOAC_EDITOR_HOST", "127.0.0.1"),
+        port=int(os.environ.get("SOAC_EDITOR_PORT", "5001")),
+        debug=os.environ.get("FLASK_DEBUG", "0") == "1",
+    )
