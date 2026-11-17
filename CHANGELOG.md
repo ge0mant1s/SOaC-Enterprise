@@ -11,6 +11,10 @@ CVE/GHSA identifier when one has been assigned.
 
 ### Security
 - `sigma-cli` 3.1.0 -> 4.0.0 (`pysigma` 1.5.1 -> 2.0.2) in `requirements.txt`. This removes `diskcache` 5.6.3 (GHSA-w8v5-vhqr-4h9v / CVE-2025-69872 / PYSEC-2026-2447, unsafe pickle deserialization, no upstream fix); `pysigma` now uses `diskcache-community` 5.8.3 with `SafeDisk`.
+- Demo Flask apps (`integration/console`, `integration/editor`) no longer start with the Werkzeug debugger on; debug is opt-in via `FLASK_DEBUG=1` and the server binds to `127.0.0.1` (CodeQL `py/flask-debug`).
+- Workflows: `persist-credentials: false` on every checkout, no package-manager cache in the release and SBOM jobs, step output passed via env in release signing (zizmor: artipacked, cache-poisoning, template-injection; now 0 findings).
+- CodeQL now also analyses GitHub Actions workflows (`actions` language).
+- Added `.github/CODEOWNERS`; CI now fails if `patches/workflows/` drifts from `.github/workflows/` (re-synced `release-signing.yml` and `osps-baseline.yml` after Dependabot bumps).
 
 ## [2.1.1] - 2026-10-15
 

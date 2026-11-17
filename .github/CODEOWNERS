@@ -1,0 +1,8 @@
+# Default owner for every path. Review by a code owner is required on main.
+*                    @ge0mant1s
+
+# Security-sensitive paths
+/.github/            @ge0mant1s
+/patches/workflows/  @ge0mant1s
+/security-insights.yml @ge0mant1s
+/SECURITY.md         @ge0mant1s

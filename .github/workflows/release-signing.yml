@@ -46,10 +46,15 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ env.TAG }}
+          # Assets are uploaded with `gh` + GH_TOKEN below; git never needs
+          # the token, so don't leave it in .git/config.
+          persist-credentials: false
 
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '20'
+          # Release builds must not restore a shared cache (cache poisoning).
+          package-manager-cache: false
 
       - name: Build release artifacts
         run: |
@@ -97,7 +102,9 @@ jobs:
       - name: Attach provenance to the release
         # The attestation is also stored on GitHub (gh attestation verify); a copy
         # is attached as *.intoto.jsonl so it travels with the artifacts.
-        run: cp "${{ steps.provenance.outputs.bundle-path }}" "dist-release/soac-enterprise-${TAG}.intoto.jsonl"
+        env:
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
+        run: cp "$BUNDLE_PATH" "dist-release/soac-enterprise-${TAG}.intoto.jsonl"
 
       - name: Upload signed assets to the release
         env:

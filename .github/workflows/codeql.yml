@@ -39,7 +39,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript-typescript', 'python']
+        # `actions` scans the workflow files themselves (injection, unpinned
+        # or over-privileged steps).
+        language: ['actions', 'javascript-typescript', 'python']
 
     steps:
       - name: Checkout repository
