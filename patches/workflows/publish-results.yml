@@ -28,8 +28,21 @@ on:
 
 permissions: {}
 
+# The hub accepts one log per target per catalog every 10 minutes and answers
+# 429 rate_limited otherwise (seen 2026-11-20 when six Dependabot PRs were
+# merged within six minutes). A burst of pushes collapses to the newest run.
+concurrency:
+  group: publish-results-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   version:
+    # Dependabot merges come in batches and only bump dependencies; the daily
+    # schedule publishes them. Checked on the commit author, because the push
+    # actor is whoever clicked merge. Other pushes, dispatches and cron run.
+    if: >-
+      github.event_name != 'push' ||
+      github.event.head_commit.author.name != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read # Read the latest release tag
