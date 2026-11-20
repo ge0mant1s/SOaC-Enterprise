@@ -1321,9 +1321,9 @@ s3transfer==0.19.2 \
     --hash=sha256:ba0309fd86be3c27dbf78cdd813c13c5e1df16e5874b99d2535ebbdfb9892993 \
     --hash=sha256:d8168eccca828cbb2cd573675333f3bddd254313a9c42494b84c76b539e8ba25
     # via boto3
-sigma-cli==4.0.0 \
-    --hash=sha256:0656315d4727796b8a1556bfc274c11352ed306fa6d52ffcd85b25c47cac4ce6 \
-    --hash=sha256:161a84ea5fabd649701cedd5e49fd16f2debecbac43c56917d6180f32ac15d8d
+sigma-cli==4.0.1 \
+    --hash=sha256:24eb7213fc2d8d9b0577cda7188f256382beba0e9adc7de8907bafd62fd475f9 \
+    --hash=sha256:8cd43d2be4d2de81a5f65da9b1ea2cffc0d57562d08550504bdb921deadac349
     # via -r requirements.in
 six==1.17.0 \
     --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
