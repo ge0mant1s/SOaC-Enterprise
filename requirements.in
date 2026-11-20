@@ -15,7 +15,7 @@ langchain>=1.5.0
 # Telemetry & SIEM Integration (The Body)
 elasticsearch-dsl>=8.18.0
 azure-monitor-query>=2.0.0
-boto3>=1.44.3
+boto3>=1.44.4
 
 # API & Web Interface (The Console)
 fastapi>=0.162.7
