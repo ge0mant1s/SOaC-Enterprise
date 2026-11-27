@@ -46,9 +46,33 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read # Read the latest release tag
+      actions: read # Find the last successful publish run (hub rate-limit window)
     outputs:
       version: ${{ steps.tag.outputs.version }}
     steps:
+      # Two merges a few minutes apart (seen 2026-11-27, #175 then #176) are not
+      # concurrent, so the concurrency group cannot collapse them and the second
+      # publish got 429. Wait out the rest of the hub's 10-minute window since
+      # the last successful run; a newer push still cancels this run while it waits.
+      - name: Wait for the hub's rate-limit window
+        if: inputs.dry-run != true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WINDOW_SECONDS: "660" # 10 min hub window + 1 min margin
+        run: |
+          set -euo pipefail
+          last=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow publish-results.yml \
+            --status success --limit 1 --json updatedAt --jq '.[0].updatedAt // empty' || true)
+          if [ -z "$last" ]; then echo "No previous successful publish found"; exit 0; fi
+          elapsed=$(( $(date -u +%s) - $(date -u -d "$last" +%s) ))
+          remaining=$(( WINDOW_SECONDS - elapsed ))
+          if [ "$remaining" -gt 0 ]; then
+            echo "Last successful publish finished at $last (${elapsed}s ago); waiting ${remaining}s"
+            sleep "$remaining"
+          else
+            echo "Last successful publish finished at $last (${elapsed}s ago); no wait needed"
+          fi
+
       - name: Latest release tag
         id: tag
         env:
