@@ -18,7 +18,7 @@ azure-monitor-query>=2.0.0
 boto3>=1.44.4
 
 # API & Web Interface (The Console)
-fastapi>=0.162.7
+fastapi>=0.165.0
 uvicorn>=0.54.0
 jinja2>=3.1.6
 
