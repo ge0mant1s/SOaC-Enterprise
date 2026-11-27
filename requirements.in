@@ -9,7 +9,7 @@ pyyaml>=6.0.1
 
 # AI Reasoning (The Brain)
 openai>=3.35.1
-anthropic>=2.9.0
+anthropic>=2.13.0
 langchain>=1.5.0
 
 # Telemetry & SIEM Integration (The Body)
