@@ -14,6 +14,7 @@ CVE/GHSA identifier when one has been assigned.
 - Demo Flask apps (`integration/console`, `integration/editor`) no longer start with the Werkzeug debugger on; debug is opt-in via `FLASK_DEBUG=1` and the server binds to `127.0.0.1` (CodeQL `py/flask-debug`).
 - Workflows: `persist-credentials: false` on every checkout, no package-manager cache in the release and SBOM jobs, step output passed via env in release signing (zizmor: artipacked, cache-poisoning, template-injection; now 0 findings).
 - CodeQL now also analyses GitHub Actions workflows (`actions` language).
+- `GOVERNANCE.md` documents the single-maintainer review policy, its compensating controls, and the accepted Scorecard `Code-Review` / `Branch-Protection` findings.
 - Added `.github/CODEOWNERS`; CI now fails if `patches/workflows/` drifts from `.github/workflows/` (re-synced `release-signing.yml` and `osps-baseline.yml` after Dependabot bumps).
 
 ## [2.1.1] - 2026-10-15
